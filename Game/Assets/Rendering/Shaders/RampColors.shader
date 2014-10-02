@@ -3,7 +3,7 @@
 		_MainTex ("Ramp (RGB)", 2D) = "white" {}
 	}
 	SubShader {
-		Tags { "RenderType"="Opaque" }
+		Tags { "RenderType"="Opaque"}
 		LOD 200
 
 		CGPROGRAM
@@ -11,9 +11,60 @@
 
 		sampler2D _MainTex;
 		
+// ------------------------------------------------------------------
+// HSV code from http://chilliant.blogspot.com/2010/11/rgbhsv-in-hlsl.html
+float3 Hue(float H)
+{
+	float R = abs(H * 6 - 3) - 1;
+	float G = 2 - abs(H * 6 - 2);
+	float B = 2 - abs(H * 6 - 4);
+	return saturate(float3(R,G,B));
+}
+
+float4 HSVtoRGB(in float3 HSV)
+{
+	return float4(((Hue(HSV.x) - 1) * HSV.y + 1) * HSV.z,1);
+}
+
+float3 RGBtoHSV(in float3 RGB)
+{
+	float3 HSV = 0;
+	HSV.z = max(RGB.r, max(RGB.g, RGB.b));
+	float M = min(RGB.r, min(RGB.g, RGB.b));
+	float C = HSV.z - M;
+	if (C != 0)
+	{
+		HSV.y = C / HSV.z;
+		float3 Delta = (HSV.z - RGB) / C;
+		Delta.rgb -= Delta.brg;
+		Delta.rg += float2(2,4);
+
+		// Original conditional statements:
+		// if (RGB.r >= HSV.z)
+		// 	HSV.x = Delta.b;
+		// else if (RGB.g >= HSV.z)
+		// 	HSV.x = Delta.r;
+		// else
+		// 	HSV.x = Delta.g;
+
+		// Rewritten to avoid branches and minimize register usage:
+		HSV.x = Delta.g;
+		HSV.x = Delta.r * (RGB.g >= HSV.z);
+		HSV.x = Delta.b * (RGB.r >= HSV.z);
+
+		HSV.x = frac(HSV.x / 6);
+	}
+	return HSV;
+}
+// ------------------------------------------------------------------
 		struct Input {
 			float2 uv_MainTex;
 		};
+		
+		float4 LightingMyDiffuse_PrePass(SurfaceOutput i, float4 light)
+	{
+		return float4(i.Albedo * light.rgb, 1.0);
+	}
 		
 		void rampcolor (Input IN, SurfaceOutput o, inout fixed4 color) {
 			float y = 0;
@@ -27,7 +78,14 @@
 			y = 3.5 / 4.0;
 			}
 			color = saturate(color);
-			color = tex2D(_MainTex, float2(color.r, y));
+			
+			half3 lightinghsv = RGBtoHSV(float3 (color.r, color.g, color.b));
+			
+			fixed4 lightcolor = color; // has lighting information... just want the base color :/
+			//half3 lightcolorHSV = RGBtoHSV(_LightColor0.rgb);
+			
+			color = tex2D(_MainTex, float2(lightinghsv.z, y));
+
 			//color = float4(0.988,0.690,0.251,1.0);		
 			//color *= 0.6;	
 		}
