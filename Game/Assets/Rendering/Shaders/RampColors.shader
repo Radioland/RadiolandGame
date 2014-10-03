@@ -8,6 +8,7 @@
 
 		CGPROGRAM
 		#pragma surface surf Lambert finalcolor:rampcolor
+		#include "UnityCG.cginc"
 
 		sampler2D _MainTex;
 		
@@ -39,18 +40,12 @@ float3 RGBtoHSV(in float3 RGB)
 		Delta.rgb -= Delta.brg;
 		Delta.rg += float2(2,4);
 
-		// Original conditional statements:
-		// if (RGB.r >= HSV.z)
-		// 	HSV.x = Delta.b;
-		// else if (RGB.g >= HSV.z)
-		// 	HSV.x = Delta.r;
-		// else
-		// 	HSV.x = Delta.g;
-
-		// Rewritten to avoid branches and minimize register usage:
-		HSV.x = Delta.g;
-		HSV.x = Delta.r * (RGB.g >= HSV.z);
-		HSV.x = Delta.b * (RGB.r >= HSV.z);
+		if (RGB.r >= HSV.z)
+		 HSV.x = Delta.b;
+		else if (RGB.g >= HSV.z)
+		 HSV.x = Delta.r;
+		else
+		 HSV.x = Delta.g;
 
 		HSV.x = frac(HSV.x / 6);
 	}
@@ -62,9 +57,10 @@ float3 RGBtoHSV(in float3 RGB)
 		};
 		
 		float4 LightingMyDiffuse_PrePass(SurfaceOutput i, float4 light)
-	{
-		return float4(i.Albedo * light.rgb, 1.0);
-	}
+		{
+			//i.Emission = light.rgb;
+			return float4(i.Albedo * light.rgb, 1.0);
+		}
 		
 		void rampcolor (Input IN, SurfaceOutput o, inout fixed4 color) {
 			float y = 0;
@@ -84,8 +80,12 @@ float3 RGBtoHSV(in float3 RGB)
 			fixed4 lightcolor = color; // has lighting information... just want the base color :/
 			//half3 lightcolorHSV = RGBtoHSV(_LightColor0.rgb);
 			
+			
+			fixed lumi = Luminance(color);
 			color = tex2D(_MainTex, float2(lightinghsv.z, y));
-
+			//color = tex2D(_MainTex, float2(lumi, y));
+			
+			//color = float4(o.Emission.rgb,1.0);
 			//color = float4(0.988,0.690,0.251,1.0);		
 			//color *= 0.6;	
 		}
