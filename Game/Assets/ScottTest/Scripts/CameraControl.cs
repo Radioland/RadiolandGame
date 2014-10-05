@@ -8,7 +8,7 @@ public class CameraControl : MonoBehaviour
     // The camera moves around a sphere centered on the player.
     // The radius is affected by the current zoom level.
     // The two angles are controlled by mouse input.
-    public float radius = 10.0f;
+    [Range(5.0f, 30.0f)] public float radius = 10.0f;
     public float verticalAngle = 20.0f; // X-Axis Euler Angle
     public float horizontalAngle = 0.0f; // Y-Axis Euler Angle
 
