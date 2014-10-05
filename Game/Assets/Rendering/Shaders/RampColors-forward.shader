@@ -1,4 +1,4 @@
-﻿Shader "Custom/RampColors" {
+﻿Shader "Custom/RampColors-forward" {
 	Properties {
 		_MainTex ("Ramp (RGB)", 2D) = "white" {}
 	}
@@ -56,6 +56,12 @@ float3 RGBtoHSV(in float3 RGB)
 			float2 uv_MainTex;
 		};
 		
+		float4 LightingMyDiffuse_PrePass(SurfaceOutput i, float4 light)
+		{
+			//i.Emission = light.rgb;
+			return float4(i.Albedo * light.rgb, 1.0);
+		}
+		
 		void rampcolor (Input IN, SurfaceOutput o, inout fixed4 color) {
 			float y = 0;
 			if (IN.uv_MainTex.y < 0.25) {
@@ -65,10 +71,8 @@ float3 RGBtoHSV(in float3 RGB)
 			} else if (IN.uv_MainTex.y < 0.75) {
 				y = 2.5 / 4.0;
 			} else {
-				y = 3.5 / 4.0;
+			y = 3.5 / 4.0;
 			}
-			y = IN.uv_MainTex.y;
-			
 			color = saturate(color);
 			
 			half3 lightinghsv = RGBtoHSV(float3 (color.r, color.g, color.b));
