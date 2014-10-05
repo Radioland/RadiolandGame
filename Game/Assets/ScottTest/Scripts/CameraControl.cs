@@ -32,14 +32,17 @@ public class CameraControl : MonoBehaviour
         Vector3 position = player.transform.position;
         position -= player.transform.forward * radius;
 
+        // Adjust this depending on the model's orientation.
         horizontalAngle = -player.transform.eulerAngles.y - 90;
 
         float phi = horizontalAngle * Mathf.Deg2Rad;
         float theta = verticalAngle * Mathf.Deg2Rad;
 
+        // Calculate the point on the unit sphere with the provided angles.
         float x = Mathf.Cos(theta) * Mathf.Cos(phi);
         float y = Mathf.Sin(theta);
         float z = Mathf.Cos(theta) * Mathf.Sin(phi);
+        // Offset from the player by the vector to that point at the given radius.
         Vector3 offset = new Vector3(x, y, z);
         transform.position = player.transform.position + offset * radius;
 
