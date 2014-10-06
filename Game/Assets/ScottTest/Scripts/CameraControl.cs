@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraControl : MonoBehaviour
 {
-    public GameObject player;
+    public Transform cameraTransform;
 
     // The camera moves around a sphere centered on the player.
     // The radius is affected by the current zoom level.
@@ -18,7 +18,7 @@ public class CameraControl : MonoBehaviour
     private float lastMouseY;
 
     void Awake() {
-        if (!player) { player = GameObject.FindWithTag("Player"); }
+        if (!cameraTransform) { cameraTransform = Camera.main.transform; }
 
         verticalAngle = defaultVerticalAngle;
         horizontalAngle = 0.0f;
@@ -40,7 +40,7 @@ public class CameraControl : MonoBehaviour
             // Default behavior.
             // Rotate horizontalAngle towards the player's orientation.
             // Maintain a constant verticalAngle.
-            horizontalAngle = -player.transform.eulerAngles.y + offsetHorizontal;
+            horizontalAngle = -transform.eulerAngles.y + offsetHorizontal;
             verticalAngle = defaultVerticalAngle;
         } else {
             // Mouse controlled camera rotation.
@@ -59,9 +59,9 @@ public class CameraControl : MonoBehaviour
         float z = Mathf.Cos(theta) * Mathf.Sin(phi);
         // Offset from the player by the vector to that point at the given radius.
         Vector3 offset = new Vector3(x, y, z);
-        transform.position = player.transform.position + offset * radius;
+        cameraTransform.position = transform.position + offset * radius;
 
-        transform.LookAt(player.transform.position);
+        cameraTransform.LookAt(transform.position);
 
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
