@@ -4,6 +4,7 @@ using System.Collections;
 public class CameraControl : MonoBehaviour
 {
     public Transform cameraTransform;
+    public CharacterMovement characterMovement;
 
     // The camera moves around a sphere centered on the player.
     // The radius is affected by the current zoom level.
@@ -19,6 +20,9 @@ public class CameraControl : MonoBehaviour
 
     void Awake() {
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
+        if (!characterMovement) {
+            Debug.LogWarning("No character movement set on CameraControl!");
+        }
 
         verticalAngle = defaultVerticalAngle;
         horizontalAngle = 0.0f;
@@ -40,8 +44,10 @@ public class CameraControl : MonoBehaviour
             // Default behavior.
             // Rotate horizontalAngle towards the player's orientation.
             // Maintain a constant verticalAngle.
-            horizontalAngle = -transform.eulerAngles.y + offsetHorizontal;
-            verticalAngle = defaultVerticalAngle;
+            if (characterMovement.playerMoving) {
+                horizontalAngle = -transform.eulerAngles.y + offsetHorizontal;
+                verticalAngle = defaultVerticalAngle;
+            }
         } else {
             // Mouse controlled camera rotation.
             float mouseDeltaX = Input.mousePosition.x - lastMouseX;
