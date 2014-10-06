@@ -45,8 +45,8 @@ public class CharacterMovement : MonoBehaviour
 
     void Update() {
         bool inputReceived = false;
-        if (Mathf.Abs(Input.GetAxis("Horizontal")) >= 1.0 ||
-            Mathf.Abs(Input.GetAxis("Vertical")) >= 1.0) {
+        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
+            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01) {
             inputReceived = true;
         }
 
