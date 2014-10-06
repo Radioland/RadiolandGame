@@ -9,11 +9,21 @@ public class CameraControl : MonoBehaviour
     // The radius is affected by the current zoom level.
     // The two angles are controlled by mouse input.
     [Range(5.0f, 30.0f)] public float radius = 10.0f;
-    public float verticalAngle = 20.0f; // X-Axis Euler Angle
-    public float horizontalAngle = 0.0f; // Y-Axis Euler Angle
+    public float defaultVerticalAngle = 20.0f;
+    public float offsetHorizontal = -90.0f; // Set based on model's orientation.
+
+    private float horizontalAngle; // Y-Axis Euler Angle
+    private float verticalAngle; // X-Axis Euler Angle
+    private float lastMouseX;
+    private float lastMouseY;
 
     void Awake() {
         if (!player) { player = GameObject.FindWithTag("Player"); }
+
+        verticalAngle = defaultVerticalAngle;
+        horizontalAngle = 0.0f;
+        lastMouseX = 0.0f;
+        lastMouseY = 0.0f;
     }
 
     void Start() {
@@ -25,15 +35,20 @@ public class CameraControl : MonoBehaviour
     }
 
     void LateUpdate() {
-        // The default (no mouse buttons) behavior is to follow behind the player.
-        // Rotate the horizontalAngle towards the player's orientation.
-        // Maintain a constant verticalAngle.
-
-        Vector3 position = player.transform.position;
-        position -= player.transform.forward * radius;
-
-        // Adjust this depending on the model's orientation.
-        horizontalAngle = -player.transform.eulerAngles.y - 90;
+        // Follow behind the player.
+        if (!Input.GetMouseButton(1)) {
+            // Default behavior.
+            // Rotate horizontalAngle towards the player's orientation.
+            // Maintain a constant verticalAngle.
+            horizontalAngle = -player.transform.eulerAngles.y + offsetHorizontal;
+            verticalAngle = defaultVerticalAngle;
+        } else {
+            // Mouse controlled camera rotation.
+            float mouseDeltaX = Input.mousePosition.x - lastMouseX;
+            float mouseDeltaY = Input.mousePosition.y - lastMouseY;
+            horizontalAngle -= mouseDeltaX;
+            verticalAngle -= mouseDeltaY;
+        }
 
         float phi = horizontalAngle * Mathf.Deg2Rad;
         float theta = verticalAngle * Mathf.Deg2Rad;
@@ -47,5 +62,8 @@ public class CameraControl : MonoBehaviour
         transform.position = player.transform.position + offset * radius;
 
         transform.LookAt(player.transform.position);
+
+        lastMouseX = Input.mousePosition.x;
+        lastMouseY = Input.mousePosition.y;
     }
 }
