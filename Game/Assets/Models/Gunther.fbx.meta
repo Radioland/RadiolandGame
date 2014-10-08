@@ -7,19 +7,24 @@ ModelImporter:
     100002: buttons
     100004: face
     100006: //RootNode
+    100008: hair
     400000: body
     400002: buttons
     400004: face
     400006: //RootNode
+    400008: hair
     2300000: body
     2300002: buttons
     2300004: face
+    2300006: hair
     3300000: body
     3300002: buttons
     3300004: face
+    3300006: hair
     4300000: face
     4300002: body
     4300004: buttons
+    4300006: hair
     9500000: //RootNode
   materials:
     importMaterials: 0
@@ -45,7 +50,7 @@ ModelImporter:
     addColliders: 0
     importBlendShapes: 1
     swapUVChannels: 0
-    generateSecondaryUV: 1
+    generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
     weldVertices: 1
