@@ -96,4 +96,12 @@ public class CharacterMovement : MonoBehaviour
             verticalSpeed = jumpVerticalSpeed;
         }
     }
+
+	public void SetJumpHeight (float height) {
+		jumpHeight = height;
+	}
+
+	public void SetGravity (float newGravity) {
+		gravity = newGravity;
+	}
 }
