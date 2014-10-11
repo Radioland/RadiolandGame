@@ -9,14 +9,21 @@ public class CameraControl : MonoBehaviour
     // The camera moves around a sphere centered on the player.
     // The radius is affected by the current zoom level.
     // The two angles are controlled by mouse input.
-    [Range(5.0f, 30.0f)] public float radius = 10.0f;
-    public float defaultVerticalAngle = 20.0f;
-    public float offsetHorizontal = -90.0f; // Set based on model's orientation.
+    [SerializeField]
+    [Range(5.0f, 30.0f)] private float radius = 10.0f;
+    [SerializeField]
+    private float defaultVerticalAngle = 20.0f;
+    [SerializeField]
+    private float offsetHorizontal = -90.0f; // Set based on model's orientation.
 
     private float horizontalAngle; // Y-Axis Euler Angle
     private float verticalAngle; // X-Axis Euler Angle
     private float lastMouseX;
     private float lastMouseY;
+
+    private Vector3 velocityCamSmooth = Vector3.zero;
+    [SerializeField]
+    private float camSmoothDampTime = 0.1f;
 
     void Awake() {
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
@@ -25,7 +32,7 @@ public class CameraControl : MonoBehaviour
         }
 
         verticalAngle = defaultVerticalAngle;
-        horizontalAngle = 0.0f;
+        horizontalAngle = offsetHorizontal;
         lastMouseX = 0.0f;
         lastMouseY = 0.0f;
     }
@@ -65,7 +72,11 @@ public class CameraControl : MonoBehaviour
         float z = Mathf.Cos(theta) * Mathf.Sin(phi);
         // Offset from the player by the vector to that point at the given radius.
         Vector3 offset = new Vector3(x, y, z);
-        cameraTransform.position = transform.position + offset * radius;
+        Vector3 targetPosition = transform.position + offset * radius;
+        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position,
+                                                      targetPosition,
+                                                      ref velocityCamSmooth,
+                                                      camSmoothDampTime);
 
         cameraTransform.LookAt(transform.position);
 

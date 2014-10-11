@@ -46,7 +46,8 @@ public class CharacterMovement : MonoBehaviour
     void Update() {
         bool inputReceived = false;
         if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
-            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01) {
+            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
+            Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
             inputReceived = true;
         }
 
@@ -66,13 +67,13 @@ public class CharacterMovement : MonoBehaviour
             }
         }
 
-        // Move forward with vertical input.
-        float inputForward = Input.GetAxis("Vertical") * walkSpeed;
+        Vector3 inputVector = transform.forward * Input.GetAxis("Vertical") +
+                              transform.right * Input.GetAxis("Strafe");
 
         ApplyGravity();
         ApplyJump();
 
-        Vector3 motion = transform.forward * inputForward + Vector3.up * verticalSpeed;
+        Vector3 motion = inputVector * walkSpeed + Vector3.up * verticalSpeed;
         motion *= Time.deltaTime;
         collisionFlags = controller.Move(motion);
 
