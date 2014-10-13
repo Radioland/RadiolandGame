@@ -8,7 +8,7 @@ public class CooldownManager : MonoBehaviour
     Text text;
 
     void Awake() {
-        powerupScript = GameObject.Find("TestCharacter").GetComponent<PowerupManager>();
+        powerupScript = GameObject.FindWithTag("Player").GetComponent<PowerupManager>();
         text = GetComponent<Text>();
     }
 

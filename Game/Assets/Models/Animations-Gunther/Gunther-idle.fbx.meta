@@ -1,0 +1,508 @@
+fileFormatVersion: 2
+guid: 6fd7e40417473974cb9643d67ae60aee
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: baseSpine
+    100002: body
+    100004: buttons
+    100006: chest
+    100008: con_L_ankle
+    100010: con_L_ball
+    100012: con_L_toe
+    100014: con_R_ankle
+    100016: con_R_ball
+    100018: con_R_toe
+    100020: Controls
+    100022: CTRL_BaseSpine
+    100024: CTRL_Chest
+    100026: CTRL_FK_L_Elbow
+    100028: CTRL_FK_L_Shoulder
+    100030: CTRL_FK_R_Elbow
+    100032: CTRL_FK_R_Shoulder
+    100034: CTRL_Head
+    100036: CTRL_IK_L_Arm
+    100038: CTRL_IK_R_Arm
+    100040: CTRL_L_Arm_PV
+    100042: CTRL_L_Clavicle
+    100044: CTRL_L_Foot
+    100046: CTRL_L_Hand
+    100048: CTRL_L_Leg_PV
+    100050: CTRL_MoveCharacter
+    100052: CTRL_Neck
+    100054: CTRL_R_Arm_PV
+    100056: CTRL_R_Clavicle
+    100058: CTRL_R_Foot
+    100060: CTRL_R_Hand
+    100062: CTRL_R_Leg_PV
+    100064: CTRL_Spine0
+    100066: CTRL_Waist
+    100068: EyesPosition
+    100070: face
+    100072: FK_L_elbow
+    100074: FK_L_shoulder
+    100076: FK_L_wrist
+    100078: FK_R_elbow
+    100080: FK_R_shoulder
+    100082: FK_R_wrist
+    100084: Geometry
+    100086: GRP_IK_L_Arm
+    100088: GRP_IK_L_Leg
+    100090: GRP_IK_R_Arm
+    100092: GRP_IK_R_Leg
+    100094: GRP_L_Arm
+    100096: GRP_R_Arm
+    100098: //RootNode
+    100100: hair
+    100102: hair_base
+    100104: hair_mid0
+    100106: hair_mid1
+    100108: hair_tip
+    100110: head
+    100112: HeadPosition
+    100114: IK_L_Ankle
+    100116: IK_L_Arm
+    100118: IK_L_Ball
+    100120: IK_L_elbow
+    100122: IK_L_shoulder
+    100124: IK_L_wrist
+    100126: IK_R_Ankle
+    100128: IK_R_Arm
+    100130: IK_R_Ball
+    100132: IK_R_elbow
+    100134: IK_R_shoulder
+    100136: IK_R_wrist
+    100138: Joints
+    100140: L_ankle
+    100142: L_Arm_PV_Position
+    100144: L_clavicle
+    100146: L_elbow
+    100148: L_hand
+    100150: L_hip
+    100152: L_knee
+    100154: L_Leg_PV_Position
+    100156: L_shoulder
+    100158: L_toe_rot
+    100160: L_wrist
+    100162: LINE_L_Arm_PV
+    100164: LINE_L_Leg_PV
+    100166: LINE_R_Arm_PV
+    100168: LINE_R_Leg_PV
+    100170: neck
+    100172: pivot
+    100174: R_ankle
+    100176: R_Arm_PV_Position
+    100178: R_clavicle
+    100180: R_elbow
+    100182: R_hand
+    100184: R_hip
+    100186: R_knee
+    100188: R_Leg_PV_Position
+    100190: R_shoulder
+    100192: R_toe_rot
+    100194: R_wrist
+    100196: root
+    100198: scalp
+    100200: spine0
+    100202: transform1
+    100204: transform2
+    400000: baseSpine
+    400002: body
+    400004: buttons
+    400006: chest
+    400008: con_L_ankle
+    400010: con_L_ball
+    400012: con_L_toe
+    400014: con_R_ankle
+    400016: con_R_ball
+    400018: con_R_toe
+    400020: Controls
+    400022: CTRL_BaseSpine
+    400024: CTRL_Chest
+    400026: CTRL_FK_L_Elbow
+    400028: CTRL_FK_L_Shoulder
+    400030: CTRL_FK_R_Elbow
+    400032: CTRL_FK_R_Shoulder
+    400034: CTRL_Head
+    400036: CTRL_IK_L_Arm
+    400038: CTRL_IK_R_Arm
+    400040: CTRL_L_Arm_PV
+    400042: CTRL_L_Clavicle
+    400044: CTRL_L_Foot
+    400046: CTRL_L_Hand
+    400048: CTRL_L_Leg_PV
+    400050: CTRL_MoveCharacter
+    400052: CTRL_Neck
+    400054: CTRL_R_Arm_PV
+    400056: CTRL_R_Clavicle
+    400058: CTRL_R_Foot
+    400060: CTRL_R_Hand
+    400062: CTRL_R_Leg_PV
+    400064: CTRL_Spine0
+    400066: CTRL_Waist
+    400068: EyesPosition
+    400070: face
+    400072: FK_L_elbow
+    400074: FK_L_shoulder
+    400076: FK_L_wrist
+    400078: FK_R_elbow
+    400080: FK_R_shoulder
+    400082: FK_R_wrist
+    400084: Geometry
+    400086: GRP_IK_L_Arm
+    400088: GRP_IK_L_Leg
+    400090: GRP_IK_R_Arm
+    400092: GRP_IK_R_Leg
+    400094: GRP_L_Arm
+    400096: GRP_R_Arm
+    400098: //RootNode
+    400100: hair
+    400102: hair_base
+    400104: hair_mid0
+    400106: hair_mid1
+    400108: hair_tip
+    400110: head
+    400112: HeadPosition
+    400114: IK_L_Ankle
+    400116: IK_L_Arm
+    400118: IK_L_Ball
+    400120: IK_L_elbow
+    400122: IK_L_shoulder
+    400124: IK_L_wrist
+    400126: IK_R_Ankle
+    400128: IK_R_Arm
+    400130: IK_R_Ball
+    400132: IK_R_elbow
+    400134: IK_R_shoulder
+    400136: IK_R_wrist
+    400138: Joints
+    400140: L_ankle
+    400142: L_Arm_PV_Position
+    400144: L_clavicle
+    400146: L_elbow
+    400148: L_hand
+    400150: L_hip
+    400152: L_knee
+    400154: L_Leg_PV_Position
+    400156: L_shoulder
+    400158: L_toe_rot
+    400160: L_wrist
+    400162: LINE_L_Arm_PV
+    400164: LINE_L_Leg_PV
+    400166: LINE_R_Arm_PV
+    400168: LINE_R_Leg_PV
+    400170: neck
+    400172: pivot
+    400174: R_ankle
+    400176: R_Arm_PV_Position
+    400178: R_clavicle
+    400180: R_elbow
+    400182: R_hand
+    400184: R_hip
+    400186: R_knee
+    400188: R_Leg_PV_Position
+    400190: R_shoulder
+    400192: R_toe_rot
+    400194: R_wrist
+    400196: root
+    400198: scalp
+    400200: spine0
+    400202: transform1
+    400204: transform2
+    4300000: face
+    4300002: buttons
+    4300004: body
+    4300006: hair
+    7400000: Idle
+    9500000: //RootNode
+    13700000: body
+    13700002: buttons
+    13700004: face
+    13700006: hair
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Idle
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 5
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Controls
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/CTRL_L_Clavicle
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/CTRL_Neck
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/CTRL_R_Clavicle
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/CTRL_FK_L_Shoulder
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/CTRL_FK_L_Shoulder/CTRL_FK_L_Elbow
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/CTRL_L_Hand
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/GRP_IK_L_Arm
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/GRP_IK_L_Arm/CTRL_IK_L_Arm
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/GRP_IK_L_Arm/CTRL_IK_L_Arm/IK_L_Arm
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/GRP_IK_L_Arm/L_Arm_PV_Position
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/GRP_IK_L_Arm/L_Arm_PV_Position/CTRL_L_Arm_PV
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_L_Arm/GRP_IK_L_Arm/L_Arm_PV_Position/LINE_L_Arm_PV
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/CTRL_FK_R_Shoulder
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/CTRL_FK_R_Shoulder/CTRL_FK_R_Elbow
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/CTRL_R_Hand
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/GRP_IK_R_Arm
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/GRP_IK_R_Arm/CTRL_IK_R_Arm
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/GRP_IK_R_Arm/CTRL_IK_R_Arm/IK_R_Arm
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/GRP_IK_R_Arm/R_Arm_PV_Position
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/GRP_IK_R_Arm/R_Arm_PV_Position/CTRL_R_Arm_PV
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_BaseSpine/CTRL_Spine0/CTRL_Chest/GRP_R_Arm/GRP_IK_R_Arm/R_Arm_PV_Position/LINE_R_Arm_PV
+        weight: 1
+      - path: Controls/CTRL_MoveCharacter/CTRL_Waist
+        weight: 1
+      - path: Controls/EyesPosition
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/CTRL_L_Foot
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/CTRL_L_Foot/transform1
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/CTRL_L_Foot/transform1/con_L_toe
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/CTRL_L_Foot/transform1/con_L_toe/con_L_ball
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/CTRL_L_Foot/transform1/con_L_toe/con_L_ball/con_L_ankle
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/CTRL_L_Foot/transform1/con_L_toe/con_L_ball/con_L_ankle/IK_L_Ankle
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/CTRL_L_Foot/transform1/con_L_toe/con_L_ball/IK_L_Ball
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/CTRL_L_Foot/transform1/con_L_toe/L_toe_rot
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/L_Leg_PV_Position
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/L_Leg_PV_Position/CTRL_L_Leg_PV
+        weight: 1
+      - path: Controls/GRP_IK_L_Leg/L_Leg_PV_Position/LINE_L_Leg_PV
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/CTRL_R_Foot
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/CTRL_R_Foot/transform2
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/CTRL_R_Foot/transform2/con_R_toe
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/CTRL_R_Foot/transform2/con_R_toe/con_R_ball
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/CTRL_R_Foot/transform2/con_R_toe/con_R_ball/con_R_ankle
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/CTRL_R_Foot/transform2/con_R_toe/con_R_ball/con_R_ankle/IK_R_Ankle
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/CTRL_R_Foot/transform2/con_R_toe/con_R_ball/IK_R_Ball
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/CTRL_R_Foot/transform2/con_R_toe/R_toe_rot
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/R_Leg_PV_Position
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/R_Leg_PV_Position/CTRL_R_Leg_PV
+        weight: 1
+      - path: Controls/GRP_IK_R_Leg/R_Leg_PV_Position/LINE_R_Leg_PV
+        weight: 1
+      - path: Controls/HeadPosition
+        weight: 1
+      - path: Controls/HeadPosition/CTRL_Head
+        weight: 1
+      - path: Geometry
+        weight: 1
+      - path: Geometry/body
+        weight: 1
+      - path: Geometry/buttons
+        weight: 1
+      - path: Geometry/face
+        weight: 1
+      - path: Geometry/hair
+        weight: 1
+      - path: Joints
+        weight: 1
+      - path: Joints/pivot
+        weight: 1
+      - path: Joints/pivot/root
+        weight: 1
+      - path: Joints/pivot/root/baseSpine
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/FK_L_shoulder
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/FK_L_shoulder/FK_L_elbow
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/FK_L_shoulder/FK_L_elbow/FK_L_wrist
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/IK_L_shoulder
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/IK_L_shoulder/IK_L_elbow
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/IK_L_shoulder/IK_L_elbow/IK_L_wrist
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/L_shoulder
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/L_shoulder/L_elbow
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/L_shoulder/L_elbow/L_wrist
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/L_clavicle/L_shoulder/L_elbow/L_wrist/L_hand
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/neck
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/neck/head
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/neck/head/scalp
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/neck/head/scalp/hair_base
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/neck/head/scalp/hair_base/hair_mid0
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/neck/head/scalp/hair_base/hair_mid0/hair_mid1
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/neck/head/scalp/hair_base/hair_mid0/hair_mid1/hair_tip
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/FK_R_shoulder
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/FK_R_shoulder/FK_R_elbow
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/FK_R_shoulder/FK_R_elbow/FK_R_wrist
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/IK_R_shoulder
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/IK_R_shoulder/IK_R_elbow
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/IK_R_shoulder/IK_R_elbow/IK_R_wrist
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/R_shoulder
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/R_shoulder/R_elbow
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/R_shoulder/R_elbow/R_wrist
+        weight: 1
+      - path: Joints/pivot/root/baseSpine/spine0/chest/R_clavicle/R_shoulder/R_elbow/R_wrist/R_hand
+        weight: 1
+      - path: Joints/pivot/root/L_hip
+        weight: 1
+      - path: Joints/pivot/root/L_hip/L_knee
+        weight: 1
+      - path: Joints/pivot/root/L_hip/L_knee/L_ankle
+        weight: 1
+      - path: Joints/pivot/root/R_hip
+        weight: 1
+      - path: Joints/pivot/root/R_hip/R_knee
+        weight: 1
+      - path: Joints/pivot/root/R_hip/R_knee/R_ankle
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 1
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: df361882e0a54854ba6bba0b468f07c3,
+    type: 3}
+  animationType: 2
+  additionalBone: 0
+  userData: 
