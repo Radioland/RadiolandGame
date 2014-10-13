@@ -6,6 +6,16 @@ using System.Collections;
 public class RadioStation : MonoBehaviour
 {
     public float frequency;
+    public float signalStrength {
+        get {
+            // Lerp signalStrength from 0 to 1 within frequencyFadeLimit.
+            // When outside of frequencyFadeLimit from the current frequency, clamp to 0.
+            float frequencyDifference = Mathf.Abs(radioControl.currentFrequency - frequency);
+            float strength = 1.0f - frequencyDifference / radioControl.frequencyFadeLimit;
+            strength = Mathf.Clamp(strength, 0.0f, 1.0f);
+            return strength;
+        }
+    }
 
     [HideInInspector] public RadioControl radioControl;
     [HideInInspector] public AudioSource audioSource;
@@ -22,12 +32,6 @@ public class RadioStation : MonoBehaviour
     }
 
     void Update() {
-        // Lerp signalStrength from 0 to 1 within frequencyFadeLimit.
-        // When outside of frequencyFadeLimit from the current frequency, clamp to 0.
-        float frequencyDifference = Mathf.Abs(radioControl.currentFrequency - frequency);
-        float signalStrength = 1.0f - frequencyDifference / radioControl.frequencyFadeLimit;
-        signalStrength = Mathf.Clamp(signalStrength, 0.0f, 1.0f);
-
         audioSource.volume = signalStrength;
     }
 }
