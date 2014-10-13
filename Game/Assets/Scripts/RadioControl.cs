@@ -6,6 +6,7 @@ using System.Collections;
 public class RadioControl : MonoBehaviour
 {
     public float frequencyFadeLimit = 0.1f;
+    public float powerupMinSignalStrength = 0.5f;
     public float currentFrequency { get { return radioDialSlider.value; } }
 
     // Private variables set in the inspector.
@@ -39,5 +40,13 @@ public class RadioControl : MonoBehaviour
 
         float scrollValue = Input.GetAxis("Mouse ScrollWheel");
         radioDialSlider.value += scrollValue;
+
+        if (Input.GetButtonDown("Fire1")) {
+            foreach (RadioStation station in stations) {
+                if (station.signalStrength > powerupMinSignalStrength) {
+                    station.UsePowerup();
+                }
+            }
+        }
     }
 }

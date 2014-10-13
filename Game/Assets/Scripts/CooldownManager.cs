@@ -2,24 +2,21 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class CooldownManager : MonoBehaviour {
-	PowerupManager powerupScript;
-	Text text;
-	float displayValue;
+public class CooldownManager : MonoBehaviour
+{
+    PowerupManager powerupScript;
+    Text text;
 
-	void Awake() {
-		powerupScript = GameObject.Find("TestCharacter").GetComponent<PowerupManager>();
-		text = GetComponent<Text>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		displayValue = 5 - (Time.time - powerupScript.powerupStart);
-		if (displayValue < 0) {
-			displayValue = 0;
-		}
-		text.text = displayValue.ToString();
-	}
+    void Awake() {
+        powerupScript = GameObject.Find("TestCharacter").GetComponent<PowerupManager>();
+        text = GetComponent<Text>();
+    }
 
-
+    void Update() {
+        float maxRemainingTime = 0.0f;
+        foreach (Powerup powerup in powerupScript.powerups) {
+            maxRemainingTime = Mathf.Max(maxRemainingTime, powerup.remainingTime);
+        }
+        text.text = maxRemainingTime.ToString();
+    }
 }

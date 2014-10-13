@@ -7,19 +7,22 @@ public class CharacterMovement : MonoBehaviour
 {
     public CameraControl cameraControl;
 
-    [Range(0.0f, 20.0f)] public float walkSpeed = 5.0f;
-    [Range(0.0f, 540.0f)] public float degRotPerSec = 200.0f;
-    [Range(0.0f, 100.0f)] public float gravity = 30.0f;
+    [SerializeField] [Range(0.0f, 20.0f)] private float walkSpeed = 5.0f;
+    [SerializeField] [Range(0.0f, 540.0f)] private float degRotPerSec = 200.0f;
+    [SerializeField] [Range(0.0f, 100.0f)] private float gravity = 30.0f;
     // Speed is calculated to reach this height.
-    [Range(0.0f, 10.0f)] public float jumpHeight = 2.0f;
+    [SerializeField] [Range(0.0f, 10.0f)] private float jumpHeight = 2.0f;
     // Extra time to become grounded before jumping.
-    [Range(0.0f, 0.5f)] public float jumpTimeout = 0.1f;
+    [SerializeField] [Range(0.0f, 0.5f)] private float jumpTimeout = 0.1f;
     public bool playerMoving;
 
     private CharacterController controller;
     private CollisionFlags collisionFlags;
     private float verticalSpeed;
     private float lastJumpTime;
+
+    private float originalGravity;
+    private float originalJumpHeight;
 
     private bool grounded {
         get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
@@ -37,6 +40,9 @@ public class CharacterMovement : MonoBehaviour
         controller = gameObject.GetComponent<CharacterController>();
         verticalSpeed = 0.0f;
         lastJumpTime = -1000.0f;
+
+        originalGravity = gravity;
+        originalJumpHeight = jumpHeight;
     }
 
     void Start() {
@@ -98,11 +104,19 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
-	public void SetJumpHeight (float height) {
-		jumpHeight = height;
-	}
+    public void SetJumpHeight(float height) {
+        jumpHeight = height;
+    }
 
-	public void SetGravity (float newGravity) {
-		gravity = newGravity;
-	}
+    public void ResetJumpHeight() {
+        jumpHeight = originalJumpHeight;
+    }
+
+    public void SetGravity(float newGravity) {
+        gravity = newGravity;
+    }
+
+    public void ResetGravity() {
+        gravity = originalGravity;
+    }
 }

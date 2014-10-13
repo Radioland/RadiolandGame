@@ -16,6 +16,7 @@ public class RadioStation : MonoBehaviour
             return strength;
         }
     }
+    public Powerup powerup;
 
     [HideInInspector] public RadioControl radioControl;
     [HideInInspector] public AudioSource audioSource;
@@ -33,5 +34,13 @@ public class RadioStation : MonoBehaviour
 
     void Update() {
         audioSource.volume = signalStrength;
+    }
+
+    public void UsePowerup() {
+        if (powerup) {
+            powerup.UsePowerup();
+        } else {
+            Debug.LogWarning("Found no powerup for " + this.GetPath());
+        }
     }
 }
