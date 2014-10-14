@@ -10,6 +10,7 @@ ModelImporter:
     100008: r_wire
     100010: //RootNode
     100012: small
+    100014: r_wire1
     400000: big
     400002: body
     400004: eyes
@@ -17,21 +18,25 @@ ModelImporter:
     400008: r_wire
     400010: //RootNode
     400012: small
+    400014: r_wire1
     2300000: big
     2300002: body
     2300004: l_wire
     2300006: r_wire
     2300008: small
+    2300010: r_wire1
     3300000: big
     3300002: body
     3300004: l_wire
     3300006: r_wire
     3300008: small
+    3300010: r_wire1
     4300000: body
     4300002: l_wire
     4300004: r_wire
     4300006: big
     4300008: small
+    4300010: r_wire1
     9500000: //RootNode
   materials:
     importMaterials: 0

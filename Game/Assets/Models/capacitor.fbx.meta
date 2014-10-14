@@ -10,6 +10,7 @@ ModelImporter:
     100008: r_eye
     100010: r_wire
     100012: blocks
+    100014: eyes
     400000: //RootNode
     400002: energy_sphere
     400004: l_eye
@@ -17,6 +18,7 @@ ModelImporter:
     400008: r_eye
     400010: r_wire
     400012: blocks
+    400014: eyes
     2300000: energy_sphere
     2300002: l_eye
     2300004: l_wire
