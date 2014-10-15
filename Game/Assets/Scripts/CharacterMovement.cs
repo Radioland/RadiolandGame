@@ -24,6 +24,7 @@ public class CharacterMovement : MonoBehaviour
     // Animation.
     private Animator animator;
     private int speedHash;
+    private int strafeHash;
 
     private float originalGravity;
     private float originalJumpHeight;
@@ -47,6 +48,7 @@ public class CharacterMovement : MonoBehaviour
 
         animator = gameObject.GetComponentInChildren<Animator>();
         speedHash = Animator.StringToHash("Speed");
+        strafeHash = Animator.StringToHash("Strafe");
 
         originalGravity = gravity;
         originalJumpHeight = jumpHeight;
@@ -82,7 +84,10 @@ public class CharacterMovement : MonoBehaviour
 
         Vector3 inputVector = transform.forward * Input.GetAxis("Vertical") +
                               transform.right * Input.GetAxis("Strafe");
-        animator.SetFloat(speedHash, (inputVector * walkSpeed).magnitude);
+        if (animator) {
+            animator.SetFloat(speedHash, Mathf.Abs(Input.GetAxis("Vertical")));
+            animator.SetFloat(strafeHash, Input.GetAxis("Strafe"));
+        }
 
         ApplyGravity();
         ApplyJump();
