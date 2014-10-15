@@ -113,6 +113,11 @@ ModelImporter:
     100214: locator2
     100216: CTRL_L_Eye
     100218: L_eye
+    100220: backpack
+    100222: backpack_pivot
+    100224: CTRL_backpack
+    100226: IK_backpack
+    100228: transform3
     400000: body
     400002: buttons
     400004: face
@@ -223,6 +228,11 @@ ModelImporter:
     400214: locator2
     400216: CTRL_L_Eye
     400218: L_eye
+    400220: backpack
+    400222: backpack_pivot
+    400224: CTRL_backpack
+    400226: IK_backpack
+    400228: transform3
     2300000: body
     2300002: buttons
     2300004: face
