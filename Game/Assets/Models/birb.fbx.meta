@@ -1,0 +1,169 @@
+fileFormatVersion: 2
+guid: 1970ca259b7793f4b93e1df900b63ca2
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: body
+    100004: Controls
+    100006: crown
+    100008: CTRL_crown
+    100010: CTRL_L_Wing
+    100012: CTRL_R_Wing
+    100014: CTRL_tail
+    100016: CTRLGRP_L_wing
+    100018: CTRLGRP_R_wing
+    100020: CTRLGRP_tail
+    100022: eyes
+    100024: l_eye
+    100026: L_wing
+    100028: mesh
+    100030: r_eye
+    100032: R_wing
+    100034: root
+    100036: tail
+    400000: //RootNode
+    400002: body
+    400004: Controls
+    400006: crown
+    400008: CTRL_crown
+    400010: CTRL_L_Wing
+    400012: CTRL_R_Wing
+    400014: CTRL_tail
+    400016: CTRLGRP_L_wing
+    400018: CTRLGRP_R_wing
+    400020: CTRLGRP_tail
+    400022: eyes
+    400024: l_eye
+    400026: L_wing
+    400028: mesh
+    400030: r_eye
+    400032: R_wing
+    400034: root
+    400036: tail
+    4300000: l_eye
+    4300002: r_eye
+    4300004: body
+    7400000: Birb-Idle
+    9500000: //RootNode
+    13700000: body
+    13700002: l_eye
+    13700004: r_eye
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Birb-Idle
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 17
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Controls
+        weight: 1
+      - path: Controls/CTRL_crown
+        weight: 1
+      - path: Controls/CTRLGRP_L_wing
+        weight: 1
+      - path: Controls/CTRLGRP_L_wing/CTRL_L_Wing
+        weight: 1
+      - path: Controls/CTRLGRP_R_wing
+        weight: 1
+      - path: Controls/CTRLGRP_R_wing/CTRL_R_Wing
+        weight: 1
+      - path: Controls/CTRLGRP_tail
+        weight: 1
+      - path: Controls/CTRLGRP_tail/CTRL_tail
+        weight: 1
+      - path: mesh
+        weight: 1
+      - path: mesh/body
+        weight: 1
+      - path: mesh/eyes
+        weight: 1
+      - path: mesh/eyes/l_eye
+        weight: 1
+      - path: mesh/eyes/r_eye
+        weight: 1
+      - path: root
+        weight: 1
+      - path: root/crown
+        weight: 1
+      - path: root/L_wing
+        weight: 1
+      - path: root/R_wing
+        weight: 1
+      - path: root/tail
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
