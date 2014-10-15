@@ -4,7 +4,9 @@ using System.Collections;
 public class CameraControl : MonoBehaviour
 {
     public Transform cameraTransform;
-    public CharacterMovement characterMovement;
+
+    [SerializeField] private Transform targetTransform;
+    [SerializeField] private CharacterMovement characterMovement;
 
     // The camera moves around a sphere centered on the player.
     // The radius is affected by the current zoom level.
@@ -26,6 +28,7 @@ public class CameraControl : MonoBehaviour
     private float camSmoothDampTime = 0.1f;
 
     void Awake() {
+        if (!targetTransform) { targetTransform = transform; }
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
         if (!characterMovement) {
             Debug.LogWarning("No character movement set on CameraControl!");
@@ -52,7 +55,7 @@ public class CameraControl : MonoBehaviour
             // Rotate horizontalAngle towards the player's orientation.
             // Maintain a constant verticalAngle.
             if (characterMovement.playerMoving) {
-                horizontalAngle = -transform.eulerAngles.y + offsetHorizontal;
+                horizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal;
                 verticalAngle = defaultVerticalAngle;
             }
         } else {
@@ -72,13 +75,13 @@ public class CameraControl : MonoBehaviour
         float z = Mathf.Cos(theta) * Mathf.Sin(phi);
         // Offset from the player by the vector to that point at the given radius.
         Vector3 offset = new Vector3(x, y, z);
-        Vector3 targetPosition = transform.position + offset * radius;
+        Vector3 targetPosition = targetTransform.position + offset * radius;
         cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position,
                                                       targetPosition,
                                                       ref velocityCamSmooth,
                                                       camSmoothDampTime);
 
-        cameraTransform.LookAt(transform.position);
+        cameraTransform.LookAt(targetTransform.position);
 
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
