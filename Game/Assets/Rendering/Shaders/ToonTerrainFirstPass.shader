@@ -64,17 +64,49 @@ SubShader {
         float2 uv_Splat1 : TEXCOORD2;
         float2 uv_Splat2 : TEXCOORD3;
         float2 uv_Splat3 : TEXCOORD4;
+        float3 worldPos;
+        float3 worldNormal;
     };
  
     // Surface Shader function
     void surf (Input IN, inout SurfaceOutput o) {
+        float3 projNormal = saturate(pow(IN.worldNormal * 1.4, 4));
         fixed4 splat_control = tex2D (_Control, IN.uv_Control);
+        
+        float _Scale = 2;
+        float3 x = tex2D(_Control, frac(IN.worldPos.zy * _Scale)) * abs(IN.worldNormal.x);
+        float3 y = tex2D(_Control, frac(IN.worldPos.zx * _Scale)) * abs(IN.worldNormal.y);
+        float3 z = tex2D(_Control, frac(IN.worldPos.xy * _Scale)) * abs(IN.worldNormal.z);
+        o.Albedo = z;
+        o.Albedo = lerp(o.Albedo, x, projNormal.x);
+        o.Albedo = lerp(o.Albedo, y, projNormal.y);
+        
+        x = tex2D(_Splat0, frac(IN.worldPos.zy * _Scale)) * abs(IN.worldNormal.x);
+        y = tex2D(_Splat0, frac(IN.worldPos.zx * _Scale)) * abs(IN.worldNormal.y);
+        z = tex2D(_Splat0, frac(IN.worldPos.xy * _Scale)) * abs(IN.worldNormal.z);
+        o.Albedo = lerp(o.Albedo, splat_control.r * x, projNormal.x);
+        o.Albedo = lerp(o.Albedo, splat_control.r * y, projNormal.y);
+        o.Albedo = lerp(o.Albedo, splat_control.r * z, projNormal.z);
+        
+        x = tex2D(_Splat1, frac(IN.worldPos.zy * _Scale)) * abs(IN.worldNormal.x);
+        y = tex2D(_Splat1, frac(IN.worldPos.zx * _Scale)) * abs(IN.worldNormal.y);
+        z = tex2D(_Splat1, frac(IN.worldPos.xy * _Scale)) * abs(IN.worldNormal.z);
+        o.Albedo = lerp(o.Albedo, splat_control.g * x, projNormal.x);
+        o.Albedo = lerp(o.Albedo, splat_control.g * y, projNormal.y);
+        o.Albedo = lerp(o.Albedo, splat_control.g * z, projNormal.z);
+        
+        o.Albedo = o.Albedo.rgb * _Color;
+
         fixed3 col;
         col  = splat_control.r * tex2D (_Splat0, IN.uv_Splat0).rgb;
         col += splat_control.g * tex2D (_Splat1, IN.uv_Splat1).rgb;
         col += splat_control.b * tex2D (_Splat2, IN.uv_Splat2).rgb;
         col += splat_control.a * tex2D (_Splat3, IN.uv_Splat3).rgb;
         o.Albedo = col * _Color;
+        
+        //o.Albedo = half3(IN.worldPos);
+        //o.Albedo = half3(IN.worldNormal);
+        
         o.Alpha = 0.0;
     }
     ENDCG
