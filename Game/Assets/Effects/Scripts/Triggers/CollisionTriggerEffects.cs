@@ -10,7 +10,9 @@ public class CollisionTriggerEffects : TriggerEffects
 
     private Vector3 lastNonZeroVelocity;
 
-    void Awake() {
+    protected override void Awake() {
+        base.Awake();
+
         lastNonZeroVelocity = Vector3.zero;
     }
 

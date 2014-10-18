@@ -3,12 +3,12 @@ using System.Collections;
 
 public class StartTriggerEffects : TriggerEffects
 {
-    void Awake() {
-
+    protected override void Awake() {
+        base.Awake();
     }
 
     void Start() {
-        effectsManager.StartEvent();
+        StartEvent();
     }
 
     void Update() {
