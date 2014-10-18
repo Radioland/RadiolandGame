@@ -14,6 +14,8 @@ public class CreateEffect : Effect
     [SerializeField] private bool destroyOnEnd = false;
     [Range(0.0f, 1.0f)] [SerializeField] private float chanceToSpawn = 1.0f;
 
+    static GameObject createEffectParent;
+
     private GameObject createdObject;
     
     protected override void Awake() {
@@ -21,6 +23,12 @@ public class CreateEffect : Effect
 
         if (referenceObjectTag.Length > 0 && !referenceObject) {
             referenceObject = GameObject.FindGameObjectWithTag(referenceObjectTag);
+        }
+
+        if (!createEffectParent) {
+            createEffectParent = new GameObject();
+            createEffectParent.name = "CreateEffectParent";
+            createEffectParent.transform.position = Vector3.zero;
         }
     }
     
@@ -41,17 +49,20 @@ public class CreateEffect : Effect
 
         if (Mathf.Approximately(chanceToSpawn, 1.0f) || Random.Range(0.0f, 1.0f) < chanceToSpawn) {
             createdObject = (GameObject) Instantiate(prefabToCreate);
-            if (referenceObject) {
-                if (parentToReference) {
-                    createdObject.transform.parent = referenceObject.transform;
-                    createdObject.transform.localPosition = localPosition;
-                } else {
+
+            if (referenceObject && parentToReference) {
+                createdObject.transform.parent = referenceObject.transform;
+                createdObject.transform.localPosition = localPosition;
+            } else {
+                createdObject.transform.parent = createEffectParent.transform;
+                if (referenceObject) {
                     createdObject.transform.position = referenceObject.transform.position;
                     createdObject.transform.Translate(localPosition);
+                } else {
+                    createdObject.transform.position = localPosition;
                 }
-            } else {
-                createdObject.transform.position = localPosition;
             }
+
             createdObject.transform.localEulerAngles = localEulerAngles;
         }
     }
