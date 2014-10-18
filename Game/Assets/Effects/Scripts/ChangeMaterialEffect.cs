@@ -3,9 +3,10 @@ using System.Collections;
 
 public class ChangeMaterialEffect : Effect
 {
-    public Renderer rendererToChange;
-    public Material newMaterial;
-    public bool revertAtEnd = false;
+    // Variables to specify in the editor.
+    [SerializeField] private Renderer rendererToChange;
+    [SerializeField] private Material newMaterial;
+    [SerializeField] private bool revertAtEnd = false;
 
     private Material originalMaterial;
 

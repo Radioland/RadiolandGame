@@ -1,36 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnableTagEffect : Effect
+[RequireComponent(typeof(AudioSource))]
+public class AudioOneShotEffect : Effect
 {
-    public string tagToEnable;
-    
+    // Variables to specify in the editor.
+    [SerializeField] private AudioClip audioClip;
+    [Range(0.0f, 1.0f)] [SerializeField] private float volumeScale = 1.0f;
+
+    private float lastTimePlayed;
+
     protected override void Awake() {
         base.Awake();
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
-        GameObject [] tagObjects = GameObject.FindGameObjectsWithTag(tagToEnable);
-        foreach (GameObject tagObject in tagObjects) {
-            Renderer[] tagObjectRenderers = tagObject.GetComponentsInChildren<Renderer>();
-            foreach (Renderer tagObjectRenderer in tagObjectRenderers) {
-                tagObjectRenderer.enabled = true;
-            }
-        }
+        audio.PlayOneShot(audioClip, volumeScale);
     }
     
     public override void EndEffect() {

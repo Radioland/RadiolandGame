@@ -18,16 +18,15 @@ public class EffectManager : MonoBehaviour
 
     }
 
-    // This should be called by an attack starting, an attack hitting a target,
-    // an environmental event, etc.
+    // Triggers all effects on this object.
     public void StartEvent() {
         foreach (Effect effect in effects) {
             effect.TriggerEffect();
         }
     }
 
-    // Prematurely end all events
-    // Call when an ability is interrupted, etc.
+    // Prematurely end all effects (ahead of their own durations).
+    // Useful for interrupting abilities, when an object dies, etc.
     public void StopEvent() {        
         foreach (Effect effect in effects) {
             effect.EndEffect();

@@ -3,7 +3,8 @@ using System.Collections;
 
 public class LoadLevelEffect : Effect
 {
-    public int levelToLoad;
+    // Variables to specify in the editor.
+    [SerializeField] private int levelToLoad;
     
     protected override void Awake() {
         base.Awake();

@@ -3,10 +3,9 @@ using System.Collections;
 
 public class AnimatorBoolEffect : Effect
 {
-    public Animator animator;
-    public string boolToSet;
-    
-    static GameObject orphanedEffectParent;
+    // Variables to specify in the editor.
+    [SerializeField] private Animator animator;
+    [SerializeField] private string boolToSet;
     
     protected override void Awake() {
         base.Awake();

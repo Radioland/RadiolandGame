@@ -3,22 +3,24 @@ using System.Collections;
 
 public class CreateEffect : Effect
 {
-    public GameObject prefabToCreate;
-    public GameObject parentObject;
-    public string parentObjectTag;
-    public bool parentToParent = true;
-    public Vector3 localPosition;
-    public Vector3 localEulerAngles;
-    public bool destroyOnEnd = false;
-    [Range(0.0f, 1.0f)] public float chanceToSpawn = 1.0f;
+    // Variables to specify in the editor.
+    [SerializeField] private GameObject prefabToCreate;
+    [SerializeField] private GameObject referenceObject;
+    [Tooltip("Alternative to setting referenceObject.")]
+    [SerializeField] private string referenceObjectTag;
+    [SerializeField] private bool parentToReference = true;
+    [SerializeField] private Vector3 localPosition;
+    [SerializeField] private Vector3 localEulerAngles;
+    [SerializeField] private bool destroyOnEnd = false;
+    [Range(0.0f, 1.0f)] [SerializeField] private float chanceToSpawn = 1.0f;
 
     private GameObject createdObject;
     
     protected override void Awake() {
         base.Awake();
 
-        if (parentObjectTag.Length > 0 && !parentObject) {
-            parentObject = GameObject.FindGameObjectWithTag(parentObjectTag);
+        if (referenceObjectTag.Length > 0 && !referenceObject) {
+            referenceObject = GameObject.FindGameObjectWithTag(referenceObjectTag);
         }
     }
     
@@ -39,12 +41,12 @@ public class CreateEffect : Effect
 
         if (Mathf.Approximately(chanceToSpawn, 1.0f) || Random.Range(0.0f, 1.0f) < chanceToSpawn) {
             createdObject = (GameObject) Instantiate(prefabToCreate);
-            if (parentObject) {
-                if (parentToParent) {
-                    createdObject.transform.parent = parentObject.transform;
+            if (referenceObject) {
+                if (parentToReference) {
+                    createdObject.transform.parent = referenceObject.transform;
                     createdObject.transform.localPosition = localPosition;
                 } else {
-                    createdObject.transform.position = parentObject.transform.position;
+                    createdObject.transform.position = referenceObject.transform.position;
                     createdObject.transform.Translate(localPosition);
                 }
             } else {

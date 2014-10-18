@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 public class AllChildEffects : Effect
 {
-    public bool overrideDurations = false;
+    // Variables to specify in the editor.
+    [SerializeField] private bool overrideDurations = false;
 
     private List<Effect> childEffectsList;
 

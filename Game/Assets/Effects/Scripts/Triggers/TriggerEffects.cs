@@ -3,8 +3,10 @@ using System.Collections;
 
 public class TriggerEffects : MonoBehaviour
 {
-    public EffectManager effectsManager;
-    public bool destroyAfterTrigger = true;
+    // Variables to specify in the editor.
+    [SerializeField] protected EffectManager effectsManager;
+    [Tooltip("Destroys this script, not its GameObject.")]
+    [SerializeField] private bool destroyAfterTrigger = false;
 
     void Awake() {
 

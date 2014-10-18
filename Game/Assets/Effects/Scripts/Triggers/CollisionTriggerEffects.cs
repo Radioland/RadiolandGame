@@ -3,8 +3,10 @@ using System.Collections;
 
 public class CollisionTriggerEffects : TriggerEffects
 {
-    public string testColliderTag;
-    public bool ignorePerpendicular = false;
+    // Variables to specify in the editor.
+    [Tooltip("Leave empty to trigger on any tag.")]
+    [SerializeField] private string testColliderTag;
+    [SerializeField] private bool ignorePerpendicular = false;
 
     private Vector3 lastNonZeroVelocity;
 

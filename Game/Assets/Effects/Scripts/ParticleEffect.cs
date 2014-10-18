@@ -3,9 +3,10 @@ using System.Collections;
 
 public class ParticleEffect : Effect
 {
-    public ParticleSystem effectParticleSystem;
-    public GameObject positionObject;
-    public Vector3 offsetFromObject;
+    // Variables to specify in the editor.
+    [SerializeField] private ParticleSystem effectParticleSystem;
+    [SerializeField] private GameObject positionObject;
+    [SerializeField] private Vector3 offsetFromObject;
 
     protected override void Awake() {
         base.Awake();
@@ -34,12 +35,7 @@ public class ParticleEffect : Effect
 
         Vector3 position;
         if (positionObject) {
-            position = positionObject.transform.position;
-            // Orient and offset in the x direction
-            position.x += offsetFromObject.x * positionObject.transform.forward.x;
-            // Simply offset in the y and z directions
-            position.y += offsetFromObject.y;
-            position.z += offsetFromObject.z;
+            position = positionObject.transform.position + offsetFromObject;
         } else {
             position = transform.position + offsetFromObject;
         }

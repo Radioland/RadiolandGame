@@ -4,10 +4,11 @@ using System.Collections.Generic;
 
 public class ToggleLayerEffect : Effect
 {
-    public GameObject objectToToggle;
-    public int newLayer;
-    public bool changeChildren = true;
-    public bool revertAtEnd = true;
+    // Variables to specify in the editor.
+    [SerializeField] private GameObject objectToToggle;
+    [SerializeField] private int newLayer;
+    [SerializeField] private bool changeChildren = true;
+    [SerializeField] private bool revertAtEnd = true;
 
     private List<GameObject> objectsToToggle;
     private List<int> originalLayers;

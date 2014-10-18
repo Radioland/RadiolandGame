@@ -3,7 +3,8 @@ using System.Collections;
 
 public class StopParticleEffect : Effect
 {
-    public ParticleSystem effectParticleSystem;
+    // Variables to specify in the editor.
+    [SerializeField] private ParticleSystem effectParticleSystem;
     
     protected override void Awake() {
         base.Awake();

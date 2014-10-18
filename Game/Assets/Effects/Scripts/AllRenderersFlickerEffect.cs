@@ -3,17 +3,19 @@ using System.Collections;
 
 public class AllRenderersFlickerEffect : Effect
 {
-    public GameObject gameObjectToChange;
-    public float timeOn;
-    public float timeOff;
+    // Variables to specify in the editor.
+    [SerializeField] private GameObject gameObjectToChange;
+    [SerializeField] private float timeOn;
+    [SerializeField] private float timeOff;
 
     private Renderer[] renderers;
-    private bool isOn;
+    private bool currentlyVisible;
     private float lastTimeChanged;
 
     protected override void Awake() {
         base.Awake();
 
+        currentlyVisible = true;
         renderers = gameObjectToChange.GetComponentsInChildren<Renderer>();
     }
 
@@ -25,10 +27,10 @@ public class AllRenderersFlickerEffect : Effect
         base.Update();
 
         if (isPlaying && hasStarted) {
-            if (isOn && Time.time - lastTimeChanged > timeOn) {
+            if (currentlyVisible && Time.time - lastTimeChanged > timeOn) {
                 ChangeVisibility(false);
             }
-            if (!isOn && Time.time - lastTimeChanged > timeOff) {
+            if (!currentlyVisible && Time.time - lastTimeChanged > timeOff) {
                 ChangeVisibility(true);
             }
         }
@@ -51,11 +53,11 @@ public class AllRenderersFlickerEffect : Effect
     }
 
     void ChangeVisibility(bool newVisibility) {
-        isOn = newVisibility;
+        currentlyVisible = newVisibility;
         lastTimeChanged = Time.time;
 
         foreach (Renderer thisRenderer in renderers) {
-            thisRenderer.enabled = isOn;
+            thisRenderer.enabled = currentlyVisible;
         }
     }
 }

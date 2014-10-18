@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 public class RandomEffect : Effect
 {
-    public List<Effect> effects;
+    // Variables to specify in the editor.
+    [SerializeField] private List<Effect> effects;
 
     private Effect currentEffect;
     

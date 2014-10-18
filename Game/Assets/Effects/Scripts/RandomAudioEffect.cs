@@ -5,11 +5,9 @@ using System.Collections.Generic;
 [RequireComponent(typeof(AudioSource))]
 public class RandomAudioEffect : Effect
 {
-    public List<AudioClip> audioClips;
-    [Range(0.0f, 1.0f)] public float volumeScale = 1.0f;
-    public float cooldown = 0.0f;
-    
-    private float lastTimePlayed;
+    // Variables to specify in the editor.
+    [SerializeField] private List<AudioClip> audioClips;
+    [Range(0.0f, 1.0f)] [SerializeField] private float volumeScale = 1.0f;
     
     protected override void Awake() {
         base.Awake();
@@ -29,13 +27,8 @@ public class RandomAudioEffect : Effect
     
     public override void StartEffect() {
         base.StartEffect();
-        
-        if (Time.time - lastTimePlayed > cooldown) {
-            audio.PlayOneShot(audioClips[Random.Range(0, audioClips.Count)], volumeScale);
-            lastTimePlayed = Time.time;
-        } else {
-            EndEffect();
-        }
+
+        audio.PlayOneShot(audioClips[Random.Range(0, audioClips.Count)], volumeScale);
     }
     
     public override void EndEffect() {

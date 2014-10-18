@@ -3,7 +3,9 @@ using System.Collections;
 
 public class SetParentEffect : Effect
 {
-    public GameObject newParent;
+    // Variables to specify in the editor.
+    [Tooltip("Leave empty to orphan on trigger.")]
+    [SerializeField] private GameObject newParent;
 
     static GameObject orphanedEffectParent;
     

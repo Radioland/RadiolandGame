@@ -3,8 +3,9 @@ using System.Collections;
 
 public class DestroyEffect : Effect
 {
-    public GameObject objectToDestroy;
-    public bool defaultToSelf = false;
+    // Variables to specify in the editor.
+    [SerializeField] private GameObject objectToDestroy;
+    [SerializeField] private bool defaultToSelf = false;
     
     protected override void Awake() {
         base.Awake();

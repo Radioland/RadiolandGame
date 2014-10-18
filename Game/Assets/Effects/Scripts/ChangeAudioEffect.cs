@@ -3,9 +3,9 @@ using System.Collections;
 
 public class ChangeAudioEffect : Effect
 {
-    //public AudioSource sourceToChange;
-    public GameObject objectWithSource;
-    public AudioClip clipToChangeTo;
+    // Variables to specify in the editor.
+    [SerializeField] private GameObject objectWithSource;
+    [SerializeField] private AudioClip clipToChangeTo;
 
     private AudioSource audioSourceOld;
     private AudioSource audioSourceNew;

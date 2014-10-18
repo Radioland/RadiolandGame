@@ -4,13 +4,14 @@ using System.Collections.Generic;
 
 public class AllRenderersColorEffect : Effect
 {
-    public GameObject gameObjectToChange;
-    public Color newColor;
-    public bool revertAtEnd = false;
-    public bool useFadeOutCurve = false;
-    public AnimationCurve fadeOutCurve;
-	public string shaderColorName = "_Color";
-	public bool isForeverLoop = false;
+    // Variables to specify in the editor.
+    [SerializeField] private GameObject gameObjectToChange;
+    [SerializeField] private Color newColor;
+    [SerializeField] private bool revertAtEnd = false;
+    [SerializeField] private bool useFadeOutCurve = false;
+    [SerializeField] private AnimationCurve fadeOutCurve;
+    [SerializeField] private string shaderColorName = "_Color";
+    [SerializeField] private bool isForeverLoop = false;
 
     private Renderer[] renderers;
     private List<Color> rendererOriginalColors;
@@ -22,11 +23,11 @@ public class AllRenderersColorEffect : Effect
 
         rendererOriginalColors = new List<Color>();
         foreach (Renderer thisRenderer in renderers) {
-            //rendererOriginalColors.Add(thisRenderer.material.color);
             if (thisRenderer.material.HasProperty(shaderColorName)) {
-			    rendererOriginalColors.Add(thisRenderer.material.GetColor (shaderColorName));
+                rendererOriginalColors.Add(thisRenderer.material.GetColor(shaderColorName));
             } else {
                 Debug.LogWarning(thisRenderer.GetPath() + " has no material color named " + shaderColorName);
+                // Keep renderers and rendererOriginalColors lists the same size (hack).
                 rendererOriginalColors.Add(Color.white);
             }
         }
@@ -43,7 +44,6 @@ public class AllRenderersColorEffect : Effect
             float curveT = fadeOutCurve.Evaluate(percentDurationElapsed);
 
             for (int i = 0; i < renderers.Length; i++) {
-                //renderers[i].material.color = lerpColor;
                 if (renderers[i].material.HasProperty(shaderColorName)) {
                     Color lerpColor = Color.Lerp(newColor, rendererOriginalColors[i], curveT);
                     renderers[i].material.SetColor(shaderColorName, lerpColor);
@@ -60,23 +60,23 @@ public class AllRenderersColorEffect : Effect
         base.StartEffect();
 
         for (int i = 0; i < renderers.Length; i++) {
-            //renderers[i].material.color = newColor;
-			renderers[i].material.SetColor(shaderColorName, newColor);
+            if (renderers[i].material.HasProperty(shaderColorName)) {
+                renderers[i].material.SetColor(shaderColorName, newColor);
+            }
         }
     }
 
     public override void EndEffect() {
-		if (!isForeverLoop) {
-	        base.EndEffect();
+        if (!isForeverLoop) {
+            base.EndEffect();
 
-	        if (revertAtEnd) {
+            if (revertAtEnd) {
                 for (int i = 0; i < renderers.Length; i++) {
-                    //renderers[i].material.color = rendererOriginalColors[i];
                     if (renderers[i].material.HasProperty(shaderColorName)) {
                         renderers[i].material.SetColor(shaderColorName, rendererOriginalColors[i]);
                     }
-	            }
-	        }
+                }
+            }
         }
     }
 }

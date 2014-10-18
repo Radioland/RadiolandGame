@@ -3,9 +3,10 @@ using System.Collections;
 
 public class ChangeGravityEffect : Effect
 {
-    public GameObject objectToChange;
-    public bool defaultToSelf = true;
-    public bool useGravity = true;
+    // Variables to specify in the editor.
+    [SerializeField] private GameObject objectToChange;
+    [SerializeField] private bool defaultToSelf = true;
+    [SerializeField] private bool useGravity = true;
 
     protected override void Awake() {
         base.Awake();
