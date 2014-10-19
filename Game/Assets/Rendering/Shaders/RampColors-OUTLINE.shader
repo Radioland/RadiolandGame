@@ -1,6 +1,9 @@
-﻿Shader "Custom/RampColors-forward" {
+﻿Shader "Custom/RampColors-OUTLINE" {
 	Properties {
 		_MainTex ("Ramp (RGB)", 2D) = "white" {}
+		
+		_OutlineColor ("Outline Color", Color) = (0,0,0,1)
+		_Outline ("Outline width", Range (.002, 0.03)) = .005
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque"}
@@ -56,12 +59,6 @@ float3 RGBtoHSV(in float3 RGB)
 			float2 uv_MainTex;
 		};
 		
-		float4 LightingMyDiffuse_PrePass(SurfaceOutput i, float4 light)
-		{
-			//i.Emission = light.rgb;
-			return float4(i.Albedo * light.rgb, 1.0);
-		}
-		
 		void rampcolor (Input IN, SurfaceOutput o, inout fixed4 color) {
 			float y = 0;
 			if (IN.uv_MainTex.y < 0.25) {
@@ -71,8 +68,10 @@ float3 RGBtoHSV(in float3 RGB)
 			} else if (IN.uv_MainTex.y < 0.75) {
 				y = 2.5 / 4.0;
 			} else {
-			y = 3.5 / 4.0;
+				y = 3.5 / 4.0;
 			}
+			y = IN.uv_MainTex.y;
+			
 			color = saturate(color);
 			
 			half3 lightinghsv = RGBtoHSV(float3 (color.r, color.g, color.b));
@@ -98,6 +97,8 @@ float3 RGBtoHSV(in float3 RGB)
 			o.Alpha = 1.0;
 		}
 		ENDCG
-	}
+		UsePass "Toon/Basic Outline/OUTLINE"
+	} 
+	Dependency "BaseMapShader" = "Toon/Lighted Outline"
 	FallBack "Diffuse"
 }
