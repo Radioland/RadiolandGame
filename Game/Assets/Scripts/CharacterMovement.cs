@@ -12,14 +12,19 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Range(0.0f, 100.0f)] private float gravity = 30.0f;
     // Speed is calculated to reach this height.
     [SerializeField] [Range(0.0f, 10.0f)] private float jumpHeight = 2.0f;
-    // Extra time to become grounded before jumping.
-    [SerializeField] [Range(0.0f, 0.5f)] private float jumpTimeout = 0.1f;
+    [SerializeField] [Tooltip("Extra time to become grounded before jumping.")]
+    private float jumpPreTimeout = 0.1f;
+    [SerializeField] [Tooltip("Extra time to jump after starting to fall.")]
+    private float jumpPostTimeout = 0.2f;
+    [SerializeField] private float jumpCooldown = 0.25f;
     public bool playerMoving;
 
     private CharacterController controller;
     private CollisionFlags collisionFlags;
     private float verticalSpeed;
+    private float lastJumpInputTime;
     private float lastJumpTime;
+    private float lastGroundedTime;
 
     // Animation.
     private Animator animator;
@@ -44,7 +49,8 @@ public class CharacterMovement : MonoBehaviour
         playerMoving = false;
         controller = gameObject.GetComponent<CharacterController>();
         verticalSpeed = 0.0f;
-        lastJumpTime = -1000.0f;
+        lastJumpInputTime = -1000.0f;
+        lastGroundedTime = -1000.0f;
 
         animator = gameObject.GetComponentInChildren<Animator>();
         speedHash = Animator.StringToHash("Speed");
@@ -59,6 +65,9 @@ public class CharacterMovement : MonoBehaviour
     }
 
     void Update() {
+        if (grounded) { lastGroundedTime = Time.time; }
+
+        // Check for movement input.
         bool inputReceived = false;
         if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
             Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
@@ -66,6 +75,7 @@ public class CharacterMovement : MonoBehaviour
             inputReceived = true;
         }
 
+        // Rotate the player (only when input is received).
         if (inputReceived) {
             if (playerMoving) {
                 // Rotate with horizontal input.
@@ -82,6 +92,7 @@ public class CharacterMovement : MonoBehaviour
             }
         }
 
+        // Grab movement input values and update animations.
         Vector3 inputVector = transform.forward * Input.GetAxis("Vertical") +
                               transform.right * Input.GetAxis("Strafe");
         if (animator) {
@@ -109,11 +120,17 @@ public class CharacterMovement : MonoBehaviour
 
     void ApplyJump() {
         if (Input.GetButtonDown("Jump")) {
-            lastJumpTime = Time.time;
+            lastJumpInputTime = Time.time;
         }
-        // Timeout lets you trigger a jump slightly before landing.
-        if (grounded && Time.time < lastJumpTime + jumpTimeout) {
-            verticalSpeed = jumpVerticalSpeed;
+
+        // PreTimeout lets you trigger a jump slightly before landing.
+        if (Time.time < lastJumpInputTime + jumpPreTimeout &&
+            Time.time > lastJumpTime + jumpCooldown) {
+            // PostTimeout lets you trigger a jump slightly after starting to fall.
+            if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
+                verticalSpeed = jumpVerticalSpeed;
+                lastJumpTime = Time.time;
+            }
         }
     }
 

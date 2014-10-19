@@ -12,7 +12,7 @@ public class CameraControl : MonoBehaviour
     // The radius is affected by the current zoom level.
     // The two angles are controlled by mouse input.
     [SerializeField]
-    [Range(5.0f, 30.0f)] private float radius = 10.0f;
+    [Range(2.0f, 40.0f)] private float radius = 10.0f;
     [SerializeField]
     private float defaultVerticalAngle = 20.0f;
     [SerializeField]
