@@ -13,11 +13,11 @@ public class CameraControl : MonoBehaviour
     // The two angles are controlled by mouse input.
     [SerializeField]
     [Range(2.0f, 40.0f)] private float radius = 10.0f;
-    [SerializeField]
-    private float defaultVerticalAngle = 20.0f;
-    [SerializeField]
-    private float offsetHorizontal = -90.0f; // Set based on model's orientation.
+    [SerializeField] private float defaultVerticalAngle = 20.0f;
+    [Tooltip("Set based on model's orientation.")]
+    [SerializeField] private float offsetHorizontal = -90.0f;
 
+    private Vector3 targetPosition;
     private float horizontalAngle; // Y-Axis Euler Angle
     private float verticalAngle; // X-Axis Euler Angle
     private float lastMouseX;
@@ -34,6 +34,7 @@ public class CameraControl : MonoBehaviour
             Debug.LogWarning("No character movement set on CameraControl!");
         }
 
+        targetPosition = new Vector3(0, 100000, 0);
         verticalAngle = defaultVerticalAngle;
         horizontalAngle = offsetHorizontal;
         lastMouseX = 0.0f;
@@ -54,7 +55,7 @@ public class CameraControl : MonoBehaviour
             // Default behavior.
             // Rotate horizontalAngle towards the player's orientation.
             // Maintain a constant verticalAngle.
-            if (characterMovement.playerMoving) {
+            if (characterMovement.moving) {
                 horizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal;
                 verticalAngle = defaultVerticalAngle;
             }
@@ -75,7 +76,19 @@ public class CameraControl : MonoBehaviour
         float z = Mathf.Cos(theta) * Mathf.Sin(phi);
         // Offset from the player by the vector to that point at the given radius.
         Vector3 offset = new Vector3(x, y, z);
-        Vector3 targetPosition = targetTransform.position + offset * radius;
+        Vector3 newTargetPosition = targetTransform.position + offset * radius;
+
+        targetPosition.x = newTargetPosition.x;
+        targetPosition.z = newTargetPosition.z;
+        if (characterMovement.jumping) {
+            // Follow when falling.
+            if (newTargetPosition.y < targetPosition.y) {
+                targetPosition.y = newTargetPosition.y;
+            }
+        } else {
+            targetPosition.y = newTargetPosition.y;
+        }
+
         cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position,
                                                       targetPosition,
                                                       ref velocityCamSmooth,

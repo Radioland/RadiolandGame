@@ -17,7 +17,12 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Tooltip("Extra time to jump after starting to fall.")]
     private float jumpPostTimeout = 0.2f;
     [SerializeField] private float jumpCooldown = 0.25f;
-    public bool playerMoving;
+
+    // State (visible to other scripts).
+    [SerializeField] private bool m_moving;
+    public bool moving { get { return m_moving; } }
+    [SerializeField] private bool m_jumping;
+    public bool jumping { get { return m_jumping; } }
 
     private CharacterController controller;
     private CollisionFlags collisionFlags;
@@ -31,6 +36,7 @@ public class CharacterMovement : MonoBehaviour
     private int speedHash;
     private int strafeHash;
 
+    // Setting backups.
     private float originalGravity;
     private float originalJumpHeight;
 
@@ -46,13 +52,20 @@ public class CharacterMovement : MonoBehaviour
             Debug.LogWarning("No camera control set on CharacterMovement!");
         }
 
-        playerMoving = false;
+        // Setup initial state.
+        m_moving = false;
+        m_jumping = false;
+
         controller = gameObject.GetComponent<CharacterController>();
         verticalSpeed = 0.0f;
         lastJumpInputTime = -1000.0f;
         lastGroundedTime = -1000.0f;
 
+        // Fetch animator properties.
         animator = gameObject.GetComponentInChildren<Animator>();
+        if (!animator) {
+            Debug.LogWarning("No animator found on " + transform.GetPath());
+        }
         speedHash = Animator.StringToHash("Speed");
         strafeHash = Animator.StringToHash("Strafe");
 
@@ -77,7 +90,7 @@ public class CharacterMovement : MonoBehaviour
 
         // Rotate the player (only when input is received).
         if (inputReceived) {
-            if (playerMoving) {
+            if (m_moving) {
                 // Rotate with horizontal input.
                 float inputRotation = Input.GetAxis("Horizontal") *
                                       degRotPerSec * Time.deltaTime;
@@ -91,6 +104,7 @@ public class CharacterMovement : MonoBehaviour
                 transform.eulerAngles = newEulerAngles;
             }
         }
+        m_moving = inputReceived;
 
         // Grab movement input values and update animations.
         Vector3 inputVector = transform.forward * Input.GetAxis("Vertical") +
@@ -106,13 +120,12 @@ public class CharacterMovement : MonoBehaviour
         Vector3 motion = inputVector * walkSpeed + Vector3.up * verticalSpeed;
         motion *= Time.deltaTime;
         collisionFlags = controller.Move(motion);
-
-        playerMoving = inputReceived;
     }
 
     void ApplyGravity() {
         if (grounded) {
             verticalSpeed = 0.0f;
+            m_jumping = false;
         } else {
             verticalSpeed -= gravity * Time.deltaTime;
         }
@@ -130,23 +143,13 @@ public class CharacterMovement : MonoBehaviour
             if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
                 verticalSpeed = jumpVerticalSpeed;
                 lastJumpTime = Time.time;
+                m_jumping = true;
             }
         }
     }
 
-    public void SetJumpHeight(float height) {
-        jumpHeight = height;
-    }
-
-    public void ResetJumpHeight() {
-        jumpHeight = originalJumpHeight;
-    }
-
-    public void SetGravity(float newGravity) {
-        gravity = newGravity;
-    }
-
-    public void ResetGravity() {
-        gravity = originalGravity;
-    }
+    public void SetJumpHeight(float height) { jumpHeight = height; }
+    public void ResetJumpHeight() { jumpHeight = originalJumpHeight; }
+    public void SetGravity(float newGravity) { gravity = newGravity; }
+    public void ResetGravity() { gravity = originalGravity; }
 }
