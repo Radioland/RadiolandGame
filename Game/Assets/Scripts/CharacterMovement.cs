@@ -95,12 +95,10 @@ public class CharacterMovement : MonoBehaviour
     }
 
     void Update() {
+		currentPlatform = null;
         if (Physics.Raycast (transform.position, Vector3.down, out hit,0.1f)) {
             if (hit.transform.tag == "moving") {
                 currentPlatform = hit.transform.gameObject;
-            }
-            else {
-                currentPlatform = null;
             }
         }
 
