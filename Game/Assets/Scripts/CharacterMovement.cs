@@ -40,10 +40,9 @@ public class CharacterMovement : MonoBehaviour
     private float originalGravity;
     private float originalJumpHeight;
 
-	//Moving platform
-	private bool isOnMovingPlatform = false;
-	GameObject platform;
-	RaycastHit hit;
+        //Moving platform
+        private GameObject currentPlatform;
+        private RaycastHit hit;
 
     private bool grounded {
         get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
@@ -76,29 +75,23 @@ public class CharacterMovement : MonoBehaviour
 
         originalGravity = gravity;
         originalJumpHeight = jumpHeight;
-
-		platform = GameObject.Find ("Platform");
     }
 
     void Start() {
-		
+                
     }
 
     void Update() {
-		isOnMovingPlatform = false;
-		if (Physics.Raycast (transform.position, Vector3.down, out hit,0.1f)) {
-			if (hit.transform.tag == "moving") {
-				isOnMovingPlatform = true;
-				platform = hit.transform.gameObject;
-			}
-			else {
-				isOnMovingPlatform = false;
-			}
-		}
+                currentPlatform = null;
+                if (Physics.Raycast (transform.position, Vector3.down, out hit,0.1f)) {
+                        if (hit.transform.tag == "moving") {
+                                currentPlatform = hit.transform.gameObject;
+                        }
+                }
 
-		if (isOnMovingPlatform) {
-			transform.position += new Vector3(platform.GetComponent<PlatformMoving>().xVelocity * Time.deltaTime,platform.GetComponent<PlatformMoving>().yVelocity * Time.deltaTime,platform.GetComponent<PlatformMoving>().zVelocity * Time.deltaTime);
-		}
+                if (currentPlatform != null) {
+                    transform.position += currentPlatform.GetComponent<PlatformMoving>().GetVelocity();
+                }
 
         if (grounded) { lastGroundedTime = Time.time; }
 
