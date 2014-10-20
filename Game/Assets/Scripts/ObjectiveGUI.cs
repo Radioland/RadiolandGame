@@ -7,7 +7,7 @@ public class ObjectiveGUI : MonoBehaviour {
     int totalTargets;
     
     Text text;
-    // Use this for initialization
+
     void Start () {
         targetsFound = 0;
         totalTargets = 5;
@@ -20,8 +20,7 @@ public class ObjectiveGUI : MonoBehaviour {
             targetsFound += 1;
         }
     }
-    
-    // Update is called once per frame
+
     void Update () {
         text.text = targetsFound.ToString() + "/" + totalTargets.ToString();
     }

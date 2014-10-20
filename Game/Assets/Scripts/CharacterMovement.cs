@@ -40,9 +40,10 @@ public class CharacterMovement : MonoBehaviour
     private float originalGravity;
     private float originalJumpHeight;
 
-        //Moving platform
-        private GameObject currentPlatform;
-        private RaycastHit hit;
+    //Moving platform
+    private GameObject currentPlatform;
+    private RaycastHit hit;
+    private GameObject pushPlatform;
 
     private bool grounded {
         get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
@@ -81,17 +82,35 @@ public class CharacterMovement : MonoBehaviour
                 
     }
 
-    void Update() {
-                currentPlatform = null;
-                if (Physics.Raycast (transform.position, Vector3.down, out hit,0.1f)) {
-                        if (hit.transform.tag == "moving") {
-                                currentPlatform = hit.transform.gameObject;
-                        }
-                }
+    void OnCollisionEnter(Collision c) {
+        if (c.transform.tag == "moving") {
+            pushPlatform = c.transform.gameObject;
+        }
+    }
 
-                if (currentPlatform != null) {
-                    transform.position += currentPlatform.GetComponent<PlatformMoving>().GetVelocity();
-                }
+    void OnCollisionExit(Collision c) {
+        if (c.transform.tag == "moving") {
+            pushPlatform = null;
+        }
+    }
+
+    void Update() {
+        if (Physics.Raycast (transform.position, Vector3.down, out hit,0.1f)) {
+            if (hit.transform.tag == "moving") {
+                currentPlatform = hit.transform.gameObject;
+            }
+            else {
+                currentPlatform = null;
+            }
+        }
+
+        if (currentPlatform != null) {
+            transform.position += currentPlatform.GetComponent<PlatformMoving>().GetVelocity();
+        }
+
+        if (pushPlatform != null) {
+            transform.position += pushPlatform.GetComponent<PlatformMoving>().GetVelocity();
+        }
 
         if (grounded) { lastGroundedTime = Time.time; }
 

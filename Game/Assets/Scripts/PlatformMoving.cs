@@ -5,13 +5,12 @@ public class PlatformMoving : MonoBehaviour {
 
     float startTime;
     public Vector3 velocity;
-    // Use this for initialization
+
     void Start () {
         startTime = Time.time;
     }
     
-    // Update is called once per frame
-    void Update () {
+    void FixedUpdate () {
         if (Time.time - startTime > 2) {
             velocity = -1 * velocity;
             startTime = Time.time;

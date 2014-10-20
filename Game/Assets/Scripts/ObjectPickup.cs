@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ObjectPickup : MonoBehaviour {
     GameObject objectiveGUI;
-    // Use this for initialization
+
     void Start () {
         objectiveGUI = GameObject.Find ("ObjectiveUI");
     }
@@ -15,7 +15,6 @@ public class ObjectPickup : MonoBehaviour {
         }
     }
     
-    // Update is called once per frame
     void Update () {
 
     }
