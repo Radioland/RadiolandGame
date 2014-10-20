@@ -15,7 +15,9 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float defaultVerticalAngle = 20.0f;
     [Tooltip("Set based on model's orientation.")]
     [SerializeField] private float offsetHorizontal = -90.0f;
-    [SerializeField] [Range(0.0f, 1.0f)] private float maxTargetScreenY = 0.75f;
+    [SerializeField] [Range(0.0f, 1.0f)] private float minTargetScreenY = 0.35f;
+    [SerializeField] [Range(0.0f, 1.0f)] private float maxTargetScreenY = 0.65f;
+    [SerializeField] [Range(0.0f, 1.0f)] private float lookUpSmooth = 0.15f;
 
     private Camera cameraComponent;
     private Vector3 targetPosition;
@@ -25,8 +27,8 @@ public class CameraControl : MonoBehaviour
     private float lastMouseY;
 
     private Vector3 velocityCamSmooth = Vector3.zero;
-    [SerializeField]
-    private float camSmoothDampTime = 0.1f;
+    [SerializeField] private float camSmoothDampTime = 0.1f;
+    private Quaternion verticalRotation;
 
     void Awake() {
         if (!targetTransform) { targetTransform = transform; }
@@ -39,6 +41,7 @@ public class CameraControl : MonoBehaviour
         targetPosition = new Vector3(0, 100000, 0);
         targetVerticalAngle = defaultVerticalAngle;
         targetHorizontalAngle = offsetHorizontal;
+        verticalRotation = Quaternion.identity;
         lastMouseX = 0.0f;
         lastMouseY = 0.0f;
     }
@@ -97,15 +100,33 @@ public class CameraControl : MonoBehaviour
                                                       ref velocityCamSmooth,
                                                       camSmoothDampTime);
 
-        // Update rotation.
+        // Update rotation, adjusting for the player leaving the viewport.
+        // Alternately: cameraTransform.LookAt(targetTransform.position);
+
+        // First rotate around the Y axis.
         Vector3 offsetToCenter = targetTransform.position - cameraTransform.position;
         Vector3 offsetXZ = new Vector3(offsetToCenter.x, 0, offsetToCenter.z);
         Quaternion yRotation = Quaternion.LookRotation(offsetXZ);
-
         cameraTransform.rotation = yRotation;
 
-        cameraTransform.rotation *= Quaternion.Euler(targetVerticalAngle, 0, 0);
-        //cameraTransform.LookAt(targetTransform.position);
+        // Default to the target vertical angle (not at the player if they are jumping).
+        Quaternion targetVerticalRotation = Quaternion.Euler(targetVerticalAngle, 0, 0);
+
+        // If the player is near an edge of the viewport, aim at them instead.
+        Vector3 from = cameraTransform.forward;
+        Vector3 to = targetTransform.position - cameraTransform.position;
+        float remainingAngle = targetVerticalAngle - Vector3.Angle(from, to);
+
+        Vector3 targetViewportPoint = cameraComponent.WorldToViewportPoint(targetTransform.position);
+        if (targetViewportPoint.y > maxTargetScreenY) {
+            targetVerticalRotation *= Quaternion.Euler(remainingAngle, 0, 0);
+        } else if (targetViewportPoint.y < minTargetScreenY) {
+            targetVerticalRotation *= Quaternion.Euler(-remainingAngle, 0, 0);
+        }
+
+        // Smoothly rotate to the target.
+        verticalRotation = Quaternion.Slerp(verticalRotation, targetVerticalRotation, lookUpSmooth);
+        cameraTransform.rotation *= verticalRotation;
 
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
