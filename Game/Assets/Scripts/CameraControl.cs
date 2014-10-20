@@ -11,15 +11,16 @@ public class CameraControl : MonoBehaviour
     // The camera moves around a sphere centered on the player.
     // The radius is affected by the current zoom level.
     // The two angles are controlled by mouse input.
-    [SerializeField]
-    [Range(2.0f, 40.0f)] private float radius = 10.0f;
+    [SerializeField] [Range(2.0f, 40.0f)] private float radius = 10.0f;
     [SerializeField] private float defaultVerticalAngle = 20.0f;
     [Tooltip("Set based on model's orientation.")]
     [SerializeField] private float offsetHorizontal = -90.0f;
+    [SerializeField] [Range(0.0f, 1.0f)] private float maxTargetScreenY = 0.75f;
 
+    private Camera cameraComponent;
     private Vector3 targetPosition;
-    private float horizontalAngle; // Y-Axis Euler Angle
-    private float verticalAngle; // X-Axis Euler Angle
+    private float targetHorizontalAngle; // Y-Axis Euler Angle
+    private float targetVerticalAngle; // X-Axis Euler Angle
     private float lastMouseX;
     private float lastMouseY;
 
@@ -34,9 +35,10 @@ public class CameraControl : MonoBehaviour
             Debug.LogWarning("No character movement set on CameraControl!");
         }
 
+        cameraComponent = cameraTransform.GetComponent<Camera>();
         targetPosition = new Vector3(0, 100000, 0);
-        verticalAngle = defaultVerticalAngle;
-        horizontalAngle = offsetHorizontal;
+        targetVerticalAngle = defaultVerticalAngle;
+        targetHorizontalAngle = offsetHorizontal;
         lastMouseX = 0.0f;
         lastMouseY = 0.0f;
     }
@@ -56,20 +58,21 @@ public class CameraControl : MonoBehaviour
             // Rotate horizontalAngle towards the player's orientation.
             // Maintain a constant verticalAngle.
             if (characterMovement.moving) {
-                horizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal;
-                verticalAngle = defaultVerticalAngle;
+                targetHorizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal;
+                targetVerticalAngle = defaultVerticalAngle;
             }
         } else {
             // Mouse controlled camera rotation.
             float mouseDeltaX = Input.mousePosition.x - lastMouseX;
             float mouseDeltaY = Input.mousePosition.y - lastMouseY;
-            horizontalAngle -= mouseDeltaX;
-            verticalAngle -= mouseDeltaY;
+            targetHorizontalAngle -= mouseDeltaX;
+            targetVerticalAngle -= mouseDeltaY;
         }
 
-        float phi = horizontalAngle * Mathf.Deg2Rad;
-        float theta = verticalAngle * Mathf.Deg2Rad;
+        float phi = targetHorizontalAngle * Mathf.Deg2Rad;
+        float theta = targetVerticalAngle * Mathf.Deg2Rad;
 
+        // Update position.
         // Calculate the point on the unit sphere with the provided angles.
         float x = Mathf.Cos(theta) * Mathf.Cos(phi);
         float y = Mathf.Sin(theta);
@@ -94,7 +97,15 @@ public class CameraControl : MonoBehaviour
                                                       ref velocityCamSmooth,
                                                       camSmoothDampTime);
 
-        cameraTransform.LookAt(targetTransform.position);
+        // Update rotation.
+        Vector3 offsetToCenter = targetTransform.position - cameraTransform.position;
+        Vector3 offsetXZ = new Vector3(offsetToCenter.x, 0, offsetToCenter.z);
+        Quaternion yRotation = Quaternion.LookRotation(offsetXZ);
+
+        cameraTransform.rotation = yRotation;
+
+        cameraTransform.rotation *= Quaternion.Euler(targetVerticalAngle, 0, 0);
+        //cameraTransform.LookAt(targetTransform.position);
 
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
