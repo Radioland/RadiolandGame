@@ -95,9 +95,11 @@ public class CharacterMovement : MonoBehaviour
 				isOnMovingPlatform = false;
 			}
 		}
-		if(isOnMovingPlatform) {
-			transform.position += new Vector3(platform.GetComponent<PlatformMoving>().xVelocity * Time.deltaTime,0f,0f);
+
+		if (isOnMovingPlatform) {
+			transform.position += new Vector3(platform.GetComponent<PlatformMoving>().xVelocity * Time.deltaTime,platform.GetComponent<PlatformMoving>().yVelocity * Time.deltaTime,platform.GetComponent<PlatformMoving>().zVelocity * Time.deltaTime);
 		}
+
         if (grounded) { lastGroundedTime = Time.time; }
 
         // Check for movement input.

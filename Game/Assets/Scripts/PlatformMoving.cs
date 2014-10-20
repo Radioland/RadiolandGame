@@ -6,6 +6,8 @@ public class PlatformMoving : MonoBehaviour {
 	float startTime;
 
 	public float xVelocity;
+	public float yVelocity;
+	public float zVelocity;
 
 	// Use this for initialization
 	void Start () {
@@ -19,7 +21,7 @@ public class PlatformMoving : MonoBehaviour {
 			startTime = Time.time;
 		}
 
-		transform.localPosition += new Vector3(xVelocity * Time.deltaTime,0,0);
+		transform.localPosition += new Vector3(xVelocity * Time.deltaTime,yVelocity * Time.deltaTime,zVelocity * Time.deltaTime);
 	
 	}
 }
