@@ -119,7 +119,7 @@ public class CharacterMovement : MonoBehaviour
         }
 
         if (pushPlatform != null) {
-            transform.position += pushPlatform.GetComponent<PlatformMoving>().GetVelocity();
+            transform.position += pushPlatform.GetComponent<PlatformMoving>().GetVelocity() * 1.1f;
         }
 
         if (grounded) {
