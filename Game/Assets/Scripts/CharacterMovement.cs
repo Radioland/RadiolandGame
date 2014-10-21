@@ -17,12 +17,15 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Tooltip("Extra time to jump after starting to fall.")]
     private float jumpPostTimeout = 0.2f;
     [SerializeField] private float jumpCooldown = 0.25f;
+    [SerializeField] private float slideSpeed = 5.0f;
 
     // State (visible to other scripts).
     [SerializeField] private bool m_moving;
     public bool moving { get { return m_moving; } }
     [SerializeField] private bool m_jumping;
     public bool jumping { get { return m_jumping; } }
+    [SerializeField] private bool m_sliding;
+    public bool sliding { get { return m_sliding; } }
 
     private CharacterController controller;
     private CollisionFlags collisionFlags;
@@ -30,6 +33,8 @@ public class CharacterMovement : MonoBehaviour
     private float lastJumpInputTime;
     private float lastJumpTime;
     private float lastGroundedTime;
+    private float rayDistance;
+    private Vector3 contactPoint;
 
     // Animation.
     private Animator animator;
@@ -60,11 +65,14 @@ public class CharacterMovement : MonoBehaviour
         // Setup initial state.
         m_moving = false;
         m_jumping = false;
+        m_sliding = false;
 
         controller = gameObject.GetComponent<CharacterController>();
         verticalSpeed = 0.0f;
         lastJumpInputTime = -1000.0f;
+        lastJumpTime = -1000.0f;
         lastGroundedTime = -1000.0f;
+        rayDistance = controller.height * 0.5f + controller.radius;
 
         // Fetch animator properties.
         animator = gameObject.GetComponentInChildren<Animator>();
@@ -79,7 +87,7 @@ public class CharacterMovement : MonoBehaviour
     }
 
     void Start() {
-                
+
     }
 
     void OnCollisionEnter(Collision c) {
@@ -94,9 +102,13 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
+    void OnControllerColliderHit(ControllerColliderHit hit) {
+        contactPoint = hit.point;
+    }
+
     void Update() {
 		currentPlatform = null;
-        if (Physics.Raycast (transform.position, Vector3.down, out hit,0.1f)) {
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 0.1f)) {
             if (hit.transform.tag == "moving") {
                 currentPlatform = hit.transform.gameObject;
             }
@@ -110,7 +122,11 @@ public class CharacterMovement : MonoBehaviour
             transform.position += pushPlatform.GetComponent<PlatformMoving>().GetVelocity();
         }
 
-        if (grounded) { lastGroundedTime = Time.time; }
+        if (grounded) {
+            lastGroundedTime = Time.time;
+
+            ApplySliding();
+        }
 
         // Check for movement input.
         bool inputReceived = false;
@@ -139,11 +155,12 @@ public class CharacterMovement : MonoBehaviour
         m_moving = inputReceived;
 
         // Grab movement input values and update animations.
-        Vector3 inputVector = transform.forward * Input.GetAxis("Vertical") +
-                              transform.right * Input.GetAxis("Strafe");
+        float verticalInput = Input.GetAxis("Vertical");
+        float strafeInput = Input.GetAxis("Strafe");
+        Vector3 inputVector = transform.forward * verticalInput + transform.right * strafeInput;
         if (animator) {
-            animator.SetFloat(speedHash, Mathf.Abs(Input.GetAxis("Vertical")));
-            animator.SetFloat(strafeHash, Input.GetAxis("Strafe"));
+            animator.SetFloat(speedHash, Mathf.Abs(verticalInput));
+            animator.SetFloat(strafeHash, strafeInput);
         }
 
         ApplyGravity();
@@ -152,6 +169,31 @@ public class CharacterMovement : MonoBehaviour
         Vector3 motion = inputVector * walkSpeed + Vector3.up * verticalSpeed;
         motion *= Time.deltaTime;
         collisionFlags = controller.Move(motion);
+    }
+
+    void ApplySliding() {
+        m_sliding = false;
+
+        // First simply check under the character for a slope.
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, rayDistance)) {
+            if (Vector3.Angle(hit.normal, Vector3.up) > controller.slopeLimit) {
+                m_sliding = true;
+            }
+        } else {
+            // Also check from a contactPoint (for particularly steep slopes).
+            Physics.Raycast(contactPoint + Vector3.up, Vector3.down, out hit);
+            if (Vector3.Angle(hit.normal, Vector3.up) > controller.slopeLimit) {
+                m_sliding = true;
+            }
+        }
+
+        if (m_sliding) {
+            // Compute moveDirection to point down the slope.
+            Vector3 hitNormal = hit.normal;
+            Vector3 moveDirection = new Vector3(hitNormal.x, -hitNormal.y, hitNormal.z);
+            Vector3.OrthoNormalize(ref hitNormal, ref moveDirection);
+            collisionFlags = controller.Move(moveDirection * slideSpeed * Time.deltaTime);
+        }
     }
 
     void ApplyGravity() {
@@ -167,6 +209,9 @@ public class CharacterMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump")) {
             lastJumpInputTime = Time.time;
         }
+
+        // Do not allow jumping while sliding.
+        if (sliding) { return; }
 
         // PreTimeout lets you trigger a jump slightly before landing.
         if (Time.time < lastJumpInputTime + jumpPreTimeout &&
