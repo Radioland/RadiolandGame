@@ -21,7 +21,7 @@
 		ZWrite On
 		
 		CGPROGRAM
-		#pragma surface surf Lambert exclude_path:prepass vertex:vert
+		#pragma surface surf ToonRamp exclude_path:prepass 
 		#pragma exclude_renderers flash
  
 		sampler2D _Side, _Top, _Bottom;
@@ -46,37 +46,28 @@
 		struct Input {
 			float3 worldPos;
 			float3 worldNormal;
-			float3 vertNormal;
-			float3 objPos;
 		};
-		
-		void vert (inout appdata_full v, out Input o) {
-          UNITY_INITIALIZE_OUTPUT(Input,o);
-          o.vertNormal = v.normal;
-          o.objPos = v.vertex;
-      }
 			
 		void surf (Input IN, inout SurfaceOutput o) {
 			float3 projNormal = saturate(pow(IN.worldNormal * 1.4, 4));
 			
 			// SIDE X
-			float3 x = tex2D(_Side, frac(IN.objPos.zy * _SideScale)) * abs(IN.vertNormal.x);
+			float3 x = tex2D(_Side, frac(IN.worldPos.zy * _SideScale)) * abs(IN.worldNormal.x);
 			
 			// TOP / BOTTOM
 			float3 y = 0;
-			if (IN.vertNormal.y > 0) {
-				y = tex2D(_Top, frac(IN.objPos.zx * _TopScale)) * abs(IN.vertNormal.y);
+			if (IN.worldNormal.y > 0) {
+				y = tex2D(_Top, frac(IN.worldPos.zx * _TopScale)) * abs(IN.worldNormal.y);
 			} else {
-				y = tex2D(_Bottom, frac(IN.objPos.zx * _BottomScale)) * abs(IN.vertNormal.y);
+				y = tex2D(_Bottom, frac(IN.worldPos.zx * _BottomScale)) * abs(IN.worldNormal.y);
 			}
 			
 			// SIDE Z	
-			float3 z = tex2D(_Side, frac(IN.objPos.xy * _SideScale)) * abs(IN.vertNormal.z);
+			float3 z = tex2D(_Side, frac(IN.worldPos.xy * _SideScale)) * abs(IN.worldNormal.z);
 			
 			o.Albedo = z;
 			o.Albedo = lerp(o.Albedo, x, projNormal.x);
 			o.Albedo = lerp(o.Albedo, y, projNormal.y);
-			//o.Albedo = IN.vertNormal;
 		} 
 		ENDCG
 	}

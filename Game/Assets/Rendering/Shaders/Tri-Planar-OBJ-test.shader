@@ -1,4 +1,4 @@
-﻿Shader "Tri-Planar World" {
+﻿Shader "Tri-Planar Obj" {
   Properties {
 		_Side("Side", 2D) = "white" {}
 		_Top("Top", 2D) = "white" {}
