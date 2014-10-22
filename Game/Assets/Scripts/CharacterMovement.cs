@@ -17,14 +17,18 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Tooltip("Extra time to jump after starting to fall.")]
     private float jumpPostTimeout = 0.2f;
     [SerializeField] private float jumpCooldown = 0.25f;
+    [SerializeField] [Tooltip("Start sliding when the slope exceeds this (degrees).")]
+    private float slideSlopeLimit = 60.0f;
+    [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")]
+    private float jumpSlopeLimit = 75.0f;
     [SerializeField] private float slideSpeed = 5.0f;
 
     // State (visible to other scripts).
-    [SerializeField] private bool m_moving;
+    private bool m_moving;
     public bool moving { get { return m_moving; } }
-    [SerializeField] private bool m_jumping;
+    private bool m_jumping;
     public bool jumping { get { return m_jumping; } }
-    [SerializeField] private bool m_sliding;
+    private bool m_sliding;
     public bool sliding { get { return m_sliding; } }
 
     private CharacterController controller;
@@ -35,6 +39,7 @@ public class CharacterMovement : MonoBehaviour
     private float lastGroundedTime;
     private float rayDistance;
     private Vector3 contactPoint;
+    private float slopeAngle;
 
     // Animation.
     private Animator animator;
@@ -74,7 +79,8 @@ public class CharacterMovement : MonoBehaviour
         lastJumpInputTime = -1000.0f;
         lastJumpTime = -1000.0f;
         lastGroundedTime = -1000.0f;
-        rayDistance = controller.height * 0.5f + controller.radius;
+        rayDistance = 0.1f;
+        slopeAngle = 0.0f;
 
         // Fetch animator properties.
         animator = gameObject.GetComponentInChildren<Animator>();
@@ -189,25 +195,28 @@ public class CharacterMovement : MonoBehaviour
     void ApplySliding() {
         m_sliding = false;
 
+        slopeAngle = 0.0f;
         // First simply check under the character for a slope.
         if (Physics.Raycast(transform.position, Vector3.down, out hit, rayDistance)) {
-            if (Vector3.Angle(hit.normal, Vector3.up) > controller.slopeLimit) {
-                m_sliding = true;
-            }
+            slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
         } else {
             // Also check from a contactPoint (for particularly steep slopes).
-            Physics.Raycast(contactPoint + Vector3.up, Vector3.down, out hit);
-            if (Vector3.Angle(hit.normal, Vector3.up) > controller.slopeLimit) {
-                m_sliding = true;
-            }
+            Physics.Raycast(contactPoint, Vector3.down, out hit);
+            slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
         }
 
-        if (m_sliding) {
+        if (slopeAngle > slideSlopeLimit) {
+            m_sliding = true;
+
             // Compute moveDirection to point down the slope.
             Vector3 hitNormal = hit.normal;
             Vector3 moveDirection = new Vector3(hitNormal.x, -hitNormal.y, hitNormal.z);
             Vector3.OrthoNormalize(ref hitNormal, ref moveDirection);
             collisionFlags = controller.Move(moveDirection * slideSpeed * Time.deltaTime);
+
+            Debug.DrawRay(contactPoint, Vector3.down, Color.blue);
+            Debug.DrawRay(hit.point, hit.normal, Color.red);
+            Debug.DrawRay(hit.point, moveDirection, Color.magenta);
         }
     }
 
@@ -226,7 +235,7 @@ public class CharacterMovement : MonoBehaviour
         }
 
         // Do not allow jumping while sliding.
-        if (sliding) { return; }
+        if (sliding && slopeAngle > jumpSlopeLimit) { return; }
 
         // PreTimeout lets you trigger a jump slightly before landing.
         if (Time.time < lastJumpInputTime + jumpPreTimeout &&
