@@ -40,6 +40,8 @@ public class CharacterMovement : MonoBehaviour
     private Animator animator;
     private int speedHash;
     private int strafeHash;
+    private int jumpingHash;
+    private int jumpModeHash;
 
     // Setting backups.
     private float originalGravity;
@@ -81,6 +83,8 @@ public class CharacterMovement : MonoBehaviour
         }
         speedHash = Animator.StringToHash("Speed");
         strafeHash = Animator.StringToHash("Strafe");
+        jumpingHash = Animator.StringToHash("Jumping");
+        jumpModeHash = Animator.StringToHash("JumpMode");
 
         originalGravity = gravity;
         originalJumpHeight = jumpHeight;
@@ -154,14 +158,10 @@ public class CharacterMovement : MonoBehaviour
         }
         m_moving = inputReceived;
 
-        // Grab movement input values and update animations.
+        // Grab movement input values.
         float verticalInput = Input.GetAxis("Vertical");
         float strafeInput = Input.GetAxis("Strafe");
         Vector3 inputVector = transform.forward * verticalInput + transform.right * strafeInput;
-        if (animator) {
-            animator.SetFloat(speedHash, Mathf.Abs(verticalInput));
-            animator.SetFloat(strafeHash, strafeInput);
-        }
 
         ApplyGravity();
         ApplyJump();
@@ -169,6 +169,21 @@ public class CharacterMovement : MonoBehaviour
         Vector3 motion = inputVector * walkSpeed + Vector3.up * verticalSpeed;
         motion *= Time.deltaTime;
         collisionFlags = controller.Move(motion);
+
+        // Update animations.
+        if (animator) {
+            animator.SetFloat(speedHash, Mathf.Abs(verticalInput));
+            animator.SetFloat(strafeHash, strafeInput);
+
+            animator.SetBool(jumpingHash, jumping);
+            float jumpMode = 0.0f; // Simple solution, arbitrary and messy though.
+            if (gravity < originalGravity) {
+                jumpMode = 0.5f;
+            } else if (jumpHeight > originalJumpHeight) {
+                jumpMode = 1.0f;
+            }
+            animator.SetFloat(jumpModeHash, jumpMode);
+        }
     }
 
     void ApplySliding() {
