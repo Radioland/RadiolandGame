@@ -13,13 +13,6 @@ public class ObjectiveGUI : MonoBehaviour {
         totalTargets = 5;
         text = GetComponent<Text>();
     }
-    
-    void OnTriggerEnter (Collider c) {
-        if (c.gameObject.tag == "pickupable") {
-            Destroy(c.gameObject);
-            targetsFound += 1;
-        }
-    }
 
     void Update () {
         text.text = targetsFound.ToString() + "/" + totalTargets.ToString();
