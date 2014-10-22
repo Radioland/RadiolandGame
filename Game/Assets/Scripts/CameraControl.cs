@@ -1,23 +1,36 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public class CameraControl : MonoBehaviour
 {
+    private enum CameraState
+    {
+        PLAYER_FOLLOW, MOUSE_CONTROL
+    }
+
     public Transform cameraTransform;
 
     [SerializeField] private Transform targetTransform;
     [SerializeField] private CharacterMovement characterMovement;
 
     // The camera moves around a sphere centered on the player.
-    // The radius is affected by the current zoom level.
-    // The two angles are controlled by mouse input.
+    // The horizontal and vertical angles are updated based on the current state.
+    // Smoothing affects how floaty, tight, or jumpy the camera feels.
+
     [SerializeField] [Range(2.0f, 40.0f)] private float radius = 10.0f;
     [SerializeField] private float defaultVerticalAngle = 20.0f;
+    [SerializeField] private float minVerticalAngle = 0.0f;
+    [SerializeField] private float maxVerticalAngle = 65.0f;
     [Tooltip("Set based on model's orientation.")]
     [SerializeField] private float offsetHorizontal = -90.0f;
     [SerializeField] [Range(0.0f, 1.0f)] private float minTargetScreenY = 0.35f;
     [SerializeField] [Range(0.0f, 1.0f)] private float maxTargetScreenY = 0.65f;
-    [SerializeField] [Range(0.0f, 1.0f)] private float lookUpSmooth = 0.15f;
+    [SerializeField] [Tooltip("Slerp time (lower is more gradual, [0,1])")]
+    private float lookUpSpeed = 0.15f;
+    [SerializeField] [Tooltip("Time to reach position (lower is faster)")]
+    private float moveSmoothTime = 0.1f;
+    [SerializeField] private float mouseLookSpeed = 0.5f;
 
     private Camera cameraComponent;
     private Vector3 targetPosition;
@@ -25,9 +38,9 @@ public class CameraControl : MonoBehaviour
     private float targetVerticalAngle; // X-Axis Euler Angle
     private float lastMouseX;
     private float lastMouseY;
+    private CameraState cameraState;
 
     private Vector3 velocityCamSmooth = Vector3.zero;
-    [SerializeField] private float camSmoothDampTime = 0.1f;
     private Quaternion verticalRotation;
 
     void Awake() {
@@ -44,6 +57,7 @@ public class CameraControl : MonoBehaviour
         verticalRotation = Quaternion.identity;
         lastMouseX = 0.0f;
         lastMouseY = 0.0f;
+        cameraState = CameraState.PLAYER_FOLLOW;
     }
 
     void Start() {
@@ -57,6 +71,7 @@ public class CameraControl : MonoBehaviour
     void LateUpdate() {
         // Follow behind the player.
         if (!Input.GetMouseButton(1)) {
+            cameraState = CameraState.PLAYER_FOLLOW;
             // Default behavior.
             // Rotate horizontalAngle towards the player's orientation.
             // Maintain a constant verticalAngle.
@@ -65,12 +80,15 @@ public class CameraControl : MonoBehaviour
                 targetVerticalAngle = defaultVerticalAngle;
             }
         } else {
+            cameraState = CameraState.MOUSE_CONTROL;
             // Mouse controlled camera rotation.
             float mouseDeltaX = Input.mousePosition.x - lastMouseX;
             float mouseDeltaY = Input.mousePosition.y - lastMouseY;
-            targetHorizontalAngle -= mouseDeltaX;
-            targetVerticalAngle -= mouseDeltaY;
+            targetHorizontalAngle -= mouseDeltaX * mouseLookSpeed;
+            targetVerticalAngle -= mouseDeltaY * mouseLookSpeed;
         }
+
+        targetVerticalAngle = Mathf.Clamp(targetVerticalAngle, minVerticalAngle, maxVerticalAngle);
 
         float phi = targetHorizontalAngle * Mathf.Deg2Rad;
         float theta = targetVerticalAngle * Mathf.Deg2Rad;
@@ -91,6 +109,7 @@ public class CameraControl : MonoBehaviour
             if (newTargetPosition.y < targetPosition.y) {
                 targetPosition.y = newTargetPosition.y;
             }
+            // TODO? Follow when jumping out of the screen (along with extra rotation below).
         } else {
             targetPosition.y = newTargetPosition.y;
         }
@@ -98,35 +117,41 @@ public class CameraControl : MonoBehaviour
         cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position,
                                                       targetPosition,
                                                       ref velocityCamSmooth,
-                                                      camSmoothDampTime);
+                                                      moveSmoothTime);
 
-        // Update rotation, adjusting for the player leaving the viewport.
-        // Alternately: cameraTransform.LookAt(targetTransform.position);
+        if (cameraState == CameraState.PLAYER_FOLLOW) {
+            // Update rotation, adjusting for the player leaving the viewport.
+            // Alternately: cameraTransform.LookAt(targetTransform.position);
 
-        // First rotate around the Y axis.
-        Vector3 offsetToCenter = targetTransform.position - cameraTransform.position;
-        Vector3 offsetXZ = new Vector3(offsetToCenter.x, 0, offsetToCenter.z);
-        Quaternion yRotation = Quaternion.LookRotation(offsetXZ);
-        cameraTransform.rotation = yRotation;
+            // First rotate around the Y axis.
+            Vector3 offsetToCenter = targetTransform.position - cameraTransform.position;
+            Vector3 offsetXZ = new Vector3(offsetToCenter.x, 0, offsetToCenter.z);
+            Quaternion yRotation = Quaternion.LookRotation(offsetXZ);
+            cameraTransform.rotation = yRotation;
 
-        // Default to the target vertical angle (not at the player if they are jumping).
-        Quaternion targetVerticalRotation = Quaternion.Euler(targetVerticalAngle, 0, 0);
+            // Default to the target vertical angle (not at the player if they are jumping).
+            Quaternion targetVerticalRotation = Quaternion.Euler(targetVerticalAngle, 0, 0);
 
-        // If the player is near an edge of the viewport, aim at them instead.
-        Vector3 from = cameraTransform.forward;
-        Vector3 to = targetTransform.position - cameraTransform.position;
-        float remainingAngle = targetVerticalAngle - Vector3.Angle(from, to);
+            // If the player is near an edge of the viewport, aim at them instead.
+            Vector3 from = cameraTransform.forward;
+            Vector3 to = targetTransform.position - cameraTransform.position;
+            float remainingAngle = targetVerticalAngle - Vector3.Angle(from, to);
 
-        Vector3 targetViewportPoint = cameraComponent.WorldToViewportPoint(targetTransform.position);
-        if (targetViewportPoint.y > maxTargetScreenY) {
-            targetVerticalRotation *= Quaternion.Euler(remainingAngle, 0, 0);
-        } else if (targetViewportPoint.y < minTargetScreenY) {
-            targetVerticalRotation *= Quaternion.Euler(-remainingAngle, 0, 0);
+            Vector3 targetViewportPoint = cameraComponent.WorldToViewportPoint(targetTransform.position);
+            if (targetViewportPoint.y > maxTargetScreenY) {
+                targetVerticalRotation *= Quaternion.Euler(remainingAngle, 0, 0);
+            } else if (targetViewportPoint.y < minTargetScreenY) {
+                targetVerticalRotation *= Quaternion.Euler(-remainingAngle, 0, 0);
+            }
+
+            // Smoothly rotate to the target.
+            verticalRotation = Quaternion.Slerp(verticalRotation, targetVerticalRotation, lookUpSpeed);
+            cameraTransform.rotation *= verticalRotation;
+        } else if (cameraState == CameraState.MOUSE_CONTROL) {
+            cameraTransform.LookAt(targetTransform.position);
+            // Update verticalRotation so that there isn't a sharp jump when switching back.
+            verticalRotation = Quaternion.Euler(cameraTransform.eulerAngles.x, 0, 0);
         }
-
-        // Smoothly rotate to the target.
-        verticalRotation = Quaternion.Slerp(verticalRotation, targetVerticalRotation, lookUpSmooth);
-        cameraTransform.rotation *= verticalRotation;
 
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
