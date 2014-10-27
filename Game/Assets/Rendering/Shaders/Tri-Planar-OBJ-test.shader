@@ -21,7 +21,7 @@
 		ZWrite On
 		
 		CGPROGRAM
-		#pragma surface surf Lambert exclude_path:prepass vertex:vert
+		#pragma surface surf ToonRamp exclude_path:prepass vertex:vert
 		#pragma exclude_renderers flash
  
 		sampler2D _Side, _Top, _Bottom;
@@ -40,6 +40,7 @@
 			half4 c;
 			c.rgb = s.Albedo * _LightColor0.rgb * ramp * (atten * 2);
 			c.a = 0;
+			
 			return c;
 		}
 		
@@ -74,9 +75,11 @@
 			float3 z = tex2D(_Side, frac(IN.objPos.xy * _SideScale)) * abs(IN.vertNormal.z);
 			
 			o.Albedo = z;
-			o.Albedo = lerp(o.Albedo, x, projNormal.x);
-			o.Albedo = lerp(o.Albedo, y, projNormal.y);
+			o.Albedo = lerp(o.Albedo, x, abs(IN.vertNormal.x));
+			o.Albedo = lerp(o.Albedo, y, abs(IN.vertNormal.y));
 			//o.Albedo = IN.vertNormal;
+			//o.Albedo = float3((IN.vertNormal.x+1)/2.0,(IN.vertNormal.y+1)/2.0,(IN.vertNormal.z+1)/2.0);
+			//o.Albedo = float3(1.0-IN.vertNormal.x,1.0-IN.vertNormal.y,1.0-IN.vertNormal.z);
 		} 
 		ENDCG
 	}

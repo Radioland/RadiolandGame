@@ -33,6 +33,7 @@ public class CharacterMovement : MonoBehaviour
 
     private CharacterController controller;
     private CollisionFlags collisionFlags;
+    private RaycastHit hit;
     private float verticalSpeed;
     private float lastJumpInputTime;
     private float lastJumpTime;
@@ -51,11 +52,6 @@ public class CharacterMovement : MonoBehaviour
     // Setting backups.
     private float originalGravity;
     private float originalJumpHeight;
-
-    //Moving platform
-    private GameObject currentPlatform;
-    private RaycastHit hit;
-    private GameObject pushPlatform;
 
     private bool grounded {
         get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
@@ -100,38 +96,11 @@ public class CharacterMovement : MonoBehaviour
 
     }
 
-    void OnCollisionEnter(Collision c) {
-        if (c.transform.tag == "moving") {
-            pushPlatform = c.transform.gameObject;
-        }
-    }
-
-    void OnCollisionExit(Collision c) {
-        if (c.transform.tag == "moving") {
-            pushPlatform = null;
-        }
-    }
-
     void OnControllerColliderHit(ControllerColliderHit hit) {
         contactPoint = hit.point;
     }
 
     void Update() {
-		currentPlatform = null;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, 0.1f)) {
-            if (hit.transform.tag == "moving") {
-                currentPlatform = hit.transform.gameObject;
-            }
-        }
-
-        if (currentPlatform != null) {
-            transform.position += currentPlatform.GetComponent<PlatformMoving>().GetVelocity();
-        }
-
-        if (pushPlatform != null) {
-            transform.position += pushPlatform.GetComponent<PlatformMoving>().GetVelocity() * 1.1f;
-        }
-
         if (grounded) {
             lastGroundedTime = Time.time;
 
