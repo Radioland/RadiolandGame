@@ -12,6 +12,8 @@ public class CreateEffect : Effect
     [SerializeField] private Vector3 localPosition;
     [SerializeField] private Vector3 localEulerAngles;
     [SerializeField] private bool destroyOnEnd = false;
+    [Tooltip("Calls StartEvent on an EffectManager on the created object at the end.")]
+    [SerializeField] private bool chainEffectsOnEnd = false;
     [Range(0.0f, 1.0f)] [SerializeField] private float chanceToSpawn = 1.0f;
 
     static GameObject createEffectParent;
@@ -69,7 +71,13 @@ public class CreateEffect : Effect
     
     public override void EndEffect() {
         base.EndEffect();
-        
+
+        if (chainEffectsOnEnd && createdObject) {
+            EffectManager effectManager = createdObject.GetComponent<EffectManager>();
+            if (effectManager) {
+                effectManager.StartEvent();
+            }
+        }
         if (destroyOnEnd && createdObject) {
             Destroy(createdObject);
         }

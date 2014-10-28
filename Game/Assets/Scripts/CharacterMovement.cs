@@ -191,8 +191,12 @@ public class CharacterMovement : MonoBehaviour
 
     void ApplyGravity() {
         if (grounded) {
+            if (m_jumping) {
+                m_jumping = false;
+
+                SendMessage("Grounded");
+            }
             verticalSpeed = 0.0f;
-            m_jumping = false;
         } else {
             verticalSpeed -= gravity * Time.deltaTime;
         }
@@ -214,6 +218,8 @@ public class CharacterMovement : MonoBehaviour
                 verticalSpeed = jumpVerticalSpeed;
                 lastJumpTime = Time.time;
                 m_jumping = true;
+
+                SendMessage("StartJump");
             }
         }
     }
