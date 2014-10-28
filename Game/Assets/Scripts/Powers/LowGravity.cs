@@ -24,7 +24,7 @@ public class LowGravity : Powerup
     public override void UsePowerup() {
         base.UsePowerup();
 
-        Debug.Log ("Low Gravity");
+        Debug.Log("Used Low Gravity.");
         
         characterMovement.SetGravity(gravity);
     }

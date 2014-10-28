@@ -24,7 +24,7 @@ public class HighJump : Powerup
     public override void UsePowerup() {
         base.UsePowerup();
 
-        Debug.Log ("High Jump");
+        Debug.Log("Used High Jump.");
 
         characterMovement.SetJumpHeight(jumpHeight);
     }
