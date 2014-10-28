@@ -34,11 +34,16 @@ public class RadioStation : MonoBehaviour
 
     void Update() {
         audioSource.volume = signalStrength;
+
+        // End if the station signal is no longer strong enough.
+        if (powerup && powerup.inUse && signalStrength < radioControl.powerupMinSignalStrength) {
+            powerup.EndPowerup();
+        }
     }
 
     public void UsePowerup() {
         if (powerup) {
-            powerup.UsePowerup();
+            powerup.TryToUsePowerup();
         } else {
             Debug.LogWarning("Found no powerup for " + this.GetPath());
         }

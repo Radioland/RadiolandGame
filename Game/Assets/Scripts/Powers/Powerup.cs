@@ -6,15 +6,18 @@ using System.Collections;
 public class Powerup : MonoBehaviour
 {
     [SerializeField] protected float duration = 5.0f;
+    public float energyCost = 0.2f;
+    public bool inUse;
 
     protected CharacterMovement characterMovement;
+    protected PowerupManager powerupManager;
     protected float lastStartedTime;
 
     public float remainingTime {
         get {
             return Mathf.Max(0.0f, duration - (Time.time - lastStartedTime));
         }
-     }
+    }
 
     public virtual void Awake() {
         GameObject playerCharacter = GameObject.FindWithTag("Player");
@@ -28,21 +31,44 @@ public class Powerup : MonoBehaviour
         lastStartedTime = -1000.0f;
     }
 
-    public virtual void Start() {
+    public void SetPowerupManager(PowerupManager manager) {
+        powerupManager = manager;
+    }
 
+    public virtual void Start() {
+        if (!powerupManager) {
+            Debug.LogWarning("Powerup was not connected to a PowerupManager!");
+        }
     }
 
     public virtual void Update() {
-        if (Time.time - lastStartedTime > duration) {
+        if (inUse && Time.time - lastStartedTime > duration) {
             EndPowerup();
         }
     }
 
+    public void TryToUsePowerup() {
+        if (powerupManager.CanUsePowerup(this)) {
+            UsePowerup();
+        } else {
+            // TODO: effects?
+            // Play a failure sound (short tap, beep, or click)?
+            // Fizzle particle effect?
+            Debug.Log("Tried to use a powerup when not able to.");
+        }
+    }
+
     public virtual void UsePowerup() {
+        // If re-using this powerup, this first ends the current instance.
+        powerupManager.SetActivePowerup(this);
+
         lastStartedTime = Time.time;
+        inUse = true;
+        powerupManager.energy -= energyCost;
     }
     
     public virtual void EndPowerup() {
-        
+        inUse = false;
+        powerupManager.EndPowerup();
     }
 }

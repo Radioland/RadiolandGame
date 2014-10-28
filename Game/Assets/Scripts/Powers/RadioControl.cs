@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-//using System.Collections.Generic;
 
 public class RadioControl : MonoBehaviour
 {
@@ -10,13 +9,26 @@ public class RadioControl : MonoBehaviour
     public float currentFrequency { get { return radioDialSlider.value; } }
 
     // Private variables set in the inspector.
+    [SerializeField] private PowerupManager powerupManager;
     [SerializeField] private Slider radioDialSlider;
+    [SerializeField] private Image energyGlowImage;
+    [SerializeField] private RectTransform radioKnobTransform;
+    [SerializeField] private float knobTurnRatio = 4.0f;
 
     private RadioStation[] stations;
 
     void Awake() {
+        if (!powerupManager) {
+            Debug.LogWarning("[UI] PowerupManager needs to be set for RadioControl to show energy.");
+        }
+        if (!energyGlowImage) {
+            Debug.LogWarning("[UI] Please set the energyGlow Image for RadioControl.");
+        }
+        if (!radioKnobTransform) {
+            Debug.LogWarning("[UI] Please set the knob Transform for RadioControl.");
+        }
         if (!radioDialSlider) {
-            Debug.LogWarning("Please set the Slider for RadioControl.");
+            Debug.LogWarning("[UI] Slider needs to be set for RadioControl to function.");
             gameObject.SetActive(false);
         }
 
@@ -31,6 +43,7 @@ public class RadioControl : MonoBehaviour
     }
 
     void Update() {
+        // Debug controls.
         if (Input.GetKey(KeyCode.Alpha1)) {
             radioDialSlider.value -= 0.01f;
         }
@@ -40,6 +53,18 @@ public class RadioControl : MonoBehaviour
 
         float scrollValue = Input.GetAxis("Mouse ScrollWheel");
         radioDialSlider.value += scrollValue;
+
+        if (radioKnobTransform) {
+            float rotationDegrees = radioDialSlider.value * 360.0f * knobTurnRatio;
+            radioKnobTransform.localRotation = Quaternion.Euler(0, 0, -rotationDegrees);
+        }
+
+        // Fade glow image based on energy percentage.
+        if (powerupManager && energyGlowImage) {
+            Color newColor = energyGlowImage.color;
+            newColor.a = powerupManager.energy;
+            energyGlowImage.color = newColor;
+        }
 
         if (Input.GetButtonDown("Fire1")) {
             foreach (RadioStation station in stations) {

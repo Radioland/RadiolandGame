@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LowGravity : Powerup
+public class HighJump : Powerup
 {
-    [SerializeField] private float gravity = 4.0f;
-    
+    [SerializeField] private float jumpHeight = 4.0f;
+
     public override void Awake() {
         base.Awake();
     }
@@ -16,7 +16,7 @@ public class LowGravity : Powerup
     public override void Update() {
         base.Update();
 
-        if (Input.GetKeyDown(KeyCode.G)) {
+        if (Input.GetKeyDown(KeyCode.H)) {
             UsePowerup();
         }
     }
@@ -24,14 +24,14 @@ public class LowGravity : Powerup
     public override void UsePowerup() {
         base.UsePowerup();
 
-        Debug.Log ("Low Gravity");
-        
-        characterMovement.SetGravity(gravity);
+        Debug.Log("Used High Jump.");
+
+        characterMovement.SetJumpHeight(jumpHeight);
     }
     
     public override void EndPowerup() {
         base.EndPowerup();
-        
-        characterMovement.ResetGravity();
+
+        characterMovement.ResetJumpHeight();
     }
 }
