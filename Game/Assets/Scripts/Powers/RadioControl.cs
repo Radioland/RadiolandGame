@@ -52,11 +52,11 @@ public class RadioControl : MonoBehaviour
         }
 
         float scrollValue = Input.GetAxis("Mouse ScrollWheel");
-        radioDialSlider.value += scrollValue;
+        radioDialSlider.value -= scrollValue;
 
         if (radioKnobTransform) {
             float rotationDegrees = radioDialSlider.value * 360.0f * knobTurnRatio;
-            radioKnobTransform.localRotation = Quaternion.Euler(0, 0, -rotationDegrees);
+            radioKnobTransform.localRotation = Quaternion.Euler(0, 0, rotationDegrees);
         }
 
         // Fade glow image based on energy percentage.
