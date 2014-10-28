@@ -14,7 +14,7 @@ public class Powerup : MonoBehaviour
         get {
             return Mathf.Max(0.0f, duration - (Time.time - lastStartedTime));
         }
-     }
+    }
 
     public virtual void Awake() {
         GameObject playerCharacter = GameObject.FindWithTag("Player");
