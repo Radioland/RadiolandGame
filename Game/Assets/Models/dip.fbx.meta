@@ -6,16 +6,113 @@ ModelImporter:
     100000: body
     100002: //RootNode
     100004: eye
+    100006: Body
+    100008: CTRL
+    100010: CTRL_Eye
+    100012: CTRL_Leg1
+    100014: CTRL_Leg2
+    100016: CTRL_Leg3
+    100018: CTRL_Leg4
+    100020: CTRL_Leg5
+    100022: CTRL_Leg6
+    100024: CTRL_Leg7
+    100026: CTRL_Leg8
+    100028: eye 1
+    100030: IK_leg1
+    100032: IK_leg2
+    100034: IK_leg3
+    100036: IK_leg4
+    100038: IK_leg5
+    100040: IK_leg6
+    100042: IK_leg7
+    100044: IK_leg8
+    100046: L_a_leg0
+    100048: L_a_leg1
+    100050: L_a_leg2
+    100052: L_b_leg0
+    100054: L_b_leg1
+    100056: L_b_leg2
+    100058: L_c_leg0
+    100060: L_c_leg1
+    100062: L_c_leg2
+    100064: L_d_leg0
+    100066: L_d_leg1
+    100068: L_d_leg2
+    100070: pivot
+    100072: R_a_leg0
+    100074: R_a_leg1
+    100076: R_a_leg2
+    100078: R_b_leg0
+    100080: R_b_leg1
+    100082: R_b_leg2
+    100084: R_c_leg0
+    100086: R_c_leg1
+    100088: R_c_leg2
+    100090: R_d_leg0
+    100092: R_d_leg1
+    100094: R_d_leg2
+    100096: root
     400000: body
     400002: //RootNode
     400004: eye
+    400006: Body
+    400008: CTRL
+    400010: CTRL_Eye
+    400012: CTRL_Leg1
+    400014: CTRL_Leg2
+    400016: CTRL_Leg3
+    400018: CTRL_Leg4
+    400020: CTRL_Leg5
+    400022: CTRL_Leg6
+    400024: CTRL_Leg7
+    400026: CTRL_Leg8
+    400028: eye 1
+    400030: IK_leg1
+    400032: IK_leg2
+    400034: IK_leg3
+    400036: IK_leg4
+    400038: IK_leg5
+    400040: IK_leg6
+    400042: IK_leg7
+    400044: IK_leg8
+    400046: L_a_leg0
+    400048: L_a_leg1
+    400050: L_a_leg2
+    400052: L_b_leg0
+    400054: L_b_leg1
+    400056: L_b_leg2
+    400058: L_c_leg0
+    400060: L_c_leg1
+    400062: L_c_leg2
+    400064: L_d_leg0
+    400066: L_d_leg1
+    400068: L_d_leg2
+    400070: pivot
+    400072: R_a_leg0
+    400074: R_a_leg1
+    400076: R_a_leg2
+    400078: R_b_leg0
+    400080: R_b_leg1
+    400082: R_b_leg2
+    400084: R_c_leg0
+    400086: R_c_leg1
+    400088: R_c_leg2
+    400090: R_d_leg0
+    400092: R_d_leg1
+    400094: R_d_leg2
+    400096: root
     2300000: body
     2300002: eye
     3300000: body
     3300002: eye
     4300000: eye
     4300002: body
+    7400000: Idle
+    7400002: Idle2
+    7400004: Walk
     9500000: //RootNode
+    13700000: body
+    13700002: eye
   materials:
     importMaterials: 0
     materialName: 0
@@ -31,7 +128,379 @@ ModelImporter:
     animationScaleError: .5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Idle
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 11
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: CTRL
+        weight: 1
+      - path: CTRL/Body
+        weight: 1
+      - path: CTRL/Body/CTRL_Eye
+        weight: 1
+      - path: CTRL/CTRL_Leg1
+        weight: 1
+      - path: CTRL/CTRL_Leg1/IK_leg1
+        weight: 1
+      - path: CTRL/CTRL_Leg2
+        weight: 1
+      - path: CTRL/CTRL_Leg2/IK_leg2
+        weight: 1
+      - path: CTRL/CTRL_Leg3
+        weight: 1
+      - path: CTRL/CTRL_Leg3/IK_leg3
+        weight: 1
+      - path: CTRL/CTRL_Leg4
+        weight: 1
+      - path: CTRL/CTRL_Leg4/IK_leg4
+        weight: 1
+      - path: CTRL/CTRL_Leg5
+        weight: 1
+      - path: CTRL/CTRL_Leg5/IK_leg5
+        weight: 1
+      - path: CTRL/CTRL_Leg6
+        weight: 1
+      - path: CTRL/CTRL_Leg6/IK_leg6
+        weight: 1
+      - path: CTRL/CTRL_Leg7
+        weight: 1
+      - path: CTRL/CTRL_Leg7/IK_leg7
+        weight: 1
+      - path: CTRL/CTRL_Leg8
+        weight: 1
+      - path: CTRL/CTRL_Leg8/IK_leg8
+        weight: 1
+      - path: eye
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/root
+        weight: 1
+      - path: pivot/root/eye 1
+        weight: 1
+      - path: pivot/root/L_a_leg0
+        weight: 1
+      - path: pivot/root/L_a_leg0/L_a_leg1
+        weight: 1
+      - path: pivot/root/L_a_leg0/L_a_leg1/L_a_leg2
+        weight: 1
+      - path: pivot/root/L_b_leg0
+        weight: 1
+      - path: pivot/root/L_b_leg0/L_b_leg1
+        weight: 1
+      - path: pivot/root/L_b_leg0/L_b_leg1/L_b_leg2
+        weight: 1
+      - path: pivot/root/L_c_leg0
+        weight: 1
+      - path: pivot/root/L_c_leg0/L_c_leg1
+        weight: 1
+      - path: pivot/root/L_c_leg0/L_c_leg1/L_c_leg2
+        weight: 1
+      - path: pivot/root/L_d_leg0
+        weight: 1
+      - path: pivot/root/L_d_leg0/L_d_leg1
+        weight: 1
+      - path: pivot/root/L_d_leg0/L_d_leg1/L_d_leg2
+        weight: 1
+      - path: pivot/root/R_a_leg0
+        weight: 1
+      - path: pivot/root/R_a_leg0/R_a_leg1
+        weight: 1
+      - path: pivot/root/R_a_leg0/R_a_leg1/R_a_leg2
+        weight: 1
+      - path: pivot/root/R_b_leg0
+        weight: 1
+      - path: pivot/root/R_b_leg0/R_b_leg1
+        weight: 1
+      - path: pivot/root/R_b_leg0/R_b_leg1/R_b_leg2
+        weight: 1
+      - path: pivot/root/R_c_leg0
+        weight: 1
+      - path: pivot/root/R_c_leg0/R_c_leg1
+        weight: 1
+      - path: pivot/root/R_c_leg0/R_c_leg1/R_c_leg2
+        weight: 1
+      - path: pivot/root/R_d_leg0
+        weight: 1
+      - path: pivot/root/R_d_leg0/R_d_leg1
+        weight: 1
+      - path: pivot/root/R_d_leg0/R_d_leg1/R_d_leg2
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Idle2
+      takeName: Take 001
+      firstFrame: 12
+      lastFrame: 47
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: CTRL
+        weight: 1
+      - path: CTRL/Body
+        weight: 1
+      - path: CTRL/Body/CTRL_Eye
+        weight: 1
+      - path: CTRL/CTRL_Leg1
+        weight: 1
+      - path: CTRL/CTRL_Leg1/IK_leg1
+        weight: 1
+      - path: CTRL/CTRL_Leg2
+        weight: 1
+      - path: CTRL/CTRL_Leg2/IK_leg2
+        weight: 1
+      - path: CTRL/CTRL_Leg3
+        weight: 1
+      - path: CTRL/CTRL_Leg3/IK_leg3
+        weight: 1
+      - path: CTRL/CTRL_Leg4
+        weight: 1
+      - path: CTRL/CTRL_Leg4/IK_leg4
+        weight: 1
+      - path: CTRL/CTRL_Leg5
+        weight: 1
+      - path: CTRL/CTRL_Leg5/IK_leg5
+        weight: 1
+      - path: CTRL/CTRL_Leg6
+        weight: 1
+      - path: CTRL/CTRL_Leg6/IK_leg6
+        weight: 1
+      - path: CTRL/CTRL_Leg7
+        weight: 1
+      - path: CTRL/CTRL_Leg7/IK_leg7
+        weight: 1
+      - path: CTRL/CTRL_Leg8
+        weight: 1
+      - path: CTRL/CTRL_Leg8/IK_leg8
+        weight: 1
+      - path: eye
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/root
+        weight: 1
+      - path: pivot/root/eye 1
+        weight: 1
+      - path: pivot/root/L_a_leg0
+        weight: 1
+      - path: pivot/root/L_a_leg0/L_a_leg1
+        weight: 1
+      - path: pivot/root/L_a_leg0/L_a_leg1/L_a_leg2
+        weight: 1
+      - path: pivot/root/L_b_leg0
+        weight: 1
+      - path: pivot/root/L_b_leg0/L_b_leg1
+        weight: 1
+      - path: pivot/root/L_b_leg0/L_b_leg1/L_b_leg2
+        weight: 1
+      - path: pivot/root/L_c_leg0
+        weight: 1
+      - path: pivot/root/L_c_leg0/L_c_leg1
+        weight: 1
+      - path: pivot/root/L_c_leg0/L_c_leg1/L_c_leg2
+        weight: 1
+      - path: pivot/root/L_d_leg0
+        weight: 1
+      - path: pivot/root/L_d_leg0/L_d_leg1
+        weight: 1
+      - path: pivot/root/L_d_leg0/L_d_leg1/L_d_leg2
+        weight: 1
+      - path: pivot/root/R_a_leg0
+        weight: 1
+      - path: pivot/root/R_a_leg0/R_a_leg1
+        weight: 1
+      - path: pivot/root/R_a_leg0/R_a_leg1/R_a_leg2
+        weight: 1
+      - path: pivot/root/R_b_leg0
+        weight: 1
+      - path: pivot/root/R_b_leg0/R_b_leg1
+        weight: 1
+      - path: pivot/root/R_b_leg0/R_b_leg1/R_b_leg2
+        weight: 1
+      - path: pivot/root/R_c_leg0
+        weight: 1
+      - path: pivot/root/R_c_leg0/R_c_leg1
+        weight: 1
+      - path: pivot/root/R_c_leg0/R_c_leg1/R_c_leg2
+        weight: 1
+      - path: pivot/root/R_d_leg0
+        weight: 1
+      - path: pivot/root/R_d_leg0/R_d_leg1
+        weight: 1
+      - path: pivot/root/R_d_leg0/R_d_leg1/R_d_leg2
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Walk
+      takeName: Take 001
+      firstFrame: 50
+      lastFrame: 61
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: CTRL
+        weight: 1
+      - path: CTRL/Body
+        weight: 1
+      - path: CTRL/Body/CTRL_Eye
+        weight: 1
+      - path: CTRL/CTRL_Leg1
+        weight: 1
+      - path: CTRL/CTRL_Leg1/IK_leg1
+        weight: 1
+      - path: CTRL/CTRL_Leg2
+        weight: 1
+      - path: CTRL/CTRL_Leg2/IK_leg2
+        weight: 1
+      - path: CTRL/CTRL_Leg3
+        weight: 1
+      - path: CTRL/CTRL_Leg3/IK_leg3
+        weight: 1
+      - path: CTRL/CTRL_Leg4
+        weight: 1
+      - path: CTRL/CTRL_Leg4/IK_leg4
+        weight: 1
+      - path: CTRL/CTRL_Leg5
+        weight: 1
+      - path: CTRL/CTRL_Leg5/IK_leg5
+        weight: 1
+      - path: CTRL/CTRL_Leg6
+        weight: 1
+      - path: CTRL/CTRL_Leg6/IK_leg6
+        weight: 1
+      - path: CTRL/CTRL_Leg7
+        weight: 1
+      - path: CTRL/CTRL_Leg7/IK_leg7
+        weight: 1
+      - path: CTRL/CTRL_Leg8
+        weight: 1
+      - path: CTRL/CTRL_Leg8/IK_leg8
+        weight: 1
+      - path: eye
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/root
+        weight: 1
+      - path: pivot/root/eye 1
+        weight: 1
+      - path: pivot/root/L_a_leg0
+        weight: 1
+      - path: pivot/root/L_a_leg0/L_a_leg1
+        weight: 1
+      - path: pivot/root/L_a_leg0/L_a_leg1/L_a_leg2
+        weight: 1
+      - path: pivot/root/L_b_leg0
+        weight: 1
+      - path: pivot/root/L_b_leg0/L_b_leg1
+        weight: 1
+      - path: pivot/root/L_b_leg0/L_b_leg1/L_b_leg2
+        weight: 1
+      - path: pivot/root/L_c_leg0
+        weight: 1
+      - path: pivot/root/L_c_leg0/L_c_leg1
+        weight: 1
+      - path: pivot/root/L_c_leg0/L_c_leg1/L_c_leg2
+        weight: 1
+      - path: pivot/root/L_d_leg0
+        weight: 1
+      - path: pivot/root/L_d_leg0/L_d_leg1
+        weight: 1
+      - path: pivot/root/L_d_leg0/L_d_leg1/L_d_leg2
+        weight: 1
+      - path: pivot/root/R_a_leg0
+        weight: 1
+      - path: pivot/root/R_a_leg0/R_a_leg1
+        weight: 1
+      - path: pivot/root/R_a_leg0/R_a_leg1/R_a_leg2
+        weight: 1
+      - path: pivot/root/R_b_leg0
+        weight: 1
+      - path: pivot/root/R_b_leg0/R_b_leg1
+        weight: 1
+      - path: pivot/root/R_b_leg0/R_b_leg1/R_b_leg2
+        weight: 1
+      - path: pivot/root/R_c_leg0
+        weight: 1
+      - path: pivot/root/R_c_leg0/R_c_leg1
+        weight: 1
+      - path: pivot/root/R_c_leg0/R_c_leg1/R_c_leg2
+        weight: 1
+      - path: pivot/root/R_d_leg0
+        weight: 1
+      - path: pivot/root/R_d_leg0/R_d_leg1
+        weight: 1
+      - path: pivot/root/R_d_leg0/R_d_leg1/R_d_leg2
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
     isReadable: 1
   meshes:
     lODScreenPercentages: []
