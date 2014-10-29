@@ -18,6 +18,7 @@ public class CharacterMovement : MonoBehaviour
     private float jumpPostTimeout = 0.2f;
     [SerializeField] private float jumpCooldown = 0.35f;
     [SerializeField] private float jumpWindupTime = 0.1f;
+    [SerializeField] private float landingTime = 0.2f;
     [SerializeField] [Tooltip("Start sliding when the slope exceeds this (degrees).")]
     private float slideSlopeLimit = 60.0f;
     [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")]
@@ -206,10 +207,16 @@ public class CharacterMovement : MonoBehaviour
             verticalSpeed -= gravity * Time.deltaTime;
 
             if (m_jumping) {
-                // Check if landing soon.
-                // TODO: sync with landing animation time, project position that far ahead.
-                if (Physics.Raycast(transform.position, Vector3.down, out hit, 0.1f)) {
-                    animator.SetBool(landingHash, true);
+                // Check if predicted to be landing within landingTime.
+                // d = v * t + 1/2 a * t^2
+                float distance = -(verticalSpeed * landingTime +
+                                   0.5f * -gravity * landingTime * landingTime);
+                if (distance > 0) {
+                    Debug.DrawLine(transform.position, transform.position + Vector3.down * distance);
+
+                    if (Physics.Raycast(transform.position, Vector3.down, out hit, distance)) {
+                        animator.SetBool(landingHash, true);
+                    }
                 }
             }
         }
