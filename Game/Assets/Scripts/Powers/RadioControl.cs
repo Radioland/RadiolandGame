@@ -28,8 +28,16 @@ public class RadioControl : MonoBehaviour
             Debug.LogWarning("[UI] Please set the knob Transform for RadioControl.");
         }
         if (!radioDialSlider) {
-            Debug.LogWarning("[UI] Slider needs to be set for RadioControl to function.");
-            gameObject.SetActive(false);
+            // Hope that there is only one slider on this object.
+            // Warning: if there are multiple, this could be undesired behavior!
+            if (transform.parent) {
+                radioDialSlider = transform.parent.GetComponentInChildren<Slider>();
+            }
+
+            if (!radioDialSlider) {
+                Debug.LogWarning("[UI] Slider needs to be set for RadioControl to function.");
+                gameObject.SetActive(false);
+            }
         }
 
         stations = gameObject.GetComponentsInChildren<RadioStation>();
