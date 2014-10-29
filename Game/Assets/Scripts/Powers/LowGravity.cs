@@ -28,7 +28,7 @@ public class LowGravity : Powerup
     
     // Called via SendMessage in CharacterMovement.
     void StartJump() {
-        if (inUse) {
+        if (inUse && !effectsStarted) {
             onJumpEffects.StartEvent();
             effectsStarted = true;
         }
@@ -48,6 +48,10 @@ public class LowGravity : Powerup
         Debug.Log("Used Low Gravity.");
         
         characterMovement.SetGravity(gravity);
+
+        if (characterMovement.jumping) {
+            StartJump();
+        }
     }
     
     public override void EndPowerup() {
