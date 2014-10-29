@@ -1,17 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class HighJump : Powerup
+public class HighJump : JumpPowerup
 {
     [SerializeField] private float jumpHeight = 4.0f;
-    [SerializeField] private EffectManager onJumpEffects;
 
-    private bool effectsStarted;
+    private int highJumpHash;
 
     public override void Awake() {
         base.Awake();
 
-        effectsStarted = false;
+        highJumpHash = Animator.StringToHash("HighJump");
     }
     
     public override void Start() {
@@ -21,24 +20,9 @@ public class HighJump : Powerup
     public override void Update() {
         base.Update();
 
+        // Debug usage, potentially glitchy.
         if (Input.GetKeyDown(KeyCode.H)) {
             UsePowerup();
-        }
-    }
-
-    // Called via SendMessage in CharacterMovement.
-    void StartJump() {
-        if (inUse) {
-            onJumpEffects.StartEvent();
-            effectsStarted = true;
-        }
-    }
-
-    // Called via SendMessage in CharacterMovement.
-    void Grounded() {
-        if (effectsStarted) {
-            onJumpEffects.StopEvent();
-            effectsStarted = false;
         }
     }
     
@@ -48,11 +32,13 @@ public class HighJump : Powerup
         Debug.Log("Used High Jump.");
 
         characterMovement.SetJumpHeight(jumpHeight);
+        animator.SetBool(highJumpHash, true);
     }
     
     public override void EndPowerup() {
         base.EndPowerup();
 
         characterMovement.ResetJumpHeight();
+        animator.SetBool(highJumpHash, false);
     }
 }

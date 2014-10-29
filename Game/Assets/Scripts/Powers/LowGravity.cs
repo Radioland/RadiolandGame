@@ -1,17 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LowGravity : Powerup
+public class LowGravity : JumpPowerup
 {
     [SerializeField] private float gravity = 4.0f;
-    [SerializeField] private EffectManager onJumpEffects;
 
-    private bool effectsStarted;
+    private int longJumpHash;
     
     public override void Awake() {
         base.Awake();
 
-        effectsStarted = false;
+        longJumpHash = Animator.StringToHash("LongJump");
     }
     
     public override void Start() {
@@ -21,24 +20,9 @@ public class LowGravity : Powerup
     public override void Update() {
         base.Update();
 
+        // Debug usage, potentially glitchy.
         if (Input.GetKeyDown(KeyCode.G)) {
             UsePowerup();
-        }
-    }
-    
-    // Called via SendMessage in CharacterMovement.
-    void StartJump() {
-        if (inUse && !effectsStarted) {
-            onJumpEffects.StartEvent();
-            effectsStarted = true;
-        }
-    }
-
-    // Called via SendMessage in CharacterMovement.
-    void Grounded() {
-        if (effectsStarted) {
-            onJumpEffects.StopEvent();
-            effectsStarted = false;
         }
     }
 
@@ -48,6 +32,7 @@ public class LowGravity : Powerup
         Debug.Log("Used Low Gravity.");
         
         characterMovement.SetGravity(gravity);
+        animator.SetBool(longJumpHash, true);
 
         if (characterMovement.jumping) {
             StartJump();
@@ -58,5 +43,6 @@ public class LowGravity : Powerup
         base.EndPowerup();
         
         characterMovement.ResetGravity();
+        animator.SetBool(longJumpHash, false);
     }
 }

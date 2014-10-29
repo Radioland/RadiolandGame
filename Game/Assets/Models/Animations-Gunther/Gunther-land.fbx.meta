@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 43e6a942806017a4c9a18cdb6cee9b91
+guid: b2f7aeb9c10d2e649ac182710731592d
 ModelImporter:
   serializedVersion: 16
   fileIDToRecycleName:
@@ -221,7 +221,7 @@ ModelImporter:
     4300002: buttons
     4300004: body
     4300006: hair
-    7400000: Jump-High
+    7400000: Land
     9500000: //RootNode
     13700000: body
     13700002: buttons
@@ -244,23 +244,23 @@ ModelImporter:
     extraExposedTransformPaths: []
     clipAnimations:
     - serializedVersion: 16
-      name: Jump-High
+      name: Land
       takeName: Take 001
-      firstFrame: 1
-      lastFrame: 9
+      firstFrame: 11
+      lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 1
+      loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 1
+      keepOriginalPositionXZ: 0
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
