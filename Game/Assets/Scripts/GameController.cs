@@ -24,6 +24,10 @@ public class GameController : MonoBehaviour
         if (player.transform.position.y < fallbackKillY) {
             KillPlayer();
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            Exit();
+        }
     }
 
     public void SetLatestCheckpoint(GameObject checkpoint) {
@@ -39,5 +43,9 @@ public class GameController : MonoBehaviour
         } else {
             player.transform.position = fallbackRespawnPosition;
         }
+    }
+
+    public void Exit() {
+        Application.Quit();
     }
 }
