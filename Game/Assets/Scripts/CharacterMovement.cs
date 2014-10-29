@@ -47,7 +47,7 @@ public class CharacterMovement : MonoBehaviour
     private int speedHash;
     private int strafeHash;
     private int jumpingHash;
-    private int jumpModeHash;
+    private int landingHash;
 
     // Setting backups.
     private float originalGravity;
@@ -86,7 +86,7 @@ public class CharacterMovement : MonoBehaviour
         speedHash = Animator.StringToHash("Speed");
         strafeHash = Animator.StringToHash("Strafe");
         jumpingHash = Animator.StringToHash("Jumping");
-        jumpModeHash = Animator.StringToHash("JumpMode");
+        landingHash = Animator.StringToHash("Landing");
 
         originalGravity = gravity;
         originalJumpHeight = jumpHeight;
@@ -149,15 +149,7 @@ public class CharacterMovement : MonoBehaviour
         if (animator) {
             animator.SetFloat(speedHash, Mathf.Abs(verticalInput));
             animator.SetFloat(strafeHash, strafeInput);
-
             animator.SetBool(jumpingHash, jumping);
-            float jumpMode = 0.0f; // Simple solution, arbitrary and messy though.
-            if (gravity < originalGravity) {
-                jumpMode = 0.5f;
-            } else if (jumpHeight > originalJumpHeight) {
-                jumpMode = 1.0f;
-            }
-            animator.SetFloat(jumpModeHash, jumpMode);
         }
     }
 
@@ -197,8 +189,17 @@ public class CharacterMovement : MonoBehaviour
                 SendMessage("Grounded");
             }
             verticalSpeed = 0.0f;
+            animator.SetBool(landingHash, false);
         } else {
             verticalSpeed -= gravity * Time.deltaTime;
+
+            if (m_jumping) {
+                // Check if landing soon.
+                // TODO: sync with landing animation time, project position that far ahead.
+                if (Physics.Raycast(transform.position, Vector3.down, out hit, 0.1f)) {
+                    animator.SetBool(landingHash, true);
+                }
+            }
         }
     }
 

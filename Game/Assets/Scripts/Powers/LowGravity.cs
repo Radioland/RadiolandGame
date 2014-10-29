@@ -4,9 +4,13 @@ using System.Collections;
 public class LowGravity : JumpPowerup
 {
     [SerializeField] private float gravity = 4.0f;
+
+    private int longJumpHash;
     
     public override void Awake() {
         base.Awake();
+
+        longJumpHash = Animator.StringToHash("LongJump");
     }
     
     public override void Start() {
@@ -28,6 +32,7 @@ public class LowGravity : JumpPowerup
         Debug.Log("Used Low Gravity.");
         
         characterMovement.SetGravity(gravity);
+        animator.SetBool(longJumpHash, true);
 
         if (characterMovement.jumping) {
             StartJump();
@@ -38,5 +43,6 @@ public class LowGravity : JumpPowerup
         base.EndPowerup();
         
         characterMovement.ResetGravity();
+        animator.SetBool(longJumpHash, false);
     }
 }

@@ -6,11 +6,17 @@ public class JumpPowerup : Powerup
     [SerializeField] protected EffectManager onJumpEffects;
 
     protected bool effectsStarted;
+    protected Animator animator;
 
     public override void Awake() {
         base.Awake();
 
         effectsStarted = false;
+
+        animator = gameObject.GetComponentInChildren<Animator>();
+        if (!animator) {
+            Debug.LogWarning("No animator found on " + transform.GetPath());
+        }
     }
 
     public override void Start() {

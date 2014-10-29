@@ -5,8 +5,12 @@ public class HighJump : JumpPowerup
 {
     [SerializeField] private float jumpHeight = 4.0f;
 
+    private int highJumpHash;
+
     public override void Awake() {
         base.Awake();
+
+        highJumpHash = Animator.StringToHash("HighJump");
     }
     
     public override void Start() {
@@ -28,11 +32,13 @@ public class HighJump : JumpPowerup
         Debug.Log("Used High Jump.");
 
         characterMovement.SetJumpHeight(jumpHeight);
+        animator.SetBool(highJumpHash, true);
     }
     
     public override void EndPowerup() {
         base.EndPowerup();
 
         characterMovement.ResetJumpHeight();
+        animator.SetBool(highJumpHash, false);
     }
 }
