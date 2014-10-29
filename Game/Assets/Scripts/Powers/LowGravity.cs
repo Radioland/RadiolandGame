@@ -1,17 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LowGravity : Powerup
+public class LowGravity : JumpPowerup
 {
     [SerializeField] private float gravity = 4.0f;
-    [SerializeField] private EffectManager onJumpEffects;
-
-    private bool effectsStarted;
     
     public override void Awake() {
         base.Awake();
-
-        effectsStarted = false;
     }
     
     public override void Start() {
@@ -21,24 +16,9 @@ public class LowGravity : Powerup
     public override void Update() {
         base.Update();
 
+        // Debug usage, potentially glitchy.
         if (Input.GetKeyDown(KeyCode.G)) {
             UsePowerup();
-        }
-    }
-    
-    // Called via SendMessage in CharacterMovement.
-    void StartJump() {
-        if (inUse && !effectsStarted) {
-            onJumpEffects.StartEvent();
-            effectsStarted = true;
-        }
-    }
-
-    // Called via SendMessage in CharacterMovement.
-    void Grounded() {
-        if (effectsStarted) {
-            onJumpEffects.StopEvent();
-            effectsStarted = false;
         }
     }
 
