@@ -6,12 +6,14 @@ public class GameController : MonoBehaviour
     public GameObject player;
     [Tooltip("Kill the player when they fall below this value.")]
     [SerializeField] private float fallbackKillY = -100.0f;
-    [SerializeField] private Vector3 fallbackRespawnPosition = Vector3.zero;
 
+    private Vector3 fallbackRespawnPosition;
     private GameObject latestCheckpoint;
 
     void Awake() {
         player = GameObject.FindWithTag("Player");
+
+        fallbackRespawnPosition = player.transform.position;
     }
 
     void Start() {
