@@ -8,6 +8,9 @@
 		_BottomScale ("Bottom Scale", Float) = 2
 		
 		_Ramp ("Toon Ramp (RGB)", 2D) = "gray" {}
+		
+	    _OutlineColor ("Outline Color", Color) = (0,0,0,1)
+   		_Outline ("Outline width", Range (.002, 0.03)) = .005
 	}
 	
 	SubShader {
@@ -82,6 +85,8 @@
 			//o.Albedo = float3(1.0-IN.vertNormal.x,1.0-IN.vertNormal.y,1.0-IN.vertNormal.z);
 		} 
 		ENDCG
+		UsePass "Toon/Basic Outline/OUTLINE"
 	}
+	Dependency "BaseMapShader" = "Toon/Lighted Outline"
 	Fallback "Diffuse"
 }

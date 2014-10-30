@@ -16,16 +16,22 @@ public class CharacterMovement : MonoBehaviour
     private float jumpPreTimeout = 0.1f;
     [SerializeField] [Tooltip("Extra time to jump after starting to fall.")]
     private float jumpPostTimeout = 0.2f;
-    [SerializeField] private float jumpCooldown = 0.25f;
+    [SerializeField] private float jumpCooldown = 0.35f;
+    [SerializeField] private float jumpWindupTime = 0.1f;
+    [SerializeField] private float landingTime = 0.2f;
     [SerializeField] [Tooltip("Start sliding when the slope exceeds this (degrees).")]
     private float slideSlopeLimit = 60.0f;
     [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")]
     private float jumpSlopeLimit = 75.0f;
     [SerializeField] private float slideSpeed = 5.0f;
 
-    // State (visible to other scripts).
+    // State (read-only visible to other scripts).
+    private bool m_controllable;
+    public bool controllable { get { return m_controllable; } }
     private bool m_moving;
     public bool moving { get { return m_moving; } }
+    private bool m_inJumpWindup;
+    public bool inJumpWindup { get { return m_inJumpWindup; } }
     private bool m_jumping;
     public bool jumping { get { return m_jumping; } }
     private bool m_sliding;
@@ -47,7 +53,7 @@ public class CharacterMovement : MonoBehaviour
     private int speedHash;
     private int strafeHash;
     private int jumpingHash;
-    private int jumpModeHash;
+    private int landingHash;
 
     // Setting backups.
     private float originalGravity;
@@ -66,7 +72,9 @@ public class CharacterMovement : MonoBehaviour
         }
 
         // Setup initial state.
+        m_controllable = true;
         m_moving = false;
+        m_inJumpWindup = false;
         m_jumping = false;
         m_sliding = false;
 
@@ -86,7 +94,7 @@ public class CharacterMovement : MonoBehaviour
         speedHash = Animator.StringToHash("Speed");
         strafeHash = Animator.StringToHash("Strafe");
         jumpingHash = Animator.StringToHash("Jumping");
-        jumpModeHash = Animator.StringToHash("JumpMode");
+        landingHash = Animator.StringToHash("Landing");
 
         originalGravity = gravity;
         originalJumpHeight = jumpHeight;
@@ -134,9 +142,14 @@ public class CharacterMovement : MonoBehaviour
         m_moving = inputReceived;
 
         // Grab movement input values.
-        float verticalInput = Input.GetAxis("Vertical");
-        float strafeInput = Input.GetAxis("Strafe");
-        Vector3 inputVector = transform.forward * verticalInput + transform.right * strafeInput;
+        float verticalInput = 0.0f;
+        float strafeInput = 0.0f;
+        Vector3 inputVector = Vector3.zero;
+        if (m_controllable) {
+            verticalInput = Input.GetAxis("Vertical");
+            strafeInput = Input.GetAxis("Strafe");
+            inputVector = transform.forward * verticalInput + transform.right * strafeInput;
+        }
 
         ApplyGravity();
         ApplyJump();
@@ -149,15 +162,7 @@ public class CharacterMovement : MonoBehaviour
         if (animator) {
             animator.SetFloat(speedHash, Mathf.Abs(verticalInput));
             animator.SetFloat(strafeHash, strafeInput);
-
             animator.SetBool(jumpingHash, jumping);
-            float jumpMode = 0.0f; // Simple solution, arbitrary and messy though.
-            if (gravity < originalGravity) {
-                jumpMode = 0.5f;
-            } else if (jumpHeight > originalJumpHeight) {
-                jumpMode = 1.0f;
-            }
-            animator.SetFloat(jumpModeHash, jumpMode);
         }
     }
 
@@ -191,10 +196,29 @@ public class CharacterMovement : MonoBehaviour
 
     void ApplyGravity() {
         if (grounded) {
+            if (m_jumping) {
+                m_jumping = false;
+
+                SendMessage("Grounded");
+            }
             verticalSpeed = 0.0f;
-            m_jumping = false;
+            animator.SetBool(landingHash, false);
         } else {
             verticalSpeed -= gravity * Time.deltaTime;
+
+            if (m_jumping) {
+                // Check if predicted to be landing within landingTime.
+                // d = v * t + 1/2 a * t^2
+                float distance = -(verticalSpeed * landingTime +
+                                   0.5f * -gravity * landingTime * landingTime);
+                if (distance > 0) {
+                    Debug.DrawLine(transform.position, transform.position + Vector3.down * distance);
+
+                    if (Physics.Raycast(transform.position, Vector3.down, out hit, distance)) {
+                        animator.SetBool(landingHash, true);
+                    }
+                }
+            }
         }
     }
 
@@ -207,14 +231,24 @@ public class CharacterMovement : MonoBehaviour
         if (sliding && slopeAngle > jumpSlopeLimit) { return; }
 
         // PreTimeout lets you trigger a jump slightly before landing.
-        if (Time.time < lastJumpInputTime + jumpPreTimeout &&
+        if (m_controllable &&
+            Time.time < lastJumpInputTime + jumpPreTimeout &&
             Time.time > lastJumpTime + jumpCooldown) {
             // PostTimeout lets you trigger a jump slightly after starting to fall.
             if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
-                verticalSpeed = jumpVerticalSpeed;
                 lastJumpTime = Time.time;
-                m_jumping = true;
+                m_inJumpWindup = true;
+                m_controllable = false;
+
+                SendMessage("StartJump");
             }
+        }
+
+        if (m_inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
+            m_inJumpWindup = false;
+            m_controllable = true;
+            m_jumping = true;
+            verticalSpeed = jumpVerticalSpeed;
         }
     }
 

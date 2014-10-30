@@ -10,8 +10,8 @@ using System.Collections;
 public class Region : MonoBehaviour
 {
     public Vector3 dimensions = new Vector3(35, 10, 10);
-    public bool isCentered = false;
-    public Color gizmoColor = Color.yellow;
+    [SerializeField] private bool isCentered = false;
+    [SerializeField] private Color gizmoColor = Color.yellow;
 
     private Vector3 globalCenter;
     private Vector3 localCenter;
