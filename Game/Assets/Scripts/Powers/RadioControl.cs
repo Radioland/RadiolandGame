@@ -15,9 +15,11 @@ public class RadioControl : MonoBehaviour
     [SerializeField] private RectTransform radioKnobTransform;
     [SerializeField] private float knobTurnRatio = 4.0f;
     [Tooltip("Plays when seeking between stations.")]
+    [SerializeField] [Range(0.0f, 1.0f)] private float stationCutoff = 0.2f;
+    [SerializeField] private AudioSource backgroundSource;
+    [SerializeField] [Range(0.0f, 1.0f)] private float backgroundMaxVolume = 0.1f;
     [SerializeField] private AudioSource staticSource;
     [SerializeField] [Range(0.0f, 1.0f)] private float staticMaxVolume = 0.5f;
-    [SerializeField] [Range(0.0f, 1.0f)] private float staticCutoff = 0.2f;
     [SerializeField] private float staticFadeTime = 3.0f;
     [SerializeField] private float staticLingerTime = 1.0f;
 
@@ -27,8 +29,6 @@ public class RadioControl : MonoBehaviour
     private float lastActiveTime;
     private float lastDecreaseVolume;
     private float lastIncreaseVolume;
-
-    public float volume;
 
     void Awake() {
         if (!powerupManager) {
@@ -127,15 +127,20 @@ public class RadioControl : MonoBehaviour
             }
         }
 
+        float maxSignal = 0.0f;
+        foreach (RadioStation station in stations) {
+            maxSignal = Mathf.Max(maxSignal, station.signalStrength);
+        }
+
+        if (backgroundSource) {
+            backgroundSource.volume = (1.0f - maxSignal / stationCutoff) * backgroundMaxVolume;
+        }
+
         // Adjust the volume of the static to fill in between stations.
         if (staticSource) {
-            float maxSignal = 0.0f;
-            foreach (RadioStation station in stations) {
-                maxSignal = Mathf.Max(maxSignal, station.signalStrength);
-            }
+            float staticStrength = (1.0f - maxSignal / stationCutoff) * staticMaxVolume;
 
-            float staticStrength = (1.0f - maxSignal / staticCutoff) * staticMaxVolume;
-
+            float volume;
             if (inUse || Time.time - lastActiveTime < staticLingerTime) {
                 // Fade in.
                 float tStart = (Time.time - lastStartedTime) / staticFadeTime;
@@ -148,7 +153,7 @@ public class RadioControl : MonoBehaviour
                 lastDecreaseVolume = volume;
             }
 
-            if (maxSignal > staticCutoff) {
+            if (maxSignal > stationCutoff) {
                 ResetStatic();
             }
 
