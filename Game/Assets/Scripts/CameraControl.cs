@@ -27,9 +27,11 @@ public class CameraControl : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] private float minTargetScreenY = 0.35f;
     [SerializeField] [Range(0.0f, 1.0f)] private float maxTargetScreenY = 0.65f;
     [SerializeField] [Tooltip("Slerp time (lower is more gradual, [0,1])")]
+    private float lookHorizSpeed = 0.65f;
+    [SerializeField] [Tooltip("Slerp time (lower is more gradual, [0,1])")]
     private float lookUpSpeed = 0.15f;
     [SerializeField] [Tooltip("Time to reach position (lower is faster)")]
-    private float moveSmoothTime = 0.1f;
+    private float moveSmoothTime = 0.2f;
     [SerializeField] private float mouseLookSpeed = 0.5f;
 
     private Camera cameraComponent;
@@ -42,6 +44,7 @@ public class CameraControl : MonoBehaviour
 
     private Vector3 velocityCamSmooth = Vector3.zero;
     private Quaternion verticalRotation;
+    private Quaternion horizRotation;
 
     void Awake() {
         if (!targetTransform) { targetTransform = transform; }
@@ -55,6 +58,7 @@ public class CameraControl : MonoBehaviour
         targetVerticalAngle = defaultVerticalAngle;
         targetHorizontalAngle = offsetHorizontal;
         verticalRotation = Quaternion.identity;
+        horizRotation = Quaternion.identity;
         lastMouseX = 0.0f;
         lastMouseY = 0.0f;
         cameraState = CameraState.PLAYER_FOLLOW;
@@ -77,7 +81,6 @@ public class CameraControl : MonoBehaviour
             // Maintain a constant verticalAngle.
             if (characterMovement.moving) {
                 targetHorizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal;
-                targetVerticalAngle = defaultVerticalAngle;
             }
         } else {
             cameraState = CameraState.MOUSE_CONTROL;
@@ -105,11 +108,13 @@ public class CameraControl : MonoBehaviour
         targetPosition.x = newTargetPosition.x;
         targetPosition.z = newTargetPosition.z;
         if (characterMovement.jumping) {
-            // Follow when falling.
-            if (newTargetPosition.y < targetPosition.y) {
+            // Follow when falling or near the edge of the viewport.
+            Vector3 targetViewportPoint = cameraComponent.WorldToViewportPoint(targetTransform.position);
+            if (newTargetPosition.y < targetPosition.y ||
+                targetViewportPoint.y > maxTargetScreenY ||
+                targetViewportPoint.y < minTargetScreenY) {
                 targetPosition.y = newTargetPosition.y;
             }
-            // TODO? Follow when jumping out of the screen (along with extra rotation below).
         } else {
             targetPosition.y = newTargetPosition.y;
         }
@@ -126,13 +131,15 @@ public class CameraControl : MonoBehaviour
             // First rotate around the Y axis.
             Vector3 offsetToCenter = targetTransform.position - cameraTransform.position;
             Vector3 offsetXZ = new Vector3(offsetToCenter.x, 0, offsetToCenter.z);
-            Quaternion yRotation = Quaternion.LookRotation(offsetXZ);
-            cameraTransform.rotation = yRotation;
+            Quaternion targetHorizRotation = Quaternion.LookRotation(offsetXZ);
+            horizRotation = Quaternion.Slerp(horizRotation, targetHorizRotation, lookHorizSpeed);
+            cameraTransform.rotation = horizRotation;
 
             // Default to the target vertical angle (not at the player if they are jumping).
             Quaternion targetVerticalRotation = Quaternion.Euler(targetVerticalAngle, 0, 0);
 
             // If the player is near an edge of the viewport, aim at them instead.
+            /*
             Vector3 from = cameraTransform.forward;
             Vector3 to = targetTransform.position - cameraTransform.position;
             float remainingAngle = targetVerticalAngle - Vector3.Angle(from, to);
@@ -143,14 +150,16 @@ public class CameraControl : MonoBehaviour
             } else if (targetViewportPoint.y < minTargetScreenY) {
                 targetVerticalRotation *= Quaternion.Euler(-remainingAngle, 0, 0);
             }
+            */
 
             // Smoothly rotate to the target.
             verticalRotation = Quaternion.Slerp(verticalRotation, targetVerticalRotation, lookUpSpeed);
             cameraTransform.rotation *= verticalRotation;
         } else if (cameraState == CameraState.MOUSE_CONTROL) {
             cameraTransform.LookAt(targetTransform.position);
-            // Update verticalRotation so that there isn't a sharp jump when switching back.
+            // Update rotations so that there isn't a sharp jump when switching back to follow mode.
             verticalRotation = Quaternion.Euler(cameraTransform.eulerAngles.x, 0, 0);
+            horizRotation = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0);
         }
 
         lastMouseX = Input.mousePosition.x;
