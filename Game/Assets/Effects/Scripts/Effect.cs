@@ -7,7 +7,7 @@ public class Effect : MonoBehaviour
 {
     // Variables to specify in the editor.
     [SerializeField] private float startDelay = 0.0f;
-    [SerializeField] private float duration = 1.0f;
+    [SerializeField] protected float duration = 1.0f;
     [SerializeField] private float cooldown = 0.0f;
 
     [HideInInspector] public bool isPlaying;

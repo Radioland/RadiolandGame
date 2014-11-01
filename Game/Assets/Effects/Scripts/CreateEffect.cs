@@ -66,6 +66,14 @@ public class CreateEffect : Effect
             }
 
             createdObject.transform.localEulerAngles = localEulerAngles;
+
+            // Add a backup destruction method, in case another object is created.
+            // TODO: make chainEffectsOnEnd also work in this case.
+            //       use effects system? or keep a list of objects in this class?
+            if (destroyOnEnd) {
+                MaxLifetime maxLifetime = createdObject.AddComponent<MaxLifetime>();
+                maxLifetime.maxTimeToLive = duration;
+            }
         }
     }
     
