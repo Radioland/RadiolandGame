@@ -196,12 +196,13 @@ public class CharacterMovement : MonoBehaviour
 
     void ApplyGravity() {
         if (grounded) {
+            float landingVerticalSpeed = verticalSpeed;
+            verticalSpeed = 0.0f;
             if (m_jumping) {
                 m_jumping = false;
 
-                SendMessage("Grounded");
+                SendMessage("Grounded", landingVerticalSpeed);
             }
-            verticalSpeed = 0.0f;
             animator.SetBool(landingHash, false);
         } else {
             verticalSpeed -= gravity * Time.deltaTime;
@@ -250,6 +251,12 @@ public class CharacterMovement : MonoBehaviour
             m_jumping = true;
             verticalSpeed = jumpVerticalSpeed;
         }
+    }
+
+    public void Bounce(float bounceSpeed) {
+        verticalSpeed = bounceSpeed;
+        m_jumping = true;
+        lastJumpTime = Time.time;
     }
 
     public void SetJumpHeight(float height) { jumpHeight = height; }
