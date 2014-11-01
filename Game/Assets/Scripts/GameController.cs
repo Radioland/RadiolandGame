@@ -6,6 +6,7 @@ public class GameController : MonoBehaviour
     public GameObject player;
     [Tooltip("Kill the player when they fall below this value.")]
     [SerializeField] private float fallbackKillY = -100.0f;
+    public bool masterMute = false;
 
     private Vector3 fallbackRespawnPosition;
     private GameObject latestCheckpoint;
@@ -28,6 +29,9 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Exit();
         }
+
+        if (Input.GetKeyDown(KeyCode.M)) { masterMute = !masterMute; }
+        AudioListener.volume = masterMute ? 0.0f : 1.0f;
     }
 
     public void SetLatestCheckpoint(GameObject checkpoint) {
