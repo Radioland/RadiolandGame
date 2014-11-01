@@ -13,6 +13,7 @@ public class CameraControl : MonoBehaviour
 
     [SerializeField] private Transform targetTransform;
     [SerializeField] private CharacterMovement characterMovement;
+    private DebugMovement debugMovement;
 
     // The camera moves around a sphere centered on the player.
     // The horizontal and vertical angles are updated based on the current state.
@@ -52,6 +53,7 @@ public class CameraControl : MonoBehaviour
         if (!characterMovement) {
             Debug.LogWarning("No character movement set on CameraControl!");
         }
+        debugMovement = gameObject.GetComponent<DebugMovement>();
 
         cameraComponent = cameraTransform.GetComponent<Camera>();
         targetPosition = new Vector3(0, 100000, 0);
@@ -79,7 +81,7 @@ public class CameraControl : MonoBehaviour
             // Default behavior.
             // Rotate horizontalAngle towards the player's orientation.
             // Maintain a constant verticalAngle.
-            if (characterMovement.moving) {
+            if (characterMovement.moving || (debugMovement && debugMovement.isActive)) {
                 targetHorizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal;
             }
         } else {
