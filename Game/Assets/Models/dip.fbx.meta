@@ -110,6 +110,7 @@ ModelImporter:
     7400000: Idle
     7400002: Idle2
     7400004: Walk
+    7400006: Dance
     9500000: //RootNode
     13700000: body
     13700002: eye
@@ -382,6 +383,130 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 50
       lastFrame: 61
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: CTRL
+        weight: 1
+      - path: CTRL/Body
+        weight: 1
+      - path: CTRL/Body/CTRL_Eye
+        weight: 1
+      - path: CTRL/CTRL_Leg1
+        weight: 1
+      - path: CTRL/CTRL_Leg1/IK_leg1
+        weight: 1
+      - path: CTRL/CTRL_Leg2
+        weight: 1
+      - path: CTRL/CTRL_Leg2/IK_leg2
+        weight: 1
+      - path: CTRL/CTRL_Leg3
+        weight: 1
+      - path: CTRL/CTRL_Leg3/IK_leg3
+        weight: 1
+      - path: CTRL/CTRL_Leg4
+        weight: 1
+      - path: CTRL/CTRL_Leg4/IK_leg4
+        weight: 1
+      - path: CTRL/CTRL_Leg5
+        weight: 1
+      - path: CTRL/CTRL_Leg5/IK_leg5
+        weight: 1
+      - path: CTRL/CTRL_Leg6
+        weight: 1
+      - path: CTRL/CTRL_Leg6/IK_leg6
+        weight: 1
+      - path: CTRL/CTRL_Leg7
+        weight: 1
+      - path: CTRL/CTRL_Leg7/IK_leg7
+        weight: 1
+      - path: CTRL/CTRL_Leg8
+        weight: 1
+      - path: CTRL/CTRL_Leg8/IK_leg8
+        weight: 1
+      - path: eye
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/root
+        weight: 1
+      - path: pivot/root/eye 1
+        weight: 1
+      - path: pivot/root/L_a_leg0
+        weight: 1
+      - path: pivot/root/L_a_leg0/L_a_leg1
+        weight: 1
+      - path: pivot/root/L_a_leg0/L_a_leg1/L_a_leg2
+        weight: 1
+      - path: pivot/root/L_b_leg0
+        weight: 1
+      - path: pivot/root/L_b_leg0/L_b_leg1
+        weight: 1
+      - path: pivot/root/L_b_leg0/L_b_leg1/L_b_leg2
+        weight: 1
+      - path: pivot/root/L_c_leg0
+        weight: 1
+      - path: pivot/root/L_c_leg0/L_c_leg1
+        weight: 1
+      - path: pivot/root/L_c_leg0/L_c_leg1/L_c_leg2
+        weight: 1
+      - path: pivot/root/L_d_leg0
+        weight: 1
+      - path: pivot/root/L_d_leg0/L_d_leg1
+        weight: 1
+      - path: pivot/root/L_d_leg0/L_d_leg1/L_d_leg2
+        weight: 1
+      - path: pivot/root/R_a_leg0
+        weight: 1
+      - path: pivot/root/R_a_leg0/R_a_leg1
+        weight: 1
+      - path: pivot/root/R_a_leg0/R_a_leg1/R_a_leg2
+        weight: 1
+      - path: pivot/root/R_b_leg0
+        weight: 1
+      - path: pivot/root/R_b_leg0/R_b_leg1
+        weight: 1
+      - path: pivot/root/R_b_leg0/R_b_leg1/R_b_leg2
+        weight: 1
+      - path: pivot/root/R_c_leg0
+        weight: 1
+      - path: pivot/root/R_c_leg0/R_c_leg1
+        weight: 1
+      - path: pivot/root/R_c_leg0/R_c_leg1/R_c_leg2
+        weight: 1
+      - path: pivot/root/R_d_leg0
+        weight: 1
+      - path: pivot/root/R_d_leg0/R_d_leg1
+        weight: 1
+      - path: pivot/root/R_d_leg0/R_d_leg1/R_d_leg2
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Dance
+      takeName: Take 001
+      firstFrame: 70
+      lastFrame: 109
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
