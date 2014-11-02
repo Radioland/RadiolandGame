@@ -11,6 +11,8 @@ ModelImporter:
     100010: //RootNode
     100012: small
     100014: r_wire1
+    100016: body 1
+    100018: pivot
     400000: big
     400002: body
     400004: eyes
@@ -19,6 +21,8 @@ ModelImporter:
     400010: //RootNode
     400012: small
     400014: r_wire1
+    400016: body 1
+    400018: pivot
     2300000: big
     2300002: body
     2300004: l_wire
@@ -37,7 +41,14 @@ ModelImporter:
     4300006: big
     4300008: small
     4300010: r_wire1
+    7400000: Idle
+    7400002: Dance
     9500000: //RootNode
+    13700000: big
+    13700002: body
+    13700004: l_wire
+    13700006: r_wire
+    13700008: small
   materials:
     importMaterials: 0
     materialName: 0
@@ -53,7 +64,95 @@ ModelImporter:
     animationScaleError: .5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Idle
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: eyes
+        weight: 1
+      - path: eyes/big
+        weight: 1
+      - path: eyes/small
+        weight: 1
+      - path: l_wire
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/body 1
+        weight: 1
+      - path: r_wire
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Dance
+      takeName: Take 001
+      firstFrame: 30
+      lastFrame: 61
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: eyes
+        weight: 1
+      - path: eyes/big
+        weight: 1
+      - path: eyes/small
+        weight: 1
+      - path: l_wire
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/body 1
+        weight: 1
+      - path: r_wire
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
     isReadable: 1
   meshes:
     lODScreenPercentages: []
