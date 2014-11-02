@@ -11,6 +11,9 @@ ModelImporter:
     100010: r_wire
     100012: blocks
     100014: eyes
+    100016: pivot
+    100018: stem0
+    100020: stem1
     400000: //RootNode
     400002: energy_sphere
     400004: l_eye
@@ -19,6 +22,9 @@ ModelImporter:
     400010: r_wire
     400012: blocks
     400014: eyes
+    400016: pivot
+    400018: stem0
+    400020: stem1
     2300000: energy_sphere
     2300002: l_eye
     2300004: l_wire
@@ -37,7 +43,13 @@ ModelImporter:
     4300006: l_eye
     4300008: r_eye
     4300010: blocks
+    7400000: Idle
+    7400002: Idle2
+    7400004: Dance
     9500000: //RootNode
+    13700000: blocks
+    13700002: l_wire
+    13700004: r_wire
   materials:
     importMaterials: 0
     materialName: 0
@@ -53,7 +65,151 @@ ModelImporter:
     animationScaleError: .5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Idle
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 47
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: blocks
+        weight: 1
+      - path: energy_sphere
+        weight: 1
+      - path: energy_sphere/eyes
+        weight: 1
+      - path: energy_sphere/eyes/l_eye
+        weight: 1
+      - path: energy_sphere/eyes/r_eye
+        weight: 1
+      - path: l_wire
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/stem0
+        weight: 1
+      - path: pivot/stem1
+        weight: 1
+      - path: r_wire
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Idle2
+      takeName: Take 001
+      firstFrame: 50
+      lastFrame: 94
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: blocks
+        weight: 1
+      - path: energy_sphere
+        weight: 1
+      - path: energy_sphere/eyes
+        weight: 1
+      - path: energy_sphere/eyes/l_eye
+        weight: 1
+      - path: energy_sphere/eyes/r_eye
+        weight: 1
+      - path: l_wire
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/stem0
+        weight: 1
+      - path: pivot/stem1
+        weight: 1
+      - path: r_wire
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Dance
+      takeName: Take 001
+      firstFrame: 106
+      lastFrame: 129
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: blocks
+        weight: 1
+      - path: energy_sphere
+        weight: 1
+      - path: energy_sphere/eyes
+        weight: 1
+      - path: energy_sphere/eyes/l_eye
+        weight: 1
+      - path: energy_sphere/eyes/r_eye
+        weight: 1
+      - path: l_wire
+        weight: 1
+      - path: pivot
+        weight: 1
+      - path: pivot/stem0
+        weight: 1
+      - path: pivot/stem1
+        weight: 1
+      - path: r_wire
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
     isReadable: 1
   meshes:
     lODScreenPercentages: []
