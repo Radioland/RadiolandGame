@@ -2,7 +2,7 @@
 	Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_Ramp ("Toon Ramp (RGB)", 2D) = "gray" {}
-		_Tint ("Tint Color", Color) = (1,1,1,1)
+		_Tint ("Tint Color", Color) = (1,1,1,0.5)
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque" }
@@ -35,7 +35,7 @@
 		};
 		
 		void tint (Input IN, SurfaceOutput o, inout fixed4 color) {
-			color *= _Tint;
+			color *= _LightColor0 * _Tint;
 		}
 
 		void surf (Input IN, inout SurfaceOutput o) {

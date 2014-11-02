@@ -7,6 +7,8 @@
 		_TopScale("Top Scale", Float) = 2
 		_BottomScale ("Bottom Scale", Float) = 2
 		
+		_Tint ("Tint Color", Color) = (1,1,1,0.5)
+		
 		_Ramp ("Toon Ramp (RGB)", 2D) = "gray" {}
 		
 	    _OutlineColor ("Outline Color", Color) = (0,0,0,1)
@@ -24,11 +26,12 @@
 		ZWrite On
 		
 		CGPROGRAM
-		#pragma surface surf ToonRamp exclude_path:prepass vertex:vert
+		#pragma surface surf ToonRamp exclude_path:prepass vertex:vert finalcolor:tint
 		#pragma exclude_renderers flash
  
 		sampler2D _Side, _Top, _Bottom;
 		float _SideScale, _TopScale, _BottomScale;
+		fixed4 _Tint;
 		uniform sampler2D _Ramp;
 		
 		inline half4 LightingToonRamp (SurfaceOutput s, half3 lightDir, half atten)
@@ -53,6 +56,11 @@
 			float3 vertNormal;
 			float3 objPos;
 		};
+		
+		void tint (Input IN, SurfaceOutput o, inout fixed4 color) {
+			color = saturate(color);
+			color *= _LightColor0 * _Tint;
+		}
 		
 		void vert (inout appdata_full v, out Input o) {
           UNITY_INITIALIZE_OUTPUT(Input,o);

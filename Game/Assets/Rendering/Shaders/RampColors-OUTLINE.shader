@@ -1,6 +1,7 @@
 ﻿Shader "Custom/RampColors-OUTLINE" {
 	Properties {
 		_MainTex ("Ramp (RGB)", 2D) = "white" {}
+		_Tint ("Tint Color", Color) = (1,1,1,0.5)
 		
 		_OutlineColor ("Outline Color", Color) = (0,0,0,1)
 		_Outline ("Outline width", Range (.002, 0.03)) = .005
@@ -14,6 +15,7 @@
 		#include "UnityCG.cginc"
 
 		sampler2D _MainTex;
+		fixed4 _Tint;
 		
 // ------------------------------------------------------------------
 // HSV code from http://chilliant.blogspot.com/2010/11/rgbhsv-in-hlsl.html
@@ -83,6 +85,8 @@ float3 RGBtoHSV(in float3 RGB)
 			fixed lumi = Luminance(color);
 			color = tex2D(_MainTex, float2(lightinghsv.z, y));
 			//color = tex2D(_MainTex, float2(lumi, y));
+			
+			color *= _LightColor0 * _Tint;
 			
 			//color = float4(o.Emission.rgb,1.0);
 			//color = float4(0.988,0.690,0.251,1.0);		

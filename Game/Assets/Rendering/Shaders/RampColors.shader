@@ -1,6 +1,7 @@
 ﻿Shader "Custom/RampColors" {
 	Properties {
 		_MainTex ("Ramp (RGB)", 2D) = "white" {}
+		_Tint ("Tint Color", Color) = (1,1,1,0.5)
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque"}
@@ -11,6 +12,7 @@
 		#include "UnityCG.cginc"
 
 		sampler2D _MainTex;
+		fixed4 _Tint;
 		
 // ------------------------------------------------------------------
 // HSV code from http://chilliant.blogspot.com/2010/11/rgbhsv-in-hlsl.html
@@ -79,6 +81,15 @@ float3 RGBtoHSV(in float3 RGB)
 			
 			fixed lumi = Luminance(color);
 			color = tex2D(_MainTex, float2(lightinghsv.z, y));
+			
+			//half3 colorhsv = RGBtoHSV(float3 (color.r, color.g, color.b));
+			//colorhsv.x += lightcolorHSV.x;
+			//color = HSVtoRGB(colorhsv); 
+			
+			color *= _LightColor0 * _Tint;
+			
+			//color = _LightColor0;
+			
 			//color = tex2D(_MainTex, float2(lumi, y));
 			
 			//color = float4(o.Emission.rgb,1.0);
