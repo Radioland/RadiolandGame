@@ -83,6 +83,7 @@ public class CameraControl : MonoBehaviour
 
     void LateUpdate() {
         // Follow behind the player.
+        /*
         if (!Input.GetMouseButton(1)) {
             cameraState = CameraState.PLAYER_FOLLOW;
             // Default behavior.
@@ -99,6 +100,14 @@ public class CameraControl : MonoBehaviour
             targetHorizontalAngle -= mouseDeltaX * mouseLookSpeed;
             targetVerticalAngle -= mouseDeltaY * mouseLookSpeed;
         }
+        */
+
+        // Controller
+        //targetHorizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal -
+        //                        Input.GetAxis("RightHorizontal") * 45.0f;
+        //targetVerticalAngle = defaultVerticalAngle - Input.GetAxis("RightVertical") * 45.0f;
+        targetHorizontalAngle += Input.GetAxis("RightHorizontal") * 5.0f;
+        targetVerticalAngle -= Input.GetAxis("RightVertical") * 5.0f;
 
         targetVerticalAngle = Mathf.Clamp(targetVerticalAngle, minVerticalAngle, maxVerticalAngle);
 

@@ -137,10 +137,12 @@ public class CharacterMovement : MonoBehaviour
                 transform.Rotate(rotationEulerAngles);
             } else {
                 // Rotate to match the camera.
+                /*
                 float cameraRotation = cameraControl.cameraTransform.eulerAngles.y;
                 Vector3 newEulerAngles = transform.eulerAngles;
                 newEulerAngles.y = cameraRotation;
                 transform.eulerAngles = newEulerAngles;
+                */
             }
         }
         m_moving = inputReceived;
