@@ -131,10 +131,12 @@ public class CharacterMovement : MonoBehaviour
         if (inputReceived) {
             if (m_moving) {
                 // Rotate with horizontal input.
+                /*
                 float inputRotation = Input.GetAxis("Horizontal") *
                                       degRotPerSec * Time.deltaTime;
                 Vector3 rotationEulerAngles = new Vector3(0.0f, inputRotation, 0.0f);
                 transform.Rotate(rotationEulerAngles);
+                */
             } else {
                 // Rotate to match the camera.
                 /*
@@ -153,7 +155,8 @@ public class CharacterMovement : MonoBehaviour
         Vector3 inputVector = Vector3.zero;
         if (m_controllable) {
             verticalInput = Input.GetAxis("Vertical");
-            strafeInput = Input.GetAxis("Strafe");
+            //strafeInput = Input.GetAxis("Strafe");
+            strafeInput = Input.GetAxis("Horizontal");
             inputVector = transform.forward * verticalInput + transform.right * strafeInput;
         }
 
