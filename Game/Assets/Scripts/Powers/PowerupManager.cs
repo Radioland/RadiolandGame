@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PowerupManager : MonoBehaviour
 {
+    [SerializeField] private ParticleSystem powerupReadyGlow;
+
     [HideInInspector] public Powerup[] powerups;
 
     [SerializeField] private float m_energy;
@@ -29,6 +31,22 @@ public class PowerupManager : MonoBehaviour
         // Debug energy refill.
         if (Input.GetKeyDown(KeyCode.F)) {
             energy = 1.0f;
+        }
+
+        // Show powerupReadyGlow if a powerup is ready.
+        bool powerupReady = false;
+        foreach (Powerup powerup in powerups) {
+            if (powerup.CanUsePowerup()) {
+                if (!powerupReadyGlow.enableEmission) {
+                    powerupReadyGlow.Play();
+                    powerupReadyGlow.enableEmission = true;
+                    powerupReadyGlow.startColor = powerup.color;
+                }
+                powerupReady = true;
+            }
+        }
+        if (!powerupReady) {
+            powerupReadyGlow.enableEmission = false;
         }
     }
 

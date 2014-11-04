@@ -30,6 +30,10 @@ public class RadioStation : MonoBehaviour
         if (!radioControl) {
             Debug.LogWarning("There is no RadioControl linked to this RadioStation!");
         }
+
+        if (powerup) {
+            powerup.radioStation = this;
+        }
     }
 
     void Update() {
@@ -39,6 +43,10 @@ public class RadioStation : MonoBehaviour
         if (powerup && powerup.inUse && signalStrength < radioControl.powerupMinSignalStrength) {
             powerup.EndPowerup();
         }
+    }
+
+    public bool StrongSignal() {
+        return signalStrength > radioControl.powerupMinSignalStrength;
     }
 
     public void UsePowerup() {

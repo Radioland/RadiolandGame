@@ -7,7 +7,10 @@ public class Powerup : MonoBehaviour
 {
     [SerializeField] protected float duration = 5.0f;
     public float energyCost = 0.2f;
+    public Color color;
     public bool inUse;
+
+    [HideInInspector] public RadioStation radioStation;
 
     protected CharacterMovement characterMovement;
     protected PowerupManager powerupManager;
@@ -47,8 +50,16 @@ public class Powerup : MonoBehaviour
         }
     }
 
+    public bool CanUsePowerup() {
+        if (radioStation) {
+            return powerupManager.CanUsePowerup(this) && radioStation.StrongSignal();
+        } else {
+            return powerupManager.CanUsePowerup(this);
+        }
+    }
+
     public void TryToUsePowerup() {
-        if (powerupManager.CanUsePowerup(this)) {
+        if (CanUsePowerup()) {
             UsePowerup();
         } else {
             // TODO: effects?
