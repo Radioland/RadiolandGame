@@ -18,8 +18,13 @@ public class CameraControl : MonoBehaviour
     // The camera moves around a sphere centered on the player.
     // The horizontal and vertical angles are updated based on the current state.
     // Smoothing affects how floaty, tight, or jumpy the camera feels.
+    // When blocked, the camera zooms in.
 
-    [SerializeField] [Range(2.0f, 40.0f)] private float radius = 10.0f;
+    [SerializeField] [Range(2.0f, 40.0f)] private float defaultRadius = 6.0f;
+    [SerializeField] [Range(2.0f, 40.0f)] private float minRadius = 2.0f;
+    [SerializeField] [Tooltip("Extra space between obstacle and camera")]
+    private float zoomBuffer = 0.2f;
+    [SerializeField] private LayerMask cameraBlockLayers;
     [SerializeField] private float defaultVerticalAngle = 20.0f;
     [SerializeField] private float minVerticalAngle = 0.0f;
     [SerializeField] private float maxVerticalAngle = 65.0f;
@@ -36,6 +41,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float mouseLookSpeed = 0.5f;
 
     private Camera cameraComponent;
+    private float targetRadius;
     private Vector3 targetPosition;
     private float targetHorizontalAngle; // Y-Axis Euler Angle
     private float targetVerticalAngle; // X-Axis Euler Angle
@@ -56,6 +62,7 @@ public class CameraControl : MonoBehaviour
         debugMovement = gameObject.GetComponent<DebugMovement>();
 
         cameraComponent = cameraTransform.GetComponent<Camera>();
+        targetRadius = defaultRadius;
         targetPosition = new Vector3(0, 100000, 0);
         targetVerticalAngle = defaultVerticalAngle;
         targetHorizontalAngle = offsetHorizontal;
@@ -105,7 +112,7 @@ public class CameraControl : MonoBehaviour
         float z = Mathf.Cos(theta) * Mathf.Sin(phi);
         // Offset from the player by the vector to that point at the given radius.
         Vector3 offset = new Vector3(x, y, z);
-        Vector3 newTargetPosition = targetTransform.position + offset * radius;
+        Vector3 newTargetPosition = targetTransform.position + offset * targetRadius;
 
         targetPosition.x = newTargetPosition.x;
         targetPosition.z = newTargetPosition.z;
@@ -162,6 +169,18 @@ public class CameraControl : MonoBehaviour
             // Update rotations so that there isn't a sharp jump when switching back to follow mode.
             verticalRotation = Quaternion.Euler(cameraTransform.eulerAngles.x, 0, 0);
             horizRotation = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0);
+        }
+
+        // Zoom in if blocked.
+        Debug.DrawLine(cameraTransform.position, targetTransform.position);
+        Vector3 direction = cameraTransform.position - targetTransform.position;
+        RaycastHit hit;
+        if (Physics.Raycast(targetTransform.position, direction, out hit,
+                            defaultRadius, cameraBlockLayers)) {
+            targetRadius = Mathf.Max(minRadius, hit.distance - zoomBuffer);
+            Debug.DrawLine(targetTransform.position, hit.point, Color.red);
+        } else {
+            targetRadius = defaultRadius;
         }
 
         lastMouseX = Input.mousePosition.x;
