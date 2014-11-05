@@ -4,6 +4,7 @@ using System.Collections;
 public class JumpPowerup : Powerup
 {
     [SerializeField] protected EffectManager onJumpEffects;
+    [SerializeField] private float groundedExtraTime = 0.1f;
 
     protected bool effectsStarted;
     protected Animator animator;
@@ -25,11 +26,21 @@ public class JumpPowerup : Powerup
 
     public override void Update() {
         base.Update();
+
+        if (!primed && characterMovement.grounded &&
+            (Time.time - lastTriggeredTime < groundedExtraTime)) {
+            UsePowerup();
+        }
+    }
+
+    public override bool CanUsePowerup() {
+        return base.CanUsePowerup() && characterMovement.grounded;
     }
 
     // Called via SendMessage in CharacterMovement.
-    protected void StartJump() {
-        if (inUse) {
+    protected virtual void StartJump() {
+        if (primed && !inUse) {
+            inUse = true;
             onJumpEffects.StartEvent();
             effectsStarted = true;
         }
@@ -37,9 +48,12 @@ public class JumpPowerup : Powerup
 
     // Called via SendMessage in CharacterMovement.
     protected void Grounded() {
-        if (effectsStarted) {
-            onJumpEffects.StopEvent();
-            effectsStarted = false;
+        if (inUse) {
+            if (effectsStarted) {
+                onJumpEffects.StopEvent();
+                effectsStarted = false;
+            }
+            EndPowerup();
         }
     }
 

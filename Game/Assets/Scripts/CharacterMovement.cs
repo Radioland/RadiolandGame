@@ -36,6 +36,9 @@ public class CharacterMovement : MonoBehaviour
     public bool jumping { get { return m_jumping; } }
     private bool m_sliding;
     public bool sliding { get { return m_sliding; } }
+    public bool grounded {
+        get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
+    }
 
     private CharacterController controller;
     private CollisionFlags collisionFlags;
@@ -59,9 +62,6 @@ public class CharacterMovement : MonoBehaviour
     private float originalGravity;
     private float originalJumpHeight;
 
-    private bool grounded {
-        get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
-    }
     private float jumpVerticalSpeed {
         get { return Mathf.Sqrt(2 * jumpHeight * gravity); }
     }

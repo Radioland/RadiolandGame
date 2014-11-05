@@ -30,15 +30,24 @@ public class RadioStation : MonoBehaviour
         if (!radioControl) {
             Debug.LogWarning("There is no RadioControl linked to this RadioStation!");
         }
+
+        if (powerup) {
+            powerup.radioStation = this;
+        }
     }
 
     void Update() {
         audioSource.volume = signalStrength;
 
         // End if the station signal is no longer strong enough.
-        if (powerup && powerup.inUse && signalStrength < radioControl.powerupMinSignalStrength) {
+        if (powerup && powerup.primed && !powerup.inUse &&
+            (signalStrength < radioControl.powerupMinSignalStrength)) {
             powerup.EndPowerup();
         }
+    }
+
+    public bool StrongSignal() {
+        return signalStrength > radioControl.powerupMinSignalStrength;
     }
 
     public void UsePowerup() {

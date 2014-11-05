@@ -7,10 +7,15 @@ public class Powerup : MonoBehaviour
 {
     [SerializeField] protected float duration = 5.0f;
     public float energyCost = 0.2f;
+    public Color color;
+    public bool primed;
     public bool inUse;
+
+    [HideInInspector] public RadioStation radioStation;
 
     protected CharacterMovement characterMovement;
     protected PowerupManager powerupManager;
+    protected float lastTriggeredTime;
     protected float lastStartedTime;
 
     public float remainingTime {
@@ -28,6 +33,7 @@ public class Powerup : MonoBehaviour
             gameObject.SetActive(false);
         }
 
+        lastTriggeredTime = -1000.0f;
         lastStartedTime = -1000.0f;
     }
 
@@ -42,13 +48,24 @@ public class Powerup : MonoBehaviour
     }
 
     public virtual void Update() {
-        if (inUse && Time.time - lastStartedTime > duration) {
+        // Unprime if duration is exceeded, do not stop in the middle of a usage.
+        if (primed && !inUse && (Time.time - lastStartedTime > duration)) {
             EndPowerup();
         }
     }
 
+    public virtual bool CanUsePowerup() {
+        if (radioStation) {
+            return powerupManager.CanUsePowerup(this) && radioStation.StrongSignal();
+        } else {
+            return powerupManager.CanUsePowerup(this);
+        }
+    }
+
     public void TryToUsePowerup() {
-        if (powerupManager.CanUsePowerup(this)) {
+        lastTriggeredTime = Time.time;
+
+        if (CanUsePowerup()) {
             UsePowerup();
         } else {
             // TODO: effects?
@@ -63,11 +80,12 @@ public class Powerup : MonoBehaviour
         powerupManager.SetActivePowerup(this);
 
         lastStartedTime = Time.time;
-        inUse = true;
+        primed = true;
         powerupManager.energy -= energyCost;
     }
     
     public virtual void EndPowerup() {
+        primed = false;
         inUse = false;
         powerupManager.EndPowerup();
     }

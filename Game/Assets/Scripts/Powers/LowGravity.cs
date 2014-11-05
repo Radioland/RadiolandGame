@@ -19,23 +19,19 @@ public class LowGravity : JumpPowerup
     
     public override void Update() {
         base.Update();
-
-        // Debug usage, potentially glitchy.
-        if (Input.GetKeyDown(KeyCode.G)) {
-            UsePowerup();
-        }
     }
 
     public override void UsePowerup() {
         base.UsePowerup();
 
-        Debug.Log("Used Low Gravity.");
-        
-        characterMovement.SetGravity(gravity);
         animator.SetBool(longJumpHash, true);
+    }
 
-        if (characterMovement.jumping) {
-            StartJump();
+    // Called via SendMessage in CharacterMovement.
+    protected override void StartJump() {
+        base.StartJump();
+        if (inUse) {
+            characterMovement.SetGravity(gravity);
         }
     }
     
