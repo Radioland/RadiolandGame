@@ -19,6 +19,11 @@ public class LowGravity : JumpPowerup
     
     public override void Update() {
         base.Update();
+
+        if (primed && !inUse && characterMovement.falling) {
+            characterMovement.SetGravity(gravity);
+            inUse = true;
+        }
     }
 
     public override void UsePowerup() {
@@ -30,6 +35,7 @@ public class LowGravity : JumpPowerup
     // Called via SendMessage in CharacterMovement.
     protected override void StartJump() {
         base.StartJump();
+
         if (inUse) {
             characterMovement.SetGravity(gravity);
         }

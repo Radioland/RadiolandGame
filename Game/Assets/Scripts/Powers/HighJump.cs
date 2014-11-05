@@ -20,6 +20,10 @@ public class HighJump : JumpPowerup
     public override void Update() {
         base.Update();
     }
+
+    public override bool CanUsePowerup() {
+        return base.CanUsePowerup() && characterMovement.grounded;
+    }
     
     public override void UsePowerup() {
         base.UsePowerup();

@@ -24,6 +24,8 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")]
     private float jumpSlopeLimit = 75.0f;
     [SerializeField] private float slideSpeed = 5.0f;
+    [SerializeField] [Tooltip("Time required to start being classified as falling.")]
+    private float fallingTime = 0.2f;
 
     // State (read-only visible to other scripts).
     private bool m_controllable;
@@ -39,6 +41,8 @@ public class CharacterMovement : MonoBehaviour
     public bool grounded {
         get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
     }
+    private bool m_falling;
+    public bool falling { get { return m_falling; } }
 
     private CharacterController controller;
     private CollisionFlags collisionFlags;
@@ -196,15 +200,19 @@ public class CharacterMovement : MonoBehaviour
 
     void ApplyGravity() {
         if (grounded) {
-            float landingVerticalSpeed = verticalSpeed;
-            verticalSpeed = 0.0f;
-            if (m_jumping) {
-                m_jumping = false;
-
+            if (falling) {
+                float landingVerticalSpeed = verticalSpeed;
+                verticalSpeed = 0.0f;
                 SendMessage("Grounded", landingVerticalSpeed);
+                m_falling = false;
             }
+            m_jumping = false;
             animator.SetBool(landingHash, false);
         } else {
+            if (Time.time - lastGroundedTime > fallingTime && verticalSpeed < 0.0f) {
+                m_falling = true;
+            }
+
             verticalSpeed -= gravity * Time.deltaTime;
 
             if (m_jumping) {

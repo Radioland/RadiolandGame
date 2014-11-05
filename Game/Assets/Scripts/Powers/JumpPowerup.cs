@@ -29,10 +29,6 @@ public class JumpPowerup : Powerup
         }
     }
 
-    public override bool CanUsePowerup() {
-        return base.CanUsePowerup() && characterMovement.grounded;
-    }
-
     // Called via SendMessage in CharacterMovement.
     protected virtual void StartJump() {
         if (primed && !inUse) {
