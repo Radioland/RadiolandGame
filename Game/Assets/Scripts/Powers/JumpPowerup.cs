@@ -6,13 +6,10 @@ public class JumpPowerup : Powerup
     [SerializeField] protected EffectManager onJumpEffects;
     [SerializeField] private float groundedExtraTime = 0.1f;
 
-    protected bool effectsStarted;
     protected Animator animator;
 
     public override void Awake() {
         base.Awake();
-
-        effectsStarted = false;
 
         animator = gameObject.GetComponentInChildren<Animator>();
         if (!animator) {
@@ -40,27 +37,29 @@ public class JumpPowerup : Powerup
     protected virtual void StartJump() {
         if (primed && !inUse) {
             inUse = true;
-            onJumpEffects.StartEvent();
-            effectsStarted = true;
         }
     }
 
     // Called via SendMessage in CharacterMovement.
     protected void Grounded() {
         if (inUse) {
-            if (effectsStarted) {
-                onJumpEffects.StopEvent();
-                effectsStarted = false;
-            }
             EndPowerup();
         }
     }
 
     public override void UsePowerup() {
         base.UsePowerup();
+
+        if (onJumpEffects) {
+            onJumpEffects.StartEvent();
+        }
     }
 
     public override void EndPowerup() {
         base.EndPowerup();
+
+        if (onJumpEffects) {
+            onJumpEffects.StopEvent();
+        }
     }
 }
