@@ -3,7 +3,8 @@ using System.Collections;
 
 public class PowerupManager : MonoBehaviour
 {
-    [SerializeField] private ParticleSystem powerupReadyGlow;
+    [SerializeField] private Renderer powerupReadyGlow;
+    [SerializeField] private string glowColorName = "_TintColor";
 
     [HideInInspector] public Powerup[] powerups;
 
@@ -36,17 +37,16 @@ public class PowerupManager : MonoBehaviour
         // Show powerupReadyGlow if a powerup is ready.
         bool powerupReady = false;
         foreach (Powerup powerup in powerups) {
-            if (powerup.CanUsePowerup()) {
-                if (!powerupReadyGlow.enableEmission) {
-                    powerupReadyGlow.Play();
-                    powerupReadyGlow.enableEmission = true;
-                    powerupReadyGlow.startColor = powerup.color;
+            if (powerup.SufficientResources()) {
+                if (!powerupReadyGlow.enabled) {
+                    powerupReadyGlow.enabled = true;
+                    powerupReadyGlow.material.SetColor(glowColorName, powerup.color);
                 }
                 powerupReady = true;
             }
         }
         if (!powerupReady) {
-            powerupReadyGlow.enableEmission = false;
+            powerupReadyGlow.enabled = false;
         }
     }
 
