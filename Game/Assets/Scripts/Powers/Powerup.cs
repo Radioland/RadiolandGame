@@ -56,9 +56,9 @@ public class Powerup : MonoBehaviour
 
     public virtual bool CanUsePowerup() {
         if (radioStation) {
-            return powerupManager.CanUsePowerup(this) && radioStation.StrongSignal();
+            return !primed && powerupManager.CanUsePowerup(this) && radioStation.StrongSignal();
         } else {
-            return powerupManager.CanUsePowerup(this);
+            return !primed && powerupManager.CanUsePowerup(this);
         }
     }
 

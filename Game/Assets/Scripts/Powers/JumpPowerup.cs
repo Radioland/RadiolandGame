@@ -27,8 +27,7 @@ public class JumpPowerup : Powerup
     public override void Update() {
         base.Update();
 
-        if (!primed && characterMovement.grounded &&
-            (Time.time - lastTriggeredTime < groundedExtraTime)) {
+        if ((Time.time - lastTriggeredTime < groundedExtraTime) && CanUsePowerup()) {
             UsePowerup();
         }
     }
