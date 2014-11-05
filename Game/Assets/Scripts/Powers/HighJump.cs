@@ -19,17 +19,10 @@ public class HighJump : JumpPowerup
     
     public override void Update() {
         base.Update();
-
-        // Debug usage, potentially glitchy.
-        if (Input.GetKeyDown(KeyCode.H)) {
-            UsePowerup();
-        }
     }
     
     public override void UsePowerup() {
         base.UsePowerup();
-
-        Debug.Log("Used High Jump.");
 
         characterMovement.SetJumpHeight(jumpHeight);
         animator.SetBool(highJumpHash, true);

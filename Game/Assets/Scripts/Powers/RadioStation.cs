@@ -40,7 +40,8 @@ public class RadioStation : MonoBehaviour
         audioSource.volume = signalStrength;
 
         // End if the station signal is no longer strong enough.
-        if (powerup && powerup.inUse && signalStrength < radioControl.powerupMinSignalStrength) {
+        if (powerup && powerup.primed && !powerup.inUse &&
+            (signalStrength < radioControl.powerupMinSignalStrength)) {
             powerup.EndPowerup();
         }
     }
