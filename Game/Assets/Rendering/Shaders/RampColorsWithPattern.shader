@@ -3,6 +3,7 @@
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_Ramp ("Toon Ramp (RGB)", 2D) = "gray" {}
 		_Tint ("Tint Color", Color) = (1,1,1,0.5)
+		
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque" }
