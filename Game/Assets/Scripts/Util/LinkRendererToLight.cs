@@ -7,6 +7,9 @@ public class LinkRendererToLight : MonoBehaviour {
 	public string shaderColorName = "_Color";
 
 	void Awake () {
+		if (theLight == null) {
+			theLight = gameObject.GetComponentInParent<Light>();
+		}
 		if (!renderer.material.HasProperty(shaderColorName)) {
 			Debug.LogWarning(renderer.GetPath() + " has no material color named " + shaderColorName);
 		}
