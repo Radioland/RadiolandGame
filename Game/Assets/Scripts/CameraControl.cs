@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+#pragma warning disable 0219 // variable assigned but not used.
+#pragma warning disable 0414 // private field assigned but not used.
 
 public class CameraControl : MonoBehaviour
 {
@@ -11,7 +13,7 @@ public class CameraControl : MonoBehaviour
 
     public Transform cameraTransform;
 
-    [SerializeField] private Transform targetTransform;
+    [SerializeField] private Transform followTransform;
     [SerializeField] private CharacterMovement characterMovement;
     private DebugMovement debugMovement;
 
@@ -52,9 +54,28 @@ public class CameraControl : MonoBehaviour
     private Vector3 velocityCamSmooth = Vector3.zero;
     private Quaternion verticalRotation;
     private Quaternion horizRotation;
+    
+    // =====================================================================
+    // Private vars from third person tutorial.
+    private Vector3 lookDir;
+    private Vector3 curLookDir;
+    private Vector3 characterOffset;
+
+    [SerializeField]
+    private float distanceUp = 2.0f;
+    [SerializeField]
+    private float distanceAway = 6.0f;
+    
+    // Smoothing and damping.
+    [SerializeField]
+    private float camSmoothDampTime = 0.1f;
+    private Vector3 velocityLookDir = Vector3.zero;
+    [SerializeField]
+    private float lookDirDampTime = 0.1f;
+    // =====================================================================
 
     void Awake() {
-        if (!targetTransform) { targetTransform = transform; }
+        if (!followTransform) { followTransform = transform; }
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
         if (!characterMovement) {
             Debug.LogWarning("No character movement set on CameraControl!");
@@ -71,6 +92,12 @@ public class CameraControl : MonoBehaviour
         lastMouseX = 0.0f;
         lastMouseY = 0.0f;
         cameraState = CameraState.PLAYER_FOLLOW;
+
+        
+        lookDir = followTransform.forward;
+        curLookDir = followTransform.forward;
+
+        characterOffset = followTransform.position + new Vector3(0f, distanceUp, 0f);
     }
 
     void Start() {
@@ -81,6 +108,48 @@ public class CameraControl : MonoBehaviour
 
     }
 
+    void LateUpdate() {
+        
+        // Pull values from controller/keyboard.
+        float rightX = Input.GetAxis("RightStickX");
+        float rightY = Input.GetAxis("RightStickY");
+        float leftX = Input.GetAxis("Horizontal");
+        float leftY = Input.GetAxis("Vertical");
+
+        cameraTransform.localRotation = Quaternion.Lerp(cameraTransform.localRotation,
+                                                        Quaternion.identity, Time.deltaTime);
+        
+        // Only update camera look direction if moving
+        //if (characterMovement.speed > 0.1f && follow.IsInLocomotion() && !follow.IsInPivot()) {
+        if (characterMovement.speed > 0.1f) {
+            lookDir = Vector3.Lerp(followTransform.right * (leftX < 0 ? 1f : -1f),
+                                   followTransform.forward * (leftY < 0 ? -1f : 1f),
+                                   Mathf.Abs(Vector3.Dot(cameraTransform.forward, followTransform.forward)));
+            Debug.DrawRay(cameraTransform.position, lookDir, Color.white);
+            
+            // Calculate direction from camera to player, kill Y, and normalize to give a valid direction with unit magnitude
+            curLookDir = Vector3.Normalize(followTransform.position - cameraTransform.position);
+            curLookDir.y = 0;
+            Debug.DrawRay(cameraTransform.position, curLookDir, Color.green);
+            
+            // Damping makes it so we don't update targetPosition while pivoting; camera shouldn't rotate around player
+            curLookDir = Vector3.SmoothDamp(curLookDir, lookDir, ref velocityLookDir, lookDirDampTime);
+        }
+
+        characterOffset = followTransform.position + (distanceUp * followTransform.up);
+        
+        targetPosition = characterOffset +
+                         followTransform.up * distanceUp -
+                         Vector3.Normalize(curLookDir) * targetRadius;
+        Debug.DrawLine(followTransform.position, targetPosition, Color.magenta);
+
+        // Smoothly translate to the target position.
+        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, targetPosition,
+                                                      ref velocityCamSmooth, camSmoothDampTime);
+        cameraTransform.LookAt(followTransform);
+    }
+    
+    #if OLD
     void LateUpdate() {
         // Follow behind the player.
         /*
@@ -106,11 +175,12 @@ public class CameraControl : MonoBehaviour
         //targetHorizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal -
         //                        Input.GetAxis("RightHorizontal") * 45.0f;
         //targetVerticalAngle = defaultVerticalAngle - Input.GetAxis("RightVertical") * 45.0f;
-        targetHorizontalAngle += Input.GetAxis("RightHorizontal") * 5.0f;
-        targetVerticalAngle -= Input.GetAxis("RightVertical") * 5.0f;
+        targetHorizontalAngle += Input.GetAxis("RightStickX") * 5.0f;
+        targetVerticalAngle -= Input.GetAxis("RightStickY") * 5.0f;
 
         targetVerticalAngle = Mathf.Clamp(targetVerticalAngle, minVerticalAngle, maxVerticalAngle);
-
+        targetHorizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal;
+        
         float phi = targetHorizontalAngle * Mathf.Deg2Rad;
         float theta = targetVerticalAngle * Mathf.Deg2Rad;
 
@@ -195,4 +265,5 @@ public class CameraControl : MonoBehaviour
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
     }
+#endif
 }
