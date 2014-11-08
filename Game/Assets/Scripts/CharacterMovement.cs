@@ -8,7 +8,7 @@ public class CharacterMovement : MonoBehaviour
     public CameraControl cameraControl;
 
     [SerializeField] [Range(0.0f, 20.0f)] private float walkSpeed = 5.0f;
-    [SerializeField] [Range(0.0f, 540.0f)] private float degRotPerSec = 200.0f;
+    [SerializeField] private float directionSpeed = 1.5f; // Affects turn rate.
     [SerializeField] [Range(0.0f, 100.0f)] private float gravity = 30.0f;
     // Speed is calculated to reach this height.
     [SerializeField] [Range(0.0f, 10.0f)] private float jumpHeight = 2.0f;
@@ -38,27 +38,13 @@ public class CharacterMovement : MonoBehaviour
     public bool jumping { get { return m_jumping; } }
     private bool m_sliding;
     public bool sliding { get { return m_sliding; } }
-    public bool grounded {
-        get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
-    }
+    public bool grounded { get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; } }
     private bool m_falling;
     public bool falling { get { return m_falling; } }
-
-    // =====================================================================
-    // Set in inspector from third person tutorial.
-    [SerializeField]
-    private float directionSpeed = 1.5f; // turn rate
-
-    // Private vars from third person tutorial.
     private float m_speed = 0f;
     public float speed { get { return m_speed; } }
 
-    private float leftX = 0f;
-    private float leftY = 0f;
-    private float direction = 0f;
-    private float charAngle = 0f;
-    // =====================================================================
-    
+    // Private class variables.
     private CharacterController controller;
     private CollisionFlags collisionFlags;
     private RaycastHit hit;
@@ -70,10 +56,14 @@ public class CharacterMovement : MonoBehaviour
     private Vector3 contactPoint;
     private float slopeAngle;
 
+    private float leftX = 0f;
+    private float leftY = 0f;
+    private float direction = 0f;
+    private float charAngle = 0f;
+
     // Animation.
     private Animator animator;
     private int speedHash;
-    private int strafeHash;
     private int jumpingHash;
     private int landingHash;
 
@@ -111,7 +101,6 @@ public class CharacterMovement : MonoBehaviour
             Debug.LogWarning("No animator found on " + transform.GetPath());
         }
         speedHash = Animator.StringToHash("Speed");
-        strafeHash = Animator.StringToHash("Strafe");
         jumpingHash = Animator.StringToHash("Jumping");
         landingHash = Animator.StringToHash("Landing");
 
@@ -134,115 +123,38 @@ public class CharacterMovement : MonoBehaviour
             ApplySliding();
         }
 
-
-
-        
-        // Pull values from controller/keyboard.
+        // Get input values from controller/keyboard.
         leftX = Input.GetAxis("Horizontal");
         leftY = Input.GetAxis("Vertical");
-        
+
         charAngle = 0f;
         direction = 0f;
         float charSpeed = 0f;
-        
+
         // Translate controls stick coordinates into world/cam/character space.
         StickToWorldspace(transform, cameraControl.cameraTransform, ref direction,
-                          ref charSpeed, ref charAngle, false); // isInPivot()
-
-        
+                          ref charSpeed, ref charAngle, false);
         m_speed = charSpeed;
 
+        // Don't rotate within a dead zone.
         if (m_speed > 0.05f) {
             transform.Rotate(new Vector3(0, charAngle, 0));
         }
 
         Vector3 motion = transform.forward * m_speed * walkSpeed;
 
-        controller.Move(transform.forward * m_speed * walkSpeed * Time.deltaTime);        
-        
         ApplyGravity();
         ApplyJump();
 
         motion += Vector3.up * verticalSpeed;
-        
-        //Vector3 motion = inputVector * walkSpeed + Vector3.up * verticalSpeed;
-        motion *= Time.deltaTime;
-        collisionFlags = controller.Move(motion);
-        
+
+        collisionFlags = controller.Move(motion * Time.deltaTime);
+
         // Update animations.
         if (animator) {
             animator.SetFloat(speedHash, Mathf.Abs(m_speed));
             animator.SetBool(jumpingHash, jumping);
         }
-            
-        /*
-            Vector3 motion = inputVector * walkSpeed + Vector3.up * verticalSpeed;
-            motion *= Time.deltaTime;
-            collisionFlags = controller.Move(motion);
-        */
-
-        //transform.rotation = Quaternion.Euler(0, direction * Mathf.Rad2Deg, 0);
-        //transform.rotation = Quaternion.Euler(0, charAngle, 0);
-        
-        
-        /*
-        // Check for movement input.
-        bool inputReceived = false;
-        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
-            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
-            Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
-            inputReceived = true;
-        }
-
-        // Rotate the player (only when input is received).
-        if (inputReceived) {
-            if (m_moving) {
-                // Rotate with horizontal input.
-
-                float inputRotation = Input.GetAxis("Horizontal") *
-                                      degRotPerSec * Time.deltaTime;
-                Vector3 rotationEulerAngles = new Vector3(0.0f, inputRotation, 0.0f);
-                transform.Rotate(rotationEulerAngles);
-
-            } else {
-                // Rotate to match the camera.
-
-                float cameraRotation = cameraControl.cameraTransform.eulerAngles.y;
-                Vector3 newEulerAngles = transform.eulerAngles;
-                newEulerAngles.y = cameraRotation;
-                transform.eulerAngles = newEulerAngles;
-
-            }
-        }
-        m_moving = inputReceived;
-        */
-
-        /*
-        // Grab movement input values.
-        float verticalInput = 0.0f;
-        float strafeInput = 0.0f;
-        Vector3 inputVector = Vector3.zero;
-        if (m_controllable) {
-            verticalInput = Input.GetAxis("Vertical");
-            //strafeInput = Input.GetAxis("Strafe");
-            strafeInput = Input.GetAxis("Horizontal");
-            inputVector = transform.forward * verticalInput + transform.right * strafeInput;
-        }
-
-        ApplyGravity();
-        ApplyJump();
-
-        Vector3 motion = inputVector * walkSpeed + Vector3.up * verticalSpeed;
-        motion *= Time.deltaTime;
-        collisionFlags = controller.Move(motion);
-
-        // Update animations.
-        if (animator) {
-            animator.SetFloat(speedHash, Mathf.Abs(verticalInput));
-            animator.SetFloat(strafeHash, strafeInput);
-            animator.SetBool(jumpingHash, jumping);
-        }
-        */
     }
 
     void ApplySliding() {
@@ -347,26 +259,25 @@ public class CharacterMovement : MonoBehaviour
     public void SetGravity(float newGravity) { gravity = newGravity; }
     public void ResetGravity() { gravity = originalGravity; }
 
-    
-    public void StickToWorldspace(Transform root, Transform camera,
+    private void StickToWorldspace(Transform root, Transform camera,
                                   ref float directionOut, ref float speedOut,
                                   ref float angleOut, bool isPivoting) {
         Vector3 rootDirection = root.forward;
-        
+
         Vector3 stickDirection = new Vector3(leftX, 0, leftY);
-        
+
         speedOut = stickDirection.sqrMagnitude;
-        
+
         // Get camera rotation.
         Vector3 CameraDirection = camera.forward;
         CameraDirection.y = 0.0f; // kill Y
         Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward,
                                                                 Vector3.Normalize(CameraDirection));
-        
+
         // Convert joystick input in Worldspace coordinates.
         Vector3 moveDirection = referentialShift * stickDirection;
         Vector3 axisSign = Vector3.Cross(moveDirection, rootDirection);
-        
+
         Debug.DrawRay(new Vector3(root.position.x, root.position.y + 2f, root.position.z),
                       moveDirection, Color.green);
         Debug.DrawRay(new Vector3(root.position.x, root.position.y + 2f, root.position.z),
@@ -375,13 +286,13 @@ public class CharacterMovement : MonoBehaviour
                       stickDirection, Color.blue);
         Debug.DrawRay(new Vector3(root.position.x, root.position.y + 2.5f, root.position.z),
                       axisSign, Color.red);
-        
+
         float angleRootToMove = Vector3.Angle(rootDirection, moveDirection) * (axisSign.y >= 0 ? -1f : 1f);
         if (!isPivoting) {
             angleOut = angleRootToMove;
         }
         angleRootToMove /= 180f;
-        
+
         directionOut = angleRootToMove * directionSpeed;
     }
 
