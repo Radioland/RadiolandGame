@@ -7,44 +7,39 @@ public class CameraControl : MonoBehaviour
 
     [SerializeField] private Transform followTransform;
     [SerializeField] private CharacterMovement characterMovement;
-    private DebugMovement debugMovement;
 
-    // The camera moves around a sphere centered on the player.
-    // The horizontal and vertical angles are updated based on the current state.
-    // Smoothing affects how floaty, tight, or jumpy the camera feels.
-    // When blocked, the camera zooms in.
-
+    // Distances from the player.
     [SerializeField] [Range(2.0f, 40.0f)] private float defaultRadius = 6.0f;
     [SerializeField] [Range(2.0f, 40.0f)] private float minRadius = 2.0f;
+    [SerializeField] private float distanceUp = 2.0f;
+    [SerializeField] private float minDistanceUp = 1.0f;
+    [SerializeField] private float maxDistanceUp = 10.0f;
+
+    // Obstacle/occulsion avoidance.
     [SerializeField] [Tooltip("Extra space between obstacle and camera")]
     private float zoomBuffer = 0.2f;
     [SerializeField] private LayerMask cameraBlockLayers;
     [SerializeField] [Range(0.0f, 1.0f)] private float minTargetScreenY = 0.35f;
     [SerializeField] [Range(0.0f, 1.0f)] private float maxTargetScreenY = 0.65f;
+
+    // Camera speeds.
+    [SerializeField] private float rotateSpeed = 3.0f;
+    [SerializeField] private float zoomSpeed = 0.2f;
     [SerializeField] private float mouseLookSpeed = 0.1f;
 
     private Camera cameraComponent;
+
     private float targetRadius;
     private Vector3 targetPosition;
+    private Vector3 characterOffset;
+    private Vector3 lookDir;
+    private Vector3 curLookDir;
     private float lastMouseX;
     private float lastMouseY;
 
-    private Vector3 lookDir;
-    private Vector3 curLookDir;
-    private Vector3 characterOffset;
-
-    [SerializeField]
-    private float distanceUp = 2.0f;
-    [SerializeField]
-    private float minDistanceUp = 1.0f;
-    [SerializeField]
-    private float maxDistanceUp = 10.0f;
-
     // Smoothing and damping.
-    [SerializeField]
-    private float camSmoothDampTime = 0.1f;
-    [SerializeField]
-    private float lookDirDampTime = 0.1f;
+    [SerializeField] private float camSmoothDampTime = 0.1f;
+    [SerializeField] private float lookDirDampTime = 1.0f;
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
     // =====================================================================
@@ -55,7 +50,6 @@ public class CameraControl : MonoBehaviour
         if (!characterMovement) {
             Debug.LogWarning("No character movement set on CameraControl!");
         }
-        debugMovement = gameObject.GetComponent<DebugMovement>();
 
         cameraComponent = cameraTransform.GetComponent<Camera>();
         targetRadius = defaultRadius;
@@ -85,23 +79,25 @@ public class CameraControl : MonoBehaviour
         float rightY = Input.GetAxis("RightStickY");
 
         // TODO: replace with better control/mouse switching.
+        /*
         if (Mathf.Abs(rightX) < 0.1f) {
             rightX = (Input.mousePosition.x - lastMouseX) * mouseLookSpeed;
         }
         if (Mathf.Abs(rightY) < 0.1f) {
             rightY = (Input.mousePosition.y - lastMouseY) * mouseLookSpeed;
         }
+        */
 
         cameraTransform.localRotation = Quaternion.Lerp(cameraTransform.localRotation,
                                                         Quaternion.identity, Time.deltaTime);
 
         cameraTransform.RotateAround(characterOffset, followTransform.up,
-                                     2.0f * (Mathf.Abs(rightX) > 0.1f ? rightX : 0f));
-        distanceUp += 0.1f * (Mathf.Abs(rightY) > 0.1f ? rightY : 0f);
+                                     rotateSpeed * (Mathf.Abs(rightX) > 0.1f ? rightX : 0f));
+        distanceUp += zoomSpeed * (Mathf.Abs(rightY) > 0.1f ? rightY : 0f);
         distanceUp = Mathf.Clamp(distanceUp, minDistanceUp, maxDistanceUp);
         cameraTransform.LookAt(followTransform);
 
-        // Only update camera look direction if moving
+        // Only update camera look direction if moving or rotating.
         if (characterMovement.speed > 0.1f || Mathf.Abs(rightX) > 0.1f || Mathf.Abs(rightY) > 0.1f) {
             lookDir = Vector3.Lerp(followTransform.right * (leftX < 0 ? 1f : -1f),
                                    followTransform.forward * (leftY < 0 ? -1f : 1f),
@@ -159,7 +155,6 @@ public class CameraControl : MonoBehaviour
         } else {
             targetRadius = defaultRadius;
         }
-
 
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
