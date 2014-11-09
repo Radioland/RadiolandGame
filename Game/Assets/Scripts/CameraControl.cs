@@ -11,9 +11,10 @@ public class CameraControl : MonoBehaviour
 
     // Distances from the player.
     [SerializeField] [Range(2.0f, 40.0f)] private float targetRadius = 6.0f;
-    [SerializeField] private float distanceUp = 2.0f;
+    [SerializeField] private float defaultDistanceUp = 2.0f;
     [SerializeField] private float minDistanceUp = 1.0f;
     [SerializeField] private float maxDistanceUp = 10.0f;
+    private float distanceUp;
 
     // Obstacle/occulsion avoidance.
     [SerializeField] [Tooltip("Extra space between obstacle and camera")]
@@ -41,6 +42,10 @@ public class CameraControl : MonoBehaviour
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
 
+    // Camera reset.
+    private float lastResetTime;
+    private float resetDuration = 0.3f;
+
     void Awake() {
         if (!followTransform) { followTransform = transform; }
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
@@ -53,10 +58,13 @@ public class CameraControl : MonoBehaviour
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
 
+        distanceUp = defaultDistanceUp;
         lookDir = followTransform.forward;
         curLookDir = followTransform.forward;
 
         characterOffset = followTransform.position + new Vector3(0f, distanceUp, 0f);
+
+        lastResetTime = -1000.0f;
     }
 
     void Start() {
@@ -113,8 +121,16 @@ public class CameraControl : MonoBehaviour
             curLookDir = Vector3.SmoothDamp(curLookDir, lookDir, ref velocityLookDir, lookDirDampTime);
         }
 
-        characterOffset = followTransform.position + (distanceUp * followTransform.up);
+        // Reset look direction if the reset button is pressed.
+        if (Input.GetButtonDown("ResetCamera")) {
+            lastResetTime = Time.time;
+        }
+        if (Time.time - lastResetTime < resetDuration) {
+            curLookDir = followTransform.forward;
+            distanceUp = defaultDistanceUp;
+        }
 
+        characterOffset = followTransform.position + (distanceUp * followTransform.up);
         targetPosition = characterOffset + followTransform.up * distanceUp -
                          Vector3.Normalize(curLookDir) * targetRadius;
 
