@@ -1,76 +1,70 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-
 public class CameraControl : MonoBehaviour
 {
-    private enum CameraState
-    {
-        PLAYER_FOLLOW, MOUSE_CONTROL
-    }
-
     public Transform cameraTransform;
 
-    [SerializeField] private Transform targetTransform;
+    [SerializeField] private Transform followTransform;
     [SerializeField] private CharacterMovement characterMovement;
-    private DebugMovement debugMovement;
-
-    // The camera moves around a sphere centered on the player.
-    // The horizontal and vertical angles are updated based on the current state.
-    // Smoothing affects how floaty, tight, or jumpy the camera feels.
-    // When blocked, the camera zooms in.
-
-    [SerializeField] [Range(2.0f, 40.0f)] private float defaultRadius = 6.0f;
-    [SerializeField] [Range(2.0f, 40.0f)] private float minRadius = 2.0f;
-    [SerializeField] [Tooltip("Extra space between obstacle and camera")]
-    private float zoomBuffer = 0.2f;
-    [SerializeField] private LayerMask cameraBlockLayers;
-    [SerializeField] private float defaultVerticalAngle = 20.0f;
-    [SerializeField] private float minVerticalAngle = 0.0f;
-    [SerializeField] private float maxVerticalAngle = 65.0f;
-    [Tooltip("Set based on model's orientation.")]
-    [SerializeField] private float offsetHorizontal = -90.0f;
-    [SerializeField] [Range(0.0f, 1.0f)] private float minTargetScreenY = 0.35f;
-    [SerializeField] [Range(0.0f, 1.0f)] private float maxTargetScreenY = 0.65f;
-    [SerializeField] [Tooltip("Slerp time (lower is more gradual, [0,1])")]
-    private float lookHorizSpeed = 0.65f;
-    [SerializeField] [Tooltip("Slerp time (lower is more gradual, [0,1])")]
-    private float lookUpSpeed = 0.15f;
-    [SerializeField] [Tooltip("Time to reach position (lower is faster)")]
-    private float moveSmoothTime = 0.2f;
-    [SerializeField] private float mouseLookSpeed = 0.5f;
-
     private Camera cameraComponent;
-    private float targetRadius;
+
+    // Distances from the player.
+    [SerializeField] [Range(2.0f, 40.0f)] private float targetRadius = 6.0f;
+    [SerializeField] private float defaultDistanceUp = 2.0f;
+    [SerializeField] private float minDistanceUp = 1.0f;
+    [SerializeField] private float maxDistanceUp = 10.0f;
+    private float distanceUp;
+
+    // Obstacle/occulsion avoidance.
+    [SerializeField] [Tooltip("Extra space between obstacle and camera")]
+    private float compensationOffset = 0.2f;
+    [SerializeField] private LayerMask cameraBlockLayers;
+    private Vector3 nearClipDimensions = Vector3.zero; // width, height, radius
+    private Vector3[] viewFrustum;
+
+    // Camera speeds.
+    [SerializeField] private float rotateSpeed = 3.0f;
+    [SerializeField] private float zoomSpeed = 0.2f;
+    [SerializeField] private float mouseRotateSpeed = 4.0f;
+    [SerializeField] private float mouseZoomSpeed = 1.0f;
+
     private Vector3 targetPosition;
-    private float targetHorizontalAngle; // Y-Axis Euler Angle
-    private float targetVerticalAngle; // X-Axis Euler Angle
+    private Vector3 characterOffset;
+    private Vector3 lookDir;
+    private Vector3 curLookDir;
     private float lastMouseX;
     private float lastMouseY;
-    private CameraState cameraState;
 
+    // Smoothing and damping.
+    [SerializeField] private float camSmoothDampTime = 0.1f;
+    [SerializeField] private float lookDirDampTime = 1.0f;
+    private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
-    private Quaternion verticalRotation;
-    private Quaternion horizRotation;
+
+    // Camera reset.
+    private float lastResetTime;
+    private float resetDuration = 0.3f;
 
     void Awake() {
-        if (!targetTransform) { targetTransform = transform; }
+        if (!followTransform) { followTransform = transform; }
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
         if (!characterMovement) {
             Debug.LogWarning("No character movement set on CameraControl!");
         }
-        debugMovement = gameObject.GetComponent<DebugMovement>();
 
         cameraComponent = cameraTransform.GetComponent<Camera>();
-        targetRadius = defaultRadius;
         targetPosition = new Vector3(0, 100000, 0);
-        targetVerticalAngle = defaultVerticalAngle;
-        targetHorizontalAngle = offsetHorizontal;
-        verticalRotation = Quaternion.identity;
-        horizRotation = Quaternion.identity;
-        lastMouseX = 0.0f;
-        lastMouseY = 0.0f;
-        cameraState = CameraState.PLAYER_FOLLOW;
+        lastMouseX = Input.mousePosition.x;
+        lastMouseY = Input.mousePosition.y;
+
+        distanceUp = defaultDistanceUp;
+        lookDir = followTransform.forward;
+        curLookDir = followTransform.forward;
+
+        characterOffset = followTransform.position + new Vector3(0f, distanceUp, 0f);
+
+        lastResetTime = -1000.0f;
     }
 
     void Start() {
@@ -82,108 +76,121 @@ public class CameraControl : MonoBehaviour
     }
 
     void LateUpdate() {
-        // Follow behind the player.
-        if (!Input.GetMouseButton(1)) {
-            cameraState = CameraState.PLAYER_FOLLOW;
-            // Default behavior.
-            // Rotate horizontalAngle towards the player's orientation.
-            // Maintain a constant verticalAngle.
-            if (characterMovement.moving || (debugMovement && debugMovement.isActive)) {
-                targetHorizontalAngle = -targetTransform.eulerAngles.y + offsetHorizontal;
-            }
-        } else {
-            cameraState = CameraState.MOUSE_CONTROL;
-            // Mouse controlled camera rotation.
-            float mouseDeltaX = Input.mousePosition.x - lastMouseX;
-            float mouseDeltaY = Input.mousePosition.y - lastMouseY;
-            targetHorizontalAngle -= mouseDeltaX * mouseLookSpeed;
-            targetVerticalAngle -= mouseDeltaY * mouseLookSpeed;
+        viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
+
+        cameraTransform.localRotation = Quaternion.Lerp(cameraTransform.localRotation,
+                                                        Quaternion.identity, Time.deltaTime);
+
+        // Get input values from controller/keyboard.
+        // TODO: replace with better controller/mouse input management.
+        float leftX = Input.GetAxis("Horizontal");
+        float leftY = Input.GetAxis("Vertical");
+        float rightX = Input.GetAxis("RightStickX");
+        float rightY = Input.GetAxis("RightStickY");
+
+        // Compute percentage of the screen that the mouse travelled over.
+        float mouseDeltaX = (Input.mousePosition.x - lastMouseX) / Screen.width;
+        float mouseDeltaY = (Input.mousePosition.y - lastMouseY) / Screen.height;
+
+        // Scale based on an arbitrary maximum.
+        // TODO: add more intuitive control over mouse camera speeds.
+        float scaledX = Mathf.InverseLerp(0.0f, 0.05f, Mathf.Abs(mouseDeltaX));
+        float scaledY = Mathf.InverseLerp(0.0f, 0.05f, Mathf.Abs(mouseDeltaY));
+        rightX += Mathf.Sign(mouseDeltaX) * scaledX * mouseRotateSpeed;
+        rightY += -Mathf.Sign(mouseDeltaY) * scaledY * mouseZoomSpeed;
+
+        // Free look using rightX and rightY.
+        cameraTransform.RotateAround(characterOffset, followTransform.up,
+                                     rotateSpeed * (Mathf.Abs(rightX) > 0.1f ? rightX : 0f));
+        distanceUp += zoomSpeed * (Mathf.Abs(rightY) > 0.1f ? rightY : 0f);
+        distanceUp = Mathf.Clamp(distanceUp, minDistanceUp, maxDistanceUp);
+
+        // Only update camera look direction if moving or rotating.
+        if (characterMovement.speed > 0.1f || Mathf.Abs(rightX) > 0.1f || Mathf.Abs(rightY) > 0.1f) {
+            lookDir = Vector3.Lerp(followTransform.right * (leftX < 0 ? 1f : -1f),
+                                   followTransform.forward * (leftY < 0 ? -1f : 1f),
+                                   Mathf.Abs(Vector3.Dot(cameraTransform.forward, followTransform.forward)));
+            Debug.DrawRay(cameraTransform.position, lookDir, Color.white);
+
+            // Calculate direction from camera to player, kill Y, and normalize to give a valid direction with unit magnitude.
+            curLookDir = Vector3.Normalize(followTransform.position - cameraTransform.position);
+            curLookDir.y = 0;
+            Debug.DrawRay(cameraTransform.position, curLookDir, Color.green);
+
+            // Damping makes it so we don't update targetPosition while pivoting; camera shouldn't rotate around player.
+            // Note: unlike in the tutorial, we don't use pivot. lookDirDampTime of 1 works well here.
+            curLookDir = Vector3.SmoothDamp(curLookDir, lookDir, ref velocityLookDir, lookDirDampTime);
         }
 
-        targetVerticalAngle = Mathf.Clamp(targetVerticalAngle, minVerticalAngle, maxVerticalAngle);
-
-        float phi = targetHorizontalAngle * Mathf.Deg2Rad;
-        float theta = targetVerticalAngle * Mathf.Deg2Rad;
-
-        // Update position.
-        // Calculate the point on the unit sphere with the provided angles.
-        float x = Mathf.Cos(theta) * Mathf.Cos(phi);
-        float y = Mathf.Sin(theta);
-        float z = Mathf.Cos(theta) * Mathf.Sin(phi);
-        // Offset from the player by the vector to that point at the given radius.
-        Vector3 offset = new Vector3(x, y, z);
-        Vector3 newTargetPosition = targetTransform.position + offset * targetRadius;
-
-        targetPosition.x = newTargetPosition.x;
-        targetPosition.z = newTargetPosition.z;
-        if (characterMovement.jumping) {
-            // Follow when falling or near the edge of the viewport.
-            Vector3 targetViewportPoint = cameraComponent.WorldToViewportPoint(targetTransform.position);
-            if (newTargetPosition.y < targetPosition.y ||
-                targetViewportPoint.y > maxTargetScreenY ||
-                targetViewportPoint.y < minTargetScreenY) {
-                targetPosition.y = newTargetPosition.y;
-            }
-        } else {
-            targetPosition.y = newTargetPosition.y;
+        // Reset look direction if the reset button is pressed.
+        if (Input.GetButtonDown("ResetCamera")) {
+            lastResetTime = Time.time;
+        }
+        if (Time.time - lastResetTime < resetDuration) {
+            curLookDir = followTransform.forward;
+            distanceUp = defaultDistanceUp;
         }
 
-        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position,
-                                                      targetPosition,
-                                                      ref velocityCamSmooth,
-                                                      moveSmoothTime);
+        characterOffset = followTransform.position + (distanceUp * followTransform.up);
+        targetPosition = characterOffset + followTransform.up * distanceUp -
+                         Vector3.Normalize(curLookDir) * targetRadius;
 
-        if (cameraState == CameraState.PLAYER_FOLLOW) {
-            // Update rotation, adjusting for the player leaving the viewport.
-            // Alternately: cameraTransform.LookAt(targetTransform.position);
+        CompensateForWalls(characterOffset, ref targetPosition);
 
-            // First rotate around the Y axis.
-            Vector3 offsetToCenter = targetTransform.position - cameraTransform.position;
-            Vector3 offsetXZ = new Vector3(offsetToCenter.x, 0, offsetToCenter.z);
-            Quaternion targetHorizRotation = Quaternion.LookRotation(offsetXZ);
-            horizRotation = Quaternion.Slerp(horizRotation, targetHorizRotation, lookHorizSpeed);
-            cameraTransform.rotation = horizRotation;
-
-            // Default to the target vertical angle (not at the player if they are jumping).
-            Quaternion targetVerticalRotation = Quaternion.Euler(targetVerticalAngle, 0, 0);
-
-            // If the player is near an edge of the viewport, aim at them instead.
-            /*
-            Vector3 from = cameraTransform.forward;
-            Vector3 to = targetTransform.position - cameraTransform.position;
-            float remainingAngle = targetVerticalAngle - Vector3.Angle(from, to);
-
-            Vector3 targetViewportPoint = cameraComponent.WorldToViewportPoint(targetTransform.position);
-            if (targetViewportPoint.y > maxTargetScreenY) {
-                targetVerticalRotation *= Quaternion.Euler(remainingAngle, 0, 0);
-            } else if (targetViewportPoint.y < minTargetScreenY) {
-                targetVerticalRotation *= Quaternion.Euler(-remainingAngle, 0, 0);
-            }
-            */
-
-            // Smoothly rotate to the target.
-            verticalRotation = Quaternion.Slerp(verticalRotation, targetVerticalRotation, lookUpSpeed);
-            cameraTransform.rotation *= verticalRotation;
-        } else if (cameraState == CameraState.MOUSE_CONTROL) {
-            cameraTransform.LookAt(targetTransform.position);
-            // Update rotations so that there isn't a sharp jump when switching back to follow mode.
-            verticalRotation = Quaternion.Euler(cameraTransform.eulerAngles.x, 0, 0);
-            horizRotation = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0);
-        }
-
-        // Zoom in if blocked.
-        Debug.DrawLine(cameraTransform.position, targetTransform.position);
-        Vector3 direction = cameraTransform.position - targetTransform.position;
-        RaycastHit hit;
-        if (Physics.Raycast(targetTransform.position, direction, out hit,
-                            defaultRadius, cameraBlockLayers)) {
-            targetRadius = Mathf.Max(minRadius, hit.distance - zoomBuffer);
-            Debug.DrawLine(targetTransform.position, hit.point, Color.red);
-        } else {
-            targetRadius = defaultRadius;
-        }
+        // Smoothly translate to the target position.
+        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, targetPosition,
+                                                      ref velocityCamSmooth, camSmoothDampTime);
+        cameraTransform.LookAt(followTransform);
 
         lastMouseX = Input.mousePosition.x;
         lastMouseY = Input.mousePosition.y;
+    }
+
+    private void CompensateForWalls(Vector3 fromObject, ref Vector3 toTarget) {
+        // Compensate for walls between camera.
+        RaycastHit wallHit = new RaycastHit();
+        Vector3 direction = Vector3.Normalize(toTarget - fromObject);
+        if (Physics.Raycast(fromObject, direction, out wallHit,
+                            targetRadius, cameraBlockLayers)) {
+            Debug.DrawRay(wallHit.point, wallHit.normal, Color.red);
+            toTarget = wallHit.point;
+        }
+
+        // Compensate for geometry intersecting with near clip plane.
+        Vector3 camPosCache = cameraTransform.position;
+        cameraTransform.position = toTarget;
+        viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
+
+        for (int i = 0; i < (viewFrustum.Length / 2); i++) {
+            RaycastHit cWHit = new RaycastHit();
+            RaycastHit cCWHit = new RaycastHit();
+
+            // Cast lines in both directions around near clipping plane bounds
+            while (Physics.Linecast(viewFrustum[i], viewFrustum[(i + 1) % (viewFrustum.Length / 2)], out cWHit) ||
+                   Physics.Linecast(viewFrustum[(i + 1) % (viewFrustum.Length / 2)], viewFrustum[i], out cCWHit)) {
+                Vector3 normal = wallHit.normal;
+                if (wallHit.normal == Vector3.zero) {
+                    // If there's no available wallHit, use normal of geometry intersected by LineCasts instead.
+                    if (cWHit.normal == Vector3.zero) {
+                        if (cCWHit.normal == Vector3.zero) {
+                            Debug.LogError("No available geometry normal from near clip plane LineCasts.", this);
+                        } else {
+                            normal = cCWHit.normal;
+                        }
+                    } else {
+                        normal = cWHit.normal;
+                    }
+                }
+
+                toTarget += (compensationOffset * normal);
+                cameraTransform.position += toTarget;
+
+                // Recalculate positions of near clip plane.
+                viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
+            }
+        }
+
+        cameraTransform.position = camPosCache;
+        viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
     }
 }

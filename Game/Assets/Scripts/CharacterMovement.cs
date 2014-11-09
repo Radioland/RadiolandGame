@@ -8,7 +8,7 @@ public class CharacterMovement : MonoBehaviour
     public CameraControl cameraControl;
 
     [SerializeField] [Range(0.0f, 20.0f)] private float walkSpeed = 5.0f;
-    [SerializeField] [Range(0.0f, 540.0f)] private float degRotPerSec = 200.0f;
+    [SerializeField] private float directionSpeed = 1.5f; // Affects turn rate.
     [SerializeField] [Range(0.0f, 100.0f)] private float gravity = 30.0f;
     // Speed is calculated to reach this height.
     [SerializeField] [Range(0.0f, 10.0f)] private float jumpHeight = 2.0f;
@@ -27,9 +27,13 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Tooltip("Time required to start being classified as falling.")]
     private float fallingTime = 0.2f;
 
+    // Smoothing.
+    [SerializeField] private float groundSmoothDampTime = 0.05f;
+    [SerializeField] private float airSmoothDampTime = 0.7f;
+    private Vector3 velocityDamp = Vector3.zero;
+    private Vector3 velocity = Vector3.zero;
+
     // State (read-only visible to other scripts).
-    private bool m_controllable;
-    public bool controllable { get { return m_controllable; } }
     private bool m_moving;
     public bool moving { get { return m_moving; } }
     private bool m_inJumpWindup;
@@ -38,12 +42,13 @@ public class CharacterMovement : MonoBehaviour
     public bool jumping { get { return m_jumping; } }
     private bool m_sliding;
     public bool sliding { get { return m_sliding; } }
-    public bool grounded {
-        get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; }
-    }
+    public bool grounded { get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; } }
     private bool m_falling;
     public bool falling { get { return m_falling; } }
+    private float m_speed = 0f;
+    public float speed { get { return m_speed; } }
 
+    // Collision, jumping, sliding.
     private CharacterController controller;
     private CollisionFlags collisionFlags;
     private RaycastHit hit;
@@ -54,6 +59,12 @@ public class CharacterMovement : MonoBehaviour
     private float rayDistance;
     private Vector3 contactPoint;
     private float slopeAngle;
+
+    // Input.
+    private float leftX = 0f;
+    private float leftY = 0f;
+    private float direction = 0f;
+    private float charAngle = 0f;
 
     // Animation.
     private Animator animator;
@@ -76,7 +87,6 @@ public class CharacterMovement : MonoBehaviour
         }
 
         // Setup initial state.
-        m_controllable = true;
         m_moving = false;
         m_inJumpWindup = false;
         m_jumping = false;
@@ -119,52 +129,48 @@ public class CharacterMovement : MonoBehaviour
             ApplySliding();
         }
 
-        // Check for movement input.
-        bool inputReceived = false;
+        // Get input values from controller/keyboard.
+        leftX = Input.GetAxis("Horizontal");
+        leftY = Input.GetAxis("Vertical");
+        float strafeInput = Input.GetAxis("Strafe");
+
+        m_moving = false;
         if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
-            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
-            Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
-            inputReceived = true;
+            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01) {
+            m_moving = true;
         }
 
-        // Rotate the player (only when input is received).
-        if (inputReceived) {
-            if (m_moving) {
-                // Rotate with horizontal input.
-                float inputRotation = Input.GetAxis("Horizontal") *
-                                      degRotPerSec * Time.deltaTime;
-                Vector3 rotationEulerAngles = new Vector3(0.0f, inputRotation, 0.0f);
-                transform.Rotate(rotationEulerAngles);
-            } else {
-                // Rotate to match the camera.
-                float cameraRotation = cameraControl.cameraTransform.eulerAngles.y;
-                Vector3 newEulerAngles = transform.eulerAngles;
-                newEulerAngles.y = cameraRotation;
-                transform.eulerAngles = newEulerAngles;
-            }
-        }
-        m_moving = inputReceived;
+        charAngle = 0f;
+        direction = 0f;
+        float inputSpeed = 0f;
 
-        // Grab movement input values.
-        float verticalInput = 0.0f;
-        float strafeInput = 0.0f;
-        Vector3 inputVector = Vector3.zero;
-        if (m_controllable) {
-            verticalInput = Input.GetAxis("Vertical");
-            strafeInput = Input.GetAxis("Strafe");
-            inputVector = transform.forward * verticalInput + transform.right * strafeInput;
+        // Translate controls stick coordinates into world/cam/character space.
+        StickToWorldspace(transform, cameraControl.cameraTransform, ref direction,
+                          ref inputSpeed, ref charAngle, false);
+        m_speed = inputSpeed;
+
+        // Don't rotate within a dead zone.
+        if (m_speed > 0.05f) {
+            transform.Rotate(new Vector3(0, charAngle, 0));
         }
+
+        Vector3 motion = (transform.forward * m_speed + transform.right * strafeInput) * walkSpeed;
+        motion = Vector3.ClampMagnitude(motion, walkSpeed);
 
         ApplyGravity();
         ApplyJump();
 
-        Vector3 motion = inputVector * walkSpeed + Vector3.up * verticalSpeed;
-        motion *= Time.deltaTime;
-        collisionFlags = controller.Move(motion);
+        if (grounded) {
+            velocity = Vector3.SmoothDamp(velocity, motion, ref velocityDamp, groundSmoothDampTime);
+        } else {
+            velocity = Vector3.SmoothDamp(velocity, motion, ref velocityDamp, airSmoothDampTime);
+        }
+
+        collisionFlags = controller.Move((velocity + Vector3.up * verticalSpeed) * Time.deltaTime);
 
         // Update animations.
         if (animator) {
-            animator.SetFloat(speedHash, Mathf.Abs(verticalInput));
+            animator.SetFloat(speedHash, Mathf.Abs(m_speed));
             animator.SetFloat(strafeHash, strafeInput);
             animator.SetBool(jumpingHash, jumping);
         }
@@ -240,14 +246,12 @@ public class CharacterMovement : MonoBehaviour
         if (sliding && slopeAngle > jumpSlopeLimit) { return; }
 
         // PreTimeout lets you trigger a jump slightly before landing.
-        if (m_controllable &&
-            Time.time < lastJumpInputTime + jumpPreTimeout &&
+        if (Time.time < lastJumpInputTime + jumpPreTimeout &&
             Time.time > lastJumpTime + jumpCooldown) {
             // PostTimeout lets you trigger a jump slightly after starting to fall.
             if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
                 lastJumpTime = Time.time;
                 m_inJumpWindup = true;
-                m_controllable = false;
 
                 SendMessage("StartJump");
             }
@@ -255,7 +259,6 @@ public class CharacterMovement : MonoBehaviour
 
         if (m_inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
             m_inJumpWindup = false;
-            m_controllable = true;
             m_jumping = true;
             verticalSpeed = jumpVerticalSpeed;
         }
@@ -271,4 +274,42 @@ public class CharacterMovement : MonoBehaviour
     public void ResetJumpHeight() { jumpHeight = originalJumpHeight; }
     public void SetGravity(float newGravity) { gravity = newGravity; }
     public void ResetGravity() { gravity = originalGravity; }
+
+    private void StickToWorldspace(Transform root, Transform camera,
+                                  ref float directionOut, ref float speedOut,
+                                  ref float angleOut, bool isPivoting) {
+        Vector3 rootDirection = root.forward;
+
+        Vector3 stickDirection = new Vector3(leftX, 0, leftY);
+
+        speedOut = stickDirection.sqrMagnitude;
+
+        // Get camera rotation.
+        Vector3 CameraDirection = camera.forward;
+        CameraDirection.y = 0.0f; // kill Y
+        Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward,
+                                                                Vector3.Normalize(CameraDirection));
+
+        // Convert joystick input in Worldspace coordinates.
+        Vector3 moveDirection = referentialShift * stickDirection;
+        Vector3 axisSign = Vector3.Cross(moveDirection, rootDirection);
+
+        Debug.DrawRay(new Vector3(root.position.x, root.position.y + 2f, root.position.z),
+                      moveDirection, Color.green);
+        Debug.DrawRay(new Vector3(root.position.x, root.position.y + 2f, root.position.z),
+                      rootDirection, Color.magenta);
+        Debug.DrawRay(new Vector3(root.position.x, root.position.y + 2f, root.position.z),
+                      stickDirection, Color.blue);
+        Debug.DrawRay(new Vector3(root.position.x, root.position.y + 2.5f, root.position.z),
+                      axisSign, Color.red);
+
+        float angleRootToMove = Vector3.Angle(rootDirection, moveDirection) * (axisSign.y >= 0 ? -1f : 1f);
+        if (!isPivoting) {
+            angleOut = angleRootToMove;
+        }
+        angleRootToMove /= 180f;
+
+        directionOut = angleRootToMove * directionSpeed;
+    }
+
 }
