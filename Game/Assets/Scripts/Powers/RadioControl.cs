@@ -88,11 +88,12 @@ public class RadioControl : MonoBehaviour
             radioDialSlider.value += 0.01f;
         }
 
-        float scrollValue = Input.GetAxis("Mouse ScrollWheel");
+        // TODO: replace with better controller/mouse input management.
+        float scrollValue = Input.GetAxis("Mouse ScrollWheel") + Input.GetAxis("Tune");
         radioDialSlider.value -= scrollValue;
 
         // Track activity using raw input.
-        float rawScroll = Input.GetAxisRaw("Mouse ScrollWheel");
+        float rawScroll = Input.GetAxisRaw("Mouse ScrollWheel") + Input.GetAxisRaw("Tune");
         if (Mathf.Abs(rawScroll) > 0.001f) {
             if (!inUse) {
                 inUse = true;
