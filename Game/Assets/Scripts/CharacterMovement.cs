@@ -27,9 +27,13 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Tooltip("Time required to start being classified as falling.")]
     private float fallingTime = 0.2f;
 
+    // Smoothing.
+    [SerializeField] private float groundSmoothDampTime = 0.05f;
+    [SerializeField] private float airSmoothDampTime = 0.7f;
+    private Vector3 velocityDamp = Vector3.zero;
+    private Vector3 velocity = Vector3.zero;
+
     // State (read-only visible to other scripts).
-    private bool m_controllable;
-    public bool controllable { get { return m_controllable; } }
     private bool m_moving;
     public bool moving { get { return m_moving; } }
     private bool m_inJumpWindup;
@@ -44,7 +48,7 @@ public class CharacterMovement : MonoBehaviour
     private float m_speed = 0f;
     public float speed { get { return m_speed; } }
 
-    // Private class variables.
+    // Collision, jumping, sliding.
     private CharacterController controller;
     private CollisionFlags collisionFlags;
     private RaycastHit hit;
@@ -56,6 +60,7 @@ public class CharacterMovement : MonoBehaviour
     private Vector3 contactPoint;
     private float slopeAngle;
 
+    // Input.
     private float leftX = 0f;
     private float leftY = 0f;
     private float direction = 0f;
@@ -64,6 +69,7 @@ public class CharacterMovement : MonoBehaviour
     // Animation.
     private Animator animator;
     private int speedHash;
+    private int strafeHash;
     private int jumpingHash;
     private int landingHash;
 
@@ -81,7 +87,6 @@ public class CharacterMovement : MonoBehaviour
         }
 
         // Setup initial state.
-        m_controllable = true;
         m_moving = false;
         m_inJumpWindup = false;
         m_jumping = false;
@@ -101,6 +106,7 @@ public class CharacterMovement : MonoBehaviour
             Debug.LogWarning("No animator found on " + transform.GetPath());
         }
         speedHash = Animator.StringToHash("Speed");
+        strafeHash = Animator.StringToHash("Strafe");
         jumpingHash = Animator.StringToHash("Jumping");
         landingHash = Animator.StringToHash("Landing");
 
@@ -126,33 +132,46 @@ public class CharacterMovement : MonoBehaviour
         // Get input values from controller/keyboard.
         leftX = Input.GetAxis("Horizontal");
         leftY = Input.GetAxis("Vertical");
+        float strafeInput = Input.GetAxis("Strafe");
+
+        m_moving = false;
+        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
+            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01) {
+            m_moving = true;
+        }
 
         charAngle = 0f;
         direction = 0f;
-        float charSpeed = 0f;
+        float inputSpeed = 0f;
 
         // Translate controls stick coordinates into world/cam/character space.
         StickToWorldspace(transform, cameraControl.cameraTransform, ref direction,
-                          ref charSpeed, ref charAngle, false);
-        m_speed = charSpeed;
+                          ref inputSpeed, ref charAngle, false);
+        m_speed = inputSpeed;
 
         // Don't rotate within a dead zone.
         if (m_speed > 0.05f) {
             transform.Rotate(new Vector3(0, charAngle, 0));
         }
 
-        Vector3 motion = transform.forward * m_speed * walkSpeed;
+        Vector3 motion = (transform.forward * m_speed + transform.right * strafeInput) * walkSpeed;
+        motion = Vector3.ClampMagnitude(motion, walkSpeed);
 
         ApplyGravity();
         ApplyJump();
 
-        motion += Vector3.up * verticalSpeed;
+        if (grounded) {
+            velocity = Vector3.SmoothDamp(velocity, motion, ref velocityDamp, groundSmoothDampTime);
+        } else {
+            velocity = Vector3.SmoothDamp(velocity, motion, ref velocityDamp, airSmoothDampTime);
+        }
 
-        collisionFlags = controller.Move(motion * Time.deltaTime);
+        collisionFlags = controller.Move((velocity + Vector3.up * verticalSpeed) * Time.deltaTime);
 
         // Update animations.
         if (animator) {
             animator.SetFloat(speedHash, Mathf.Abs(m_speed));
+            animator.SetFloat(strafeHash, strafeInput);
             animator.SetBool(jumpingHash, jumping);
         }
     }
@@ -227,14 +246,12 @@ public class CharacterMovement : MonoBehaviour
         if (sliding && slopeAngle > jumpSlopeLimit) { return; }
 
         // PreTimeout lets you trigger a jump slightly before landing.
-        if (m_controllable &&
-            Time.time < lastJumpInputTime + jumpPreTimeout &&
+        if (Time.time < lastJumpInputTime + jumpPreTimeout &&
             Time.time > lastJumpTime + jumpCooldown) {
             // PostTimeout lets you trigger a jump slightly after starting to fall.
             if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
                 lastJumpTime = Time.time;
                 m_inJumpWindup = true;
-                m_controllable = false;
 
                 SendMessage("StartJump");
             }
@@ -242,7 +259,6 @@ public class CharacterMovement : MonoBehaviour
 
         if (m_inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
             m_inJumpWindup = false;
-            m_controllable = true;
             m_jumping = true;
             verticalSpeed = jumpVerticalSpeed;
         }

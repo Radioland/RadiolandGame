@@ -97,7 +97,7 @@ public class CameraControl : MonoBehaviour
         float scaledX = Mathf.InverseLerp(0.0f, 0.05f, Mathf.Abs(mouseDeltaX));
         float scaledY = Mathf.InverseLerp(0.0f, 0.05f, Mathf.Abs(mouseDeltaY));
         rightX += Mathf.Sign(mouseDeltaX) * scaledX * mouseRotateSpeed;
-        rightY += Mathf.Sign(mouseDeltaY) * scaledY * mouseZoomSpeed;
+        rightY += -Mathf.Sign(mouseDeltaY) * scaledY * mouseZoomSpeed;
 
         // Free look using rightX and rightY.
         cameraTransform.RotateAround(characterOffset, followTransform.up,
@@ -112,12 +112,13 @@ public class CameraControl : MonoBehaviour
                                    Mathf.Abs(Vector3.Dot(cameraTransform.forward, followTransform.forward)));
             Debug.DrawRay(cameraTransform.position, lookDir, Color.white);
 
-            // Calculate direction from camera to player, kill Y, and normalize to give a valid direction with unit magnitude
+            // Calculate direction from camera to player, kill Y, and normalize to give a valid direction with unit magnitude.
             curLookDir = Vector3.Normalize(followTransform.position - cameraTransform.position);
             curLookDir.y = 0;
             Debug.DrawRay(cameraTransform.position, curLookDir, Color.green);
 
-            // Damping makes it so we don't update targetPosition while pivoting; camera shouldn't rotate around player
+            // Damping makes it so we don't update targetPosition while pivoting; camera shouldn't rotate around player.
+            // Note: unlike in the tutorial, we don't use pivot. lookDirDampTime of 1 works well here.
             curLookDir = Vector3.SmoothDamp(curLookDir, lookDir, ref velocityLookDir, lookDirDampTime);
         }
 
@@ -154,16 +155,16 @@ public class CameraControl : MonoBehaviour
             Debug.DrawRay(wallHit.point, wallHit.normal, Color.red);
             toTarget = wallHit.point;
         }
-        
+
         // Compensate for geometry intersecting with near clip plane.
         Vector3 camPosCache = cameraTransform.position;
         cameraTransform.position = toTarget;
         viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
-        
+
         for (int i = 0; i < (viewFrustum.Length / 2); i++) {
             RaycastHit cWHit = new RaycastHit();
             RaycastHit cCWHit = new RaycastHit();
-            
+
             // Cast lines in both directions around near clipping plane bounds
             while (Physics.Linecast(viewFrustum[i], viewFrustum[(i + 1) % (viewFrustum.Length / 2)], out cWHit) ||
                    Physics.Linecast(viewFrustum[(i + 1) % (viewFrustum.Length / 2)], viewFrustum[i], out cCWHit)) {
@@ -180,15 +181,15 @@ public class CameraControl : MonoBehaviour
                         normal = cWHit.normal;
                     }
                 }
-                
+
                 toTarget += (compensationOffset * normal);
                 cameraTransform.position += toTarget;
-                
+
                 // Recalculate positions of near clip plane.
                 viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
             }
         }
-        
+
         cameraTransform.position = camPosCache;
         viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
     }
