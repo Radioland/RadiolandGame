@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// The player orbits around the camera, see CharacterMovement.StickToWorldspace.
+// Reference tutorial video: https://www.youtube.com/watch?v=lnguV1v38z4
+// Reference tutorial GitHub: https://github.com/jm991/UnityThirdPersonTutorial
+
 public class CameraControl : MonoBehaviour
 {
     public Transform cameraTransform;
@@ -23,24 +27,26 @@ public class CameraControl : MonoBehaviour
     private Vector3 nearClipDimensions = Vector3.zero; // width, height, radius
     private Vector3[] viewFrustum;
 
-    // Camera speeds.
+    // Camera speeds (controller and mouse free look as well as default orbit).
     [SerializeField] private float rotateSpeed = 3.0f;
     [SerializeField] private float zoomSpeed = 0.2f;
-    [SerializeField] private float mouseRotateSpeed = 4.0f;
-    [SerializeField] private float mouseZoomSpeed = 1.0f;
+
+    // Mouse look.
+    [SerializeField] private Vector2 mouseSensitivity = new Vector2(0.7f, 0.4f);
+    [SerializeField] private Vector2 mouseSmoothing = new Vector2(2.0f, 2.0f);
+    private Vector2 smoothMouse;
 
     private Vector3 targetPosition;
     private Vector3 characterOffset;
     private Vector3 lookDir;
     private Vector3 curLookDir;
-    private float lastMouseX;
-    private float lastMouseY;
 
     // Smoothing and damping.
     [SerializeField] private float camSmoothDampTime = 0.1f;
     [SerializeField] private float lookDirDampTime = 1.0f;
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
+
 
     // Camera reset.
     private float lastResetTime;
@@ -55,8 +61,10 @@ public class CameraControl : MonoBehaviour
 
         cameraComponent = cameraTransform.GetComponent<Camera>();
         targetPosition = new Vector3(0, 100000, 0);
-        lastMouseX = Input.mousePosition.x;
-        lastMouseY = Input.mousePosition.y;
+        smoothMouse = Vector2.zero;
+
+        Screen.showCursor = false;
+        Screen.lockCursor = true;
 
         distanceUp = defaultDistanceUp;
         lookDir = followTransform.forward;
@@ -88,16 +96,7 @@ public class CameraControl : MonoBehaviour
         float rightX = Input.GetAxis("RightStickX");
         float rightY = Input.GetAxis("RightStickY");
 
-        // Compute percentage of the screen that the mouse travelled over.
-        float mouseDeltaX = (Input.mousePosition.x - lastMouseX) / Screen.width;
-        float mouseDeltaY = (Input.mousePosition.y - lastMouseY) / Screen.height;
-
-        // Scale based on an arbitrary maximum.
-        // TODO: add more intuitive control over mouse camera speeds.
-        float scaledX = Mathf.InverseLerp(0.0f, 0.05f, Mathf.Abs(mouseDeltaX));
-        float scaledY = Mathf.InverseLerp(0.0f, 0.05f, Mathf.Abs(mouseDeltaY));
-        rightX += Mathf.Sign(mouseDeltaX) * scaledX * mouseRotateSpeed;
-        rightY += -Mathf.Sign(mouseDeltaY) * scaledY * mouseZoomSpeed;
+        ApplyMouseLook(ref rightX, ref rightY);
 
         // Free look using rightX and rightY.
         cameraTransform.RotateAround(characterOffset, followTransform.up,
@@ -141,9 +140,23 @@ public class CameraControl : MonoBehaviour
         cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, targetPosition,
                                                       ref velocityCamSmooth, camSmoothDampTime);
         cameraTransform.LookAt(followTransform);
+    }
 
-        lastMouseX = Input.mousePosition.x;
-        lastMouseY = Input.mousePosition.y;
+    void ApplyMouseLook(ref float rightX, ref float rightY) {
+        // http://forum.unity3d.com/threads/a-free-simple-smooth-mouselook.73117/
+        // Get raw mouse input for a cleaner reading on more sensitive mice.
+        Vector2 mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+
+        // Scale input against the sensitivity setting and multiply that against the smoothing value.
+        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(mouseSensitivity.x * mouseSmoothing.x,
+                                                           mouseSensitivity.y * mouseSmoothing.y));
+
+        // Interpolate mouse movement over time to apply smoothing delta.
+        smoothMouse.x = Mathf.Lerp(smoothMouse.x, mouseDelta.x, 1.0f / mouseSmoothing.x);
+        smoothMouse.y = Mathf.Lerp(smoothMouse.y, mouseDelta.y, 1.0f / mouseSmoothing.y);
+
+        rightX += smoothMouse.x;
+        rightY -= smoothMouse.y;
     }
 
     private void CompensateForWalls(Vector3 fromObject, ref Vector3 toTarget) {
