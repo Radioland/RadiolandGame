@@ -11,8 +11,10 @@ public class RadioControl : MonoBehaviour
     // Private variables set in the inspector.
     [SerializeField] private PowerupManager powerupManager;
     [SerializeField] private Slider radioDialSlider;
+    [SerializeField] private Slider radioDialSlider2;
     [SerializeField] private Image energyGlowImage;
     [SerializeField] private RectTransform radioKnobTransform;
+    [SerializeField] private RectTransform radioKnobTransform2;
     [SerializeField] private float knobTurnRatio = 4.0f;
     [Tooltip("Plays when seeking between stations.")]
     [SerializeField] [Range(0.0f, 1.0f)] private float stationCutoff = 0.2f;
@@ -22,6 +24,7 @@ public class RadioControl : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] private float staticMaxVolume = 0.5f;
     [SerializeField] private float staticFadeTime = 3.0f;
     [SerializeField] private float staticLingerTime = 1.0f;
+    [SerializeField] private GameObject worldGUI;
 
     private RadioStation[] stations;
     private bool inUse;
@@ -29,6 +32,8 @@ public class RadioControl : MonoBehaviour
     private float lastActiveTime;
     private float lastDecreaseVolume;
     private float lastIncreaseVolume;
+
+    private float GUILingerTime;
 
     void Awake() {
         if (!powerupManager) {
@@ -64,6 +69,8 @@ public class RadioControl : MonoBehaviour
             station.radioControl = this;
         }
 
+        GUILingerTime = -5;
+
         ResetStatic();
     }
 
@@ -83,18 +90,22 @@ public class RadioControl : MonoBehaviour
         // Debug controls.
         if (Input.GetKey(KeyCode.Alpha1)) {
             radioDialSlider.value -= 0.01f;
+            radioDialSlider2.value -= 0.01f;
         }
         if (Input.GetKey(KeyCode.Alpha2)) {
             radioDialSlider.value += 0.01f;
+            radioDialSlider2.value += 0.01f;
         }
 
         // TODO: replace with better controller/mouse input management.
         float scrollValue = Input.GetAxis("Mouse ScrollWheel") + Input.GetAxis("Tune");
         radioDialSlider.value -= scrollValue;
+        radioDialSlider2.value += scrollValue;
 
         // Track activity using raw input.
         float rawScroll = Input.GetAxisRaw("Mouse ScrollWheel") + Input.GetAxisRaw("Tune");
         if (Mathf.Abs(rawScroll) > 0.001f) {
+            GUILingerTime = Time.time;
             if (!inUse) {
                 inUse = true;
                 if (Time.time - lastActiveTime > staticLingerTime) {
@@ -102,6 +113,7 @@ public class RadioControl : MonoBehaviour
                 }
             }
             lastActiveTime = Time.time;
+
         } else {
             inUse = false;
         }
@@ -110,6 +122,7 @@ public class RadioControl : MonoBehaviour
         if (radioKnobTransform) {
             float rotationDegrees = radioDialSlider.value * 360.0f * knobTurnRatio;
             radioKnobTransform.localRotation = Quaternion.Euler(0, 0, rotationDegrees);
+            radioKnobTransform2.localRotation = Quaternion.Euler(0,0, -1 * rotationDegrees);
         }
 
         // Fade glow image based on energy percentage.
@@ -152,6 +165,13 @@ public class RadioControl : MonoBehaviour
                 float tEnd = (Time.time - staticLingerTime - lastActiveTime) / staticFadeTime;
                 volume = Mathf.Lerp(lastIncreaseVolume, 0.0f, Mathf.Clamp01(tEnd));
                 lastDecreaseVolume = volume;
+            }
+
+            if (inUse || Time.time - GUILingerTime < 1.5f) {
+                worldGUI.SetActive(true);
+            }
+            else {
+                worldGUI.SetActive(false);
             }
 
             if (maxSignal > stationCutoff) {
