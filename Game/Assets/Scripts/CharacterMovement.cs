@@ -160,7 +160,7 @@ public class CharacterMovement : MonoBehaviour
         ApplyGravity();
         ApplyJump();
 
-        if (grounded) {
+        if (grounded && !jumping) {
             velocity = Vector3.SmoothDamp(velocity, motion, ref velocityDamp, groundSmoothDampTime);
         } else {
             velocity = Vector3.SmoothDamp(velocity, motion, ref velocityDamp, airSmoothDampTime);
@@ -209,7 +209,7 @@ public class CharacterMovement : MonoBehaviour
             if (falling) {
                 float landingVerticalSpeed = verticalSpeed;
                 verticalSpeed = 0.0f;
-                SendMessage("Grounded", landingVerticalSpeed);
+                SendMessage("Grounded", landingVerticalSpeed, SendMessageOptions.DontRequireReceiver);
                 m_falling = false;
             }
             m_jumping = false;
@@ -253,7 +253,7 @@ public class CharacterMovement : MonoBehaviour
                 lastJumpTime = Time.time;
                 m_inJumpWindup = true;
 
-                SendMessage("StartJump");
+                SendMessage("StartJump", SendMessageOptions.DontRequireReceiver);
             }
         }
 
@@ -261,6 +261,8 @@ public class CharacterMovement : MonoBehaviour
             m_inJumpWindup = false;
             m_jumping = true;
             verticalSpeed = jumpVerticalSpeed;
+
+            SendMessage("Jump", SendMessageOptions.DontRequireReceiver);
         }
     }
 
@@ -268,6 +270,10 @@ public class CharacterMovement : MonoBehaviour
         verticalSpeed = bounceSpeed;
         m_jumping = true;
         lastJumpTime = Time.time;
+    }
+
+    public void AddVelocity(Vector3 extraVelocity) {
+        velocity += extraVelocity;
     }
 
     public void SetJumpHeight(float height) { jumpHeight = height; }

@@ -7,9 +7,11 @@ public class FollowPlatforms : MonoBehaviour
 
     private RaycastHit hit;
     private CharacterController controller;
+    private CharacterMovement characterMovement;
 
     void Awake() {
         controller = gameObject.GetComponent<CharacterController>();
+        characterMovement = gameObject.GetComponent<CharacterMovement>();
 
         if (!controller) {
             Debug.LogWarning(transform.GetPath() + " does not have a CharacterController.");
@@ -22,15 +24,31 @@ public class FollowPlatforms : MonoBehaviour
     }
 
     void Update() {
+        Platform platform = GetPlatformUnder();
+        if (platform) {
+            controller.Move(platform.deltaPosition);
+        }
+    }
+
+    // Called via SendMessage in CharacterMovement.
+    void Jump() {
+        if (!characterMovement) { return; }
+
+        Platform platform = GetPlatformUnder();
+        if (platform) {
+            characterMovement.AddVelocity(platform.lastVelocity);
+        }
+    }
+
+    Platform GetPlatformUnder() {
         Vector3 start = transform.position + Vector3.up; // Adds 1.0f up.
         float distance = 1.0f + raycastDistance; // Counteracts the 1.0f up.
 
         if (Physics.Raycast(start, Vector3.down, out hit, distance)) {
-            Platform platform = hit.collider.gameObject.GetComponent<Platform>();
-            if (platform) {
-                controller.Move(platform.deltaPosition);
-            }
+            return hit.collider.gameObject.GetComponent<Platform>();
         }
+
+        return null;
     }
 
     void Push(Platform platform) {
