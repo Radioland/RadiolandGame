@@ -5,7 +5,7 @@ using System.Collections;
 
 public class BackgroundMusic : MonoBehaviour
 {
-    [SerializeField] private float maxVolume;
+    [SerializeField] [Range(0.0f, 1.0f)] private float maxVolume;
 
     private RadioControl radioControl;
     private AudioSource audioSource;
