@@ -22,9 +22,9 @@ public class RadioControl : MonoBehaviour
     [SerializeField] private float staticFadeTime = 3.0f;
     [SerializeField] private float staticLingerTime = 1.0f;
 
-    // Secondary GUI.
-    [SerializeField] private GameObject worldGUIPrefab;
-    private GameObject worldGUI;
+    // Secondary UI (screen space).
+    [SerializeField] private GameObject screenUIPrefab;
+    private GameObject screenUI;
     private Slider radioDialSlider2;
     private RectTransform radioKnobTransform2;
     private Image energyGlowImage2;
@@ -77,8 +77,8 @@ public class RadioControl : MonoBehaviour
 
         GUILingerTime = -5;
 
-        worldGUI = (GameObject) GameObject.Instantiate(worldGUIPrefab);
-        RadioUI radioUI = worldGUI.GetComponent<RadioUI>();
+        screenUI = (GameObject) GameObject.Instantiate(screenUIPrefab);
+        RadioUI radioUI = screenUI.GetComponent<RadioUI>();
         radioDialSlider2 = radioUI.radioSlider;
         radioKnobTransform2 = radioUI.radioKnob;
         energyGlowImage2 = radioUI.radioEnergyGlowImage;
@@ -184,10 +184,10 @@ public class RadioControl : MonoBehaviour
             }
 
             if (inUse || Time.time - GUILingerTime < 1.5f) {
-                worldGUI.SetActive(true);
+                screenUI.SetActive(true);
             }
             else {
-                worldGUI.SetActive(false);
+                screenUI.SetActive(false);
             }
 
             if (maxSignal > stationCutoff) {
