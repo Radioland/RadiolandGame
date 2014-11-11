@@ -13,7 +13,7 @@ public class RadioControl : MonoBehaviour
     [SerializeField] private PowerupManager powerupManager;
     [SerializeField] private Slider radioDialSlider;
     [SerializeField] private Image energyGlowImage;
-	[SerializeField] private RectTransform radioKnobTransform;
+    [SerializeField] private RectTransform radioKnobTransform;
     [SerializeField] private float knobTurnRatio = 4.0f;
     [Tooltip("Plays when seeking between stations.")]
     [SerializeField] [Range(0.0f, 1.0f)] private float stationCutoff = 0.2f;
@@ -21,11 +21,13 @@ public class RadioControl : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] private float staticMaxVolume = 0.5f;
     [SerializeField] private float staticFadeTime = 3.0f;
     [SerializeField] private float staticLingerTime = 1.0f;
-    
-	[SerializeField] private GameObject worldGUIPrefab;
-	private GameObject worldGUI;
-	private Slider radioDialSlider2;
-	private RectTransform radioKnobTransform2;
+
+    // Secondary GUI.
+    [SerializeField] private GameObject worldGUIPrefab;
+    private GameObject worldGUI;
+    private Slider radioDialSlider2;
+    private RectTransform radioKnobTransform2;
+    private Image energyGlowImage2;
 
     private RadioStation[] stations;
     private bool inUse;
@@ -75,9 +77,11 @@ public class RadioControl : MonoBehaviour
 
         GUILingerTime = -5;
 
-		worldGUI = (GameObject)GameObject.Instantiate(worldGUIPrefab);
-		radioDialSlider2 = worldGUI.GetComponent<RadioUI>().radioSlider;
-		radioKnobTransform2 = worldGUI.GetComponent<RadioUI>().radioKnob;
+        worldGUI = (GameObject) GameObject.Instantiate(worldGUIPrefab);
+        RadioUI radioUI = worldGUI.GetComponent<RadioUI>();
+        radioDialSlider2 = radioUI.radioSlider;
+        radioKnobTransform2 = radioUI.radioKnob;
+        energyGlowImage2 = radioUI.radioEnergyGlowImage;
 
         ResetStatic();
     }
@@ -134,10 +138,18 @@ public class RadioControl : MonoBehaviour
         }
 
         // Fade glow image based on energy percentage.
-        if (powerupManager && energyGlowImage) {
-            Color newColor = energyGlowImage.color;
-            newColor.a = powerupManager.energy;
-            energyGlowImage.color = newColor;
+        if (powerupManager) {
+            Color newColor;
+            if (energyGlowImage) {
+                newColor = energyGlowImage.color;
+                newColor.a = powerupManager.energy;
+                energyGlowImage.color = newColor;
+            }
+            if (energyGlowImage2) {
+                newColor = energyGlowImage2.color;
+                newColor.a = powerupManager.energy;
+                energyGlowImage2.color = newColor;
+            }
         }
 
         // Trigger powerups.
