@@ -7,6 +7,7 @@ public class RadioControl : MonoBehaviour
     public float frequencyFadeLimit = 0.2f;
     public float powerupMinSignalStrength = 0.25f;
     public float currentFrequency { get { return radioDialSlider.value; } }
+    public float backgroundStrength { get { return (1.0f - maxSignal / stationCutoff); } }
 
     // Private variables set in the inspector.
     [SerializeField] private PowerupManager powerupManager;
@@ -16,8 +17,6 @@ public class RadioControl : MonoBehaviour
     [SerializeField] private float knobTurnRatio = 4.0f;
     [Tooltip("Plays when seeking between stations.")]
     [SerializeField] [Range(0.0f, 1.0f)] private float stationCutoff = 0.2f;
-    [SerializeField] private AudioSource backgroundSource;
-    [SerializeField] [Range(0.0f, 1.0f)] private float backgroundMaxVolume = 0.1f;
     [SerializeField] private AudioSource staticSource;
     [SerializeField] [Range(0.0f, 1.0f)] private float staticMaxVolume = 0.5f;
     [SerializeField] private float staticFadeTime = 3.0f;
@@ -34,6 +33,7 @@ public class RadioControl : MonoBehaviour
     private float lastActiveTime;
     private float lastDecreaseVolume;
     private float lastIncreaseVolume;
+    private float maxSignal;
 
     private float GUILingerTime;
 
@@ -70,6 +70,8 @@ public class RadioControl : MonoBehaviour
         foreach (RadioStation station in stations) {
             station.radioControl = this;
         }
+
+        maxSignal = 0.0f;
 
         GUILingerTime = -5;
 
@@ -147,13 +149,9 @@ public class RadioControl : MonoBehaviour
             }
         }
 
-        float maxSignal = 0.0f;
+        maxSignal = 0.0f;
         foreach (RadioStation station in stations) {
             maxSignal = Mathf.Max(maxSignal, station.signalStrength);
-        }
-
-        if (backgroundSource) {
-            backgroundSource.volume = (1.0f - maxSignal / stationCutoff) * backgroundMaxVolume;
         }
 
         // Adjust the volume of the static to fill in between stations.
