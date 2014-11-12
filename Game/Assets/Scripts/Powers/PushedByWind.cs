@@ -24,6 +24,9 @@ public class PushedByWind : MonoBehaviour
     
     void OnTriggerStay(Collider other) {
         WindPushArea windPushArea = other.gameObject.GetComponent<WindPushArea>();
+        if (!windPushArea && other.gameObject.transform.parent) {
+            windPushArea = other.gameObject.transform.parent.GetComponent<WindPushArea>();
+        }
         if (windPushArea) {
             controller.Move(windPushArea.windVelocity * Time.deltaTime);
         }
