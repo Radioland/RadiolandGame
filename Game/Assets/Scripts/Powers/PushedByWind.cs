@@ -4,14 +4,11 @@ using System.Collections;
 public class PushedByWind : MonoBehaviour
 {
     private CharacterController controller;
+    private CharacterMovement characterMovement;
     
     void Awake() {
         controller = gameObject.GetComponent<CharacterController>();
-        
-        if (!controller) {
-            Debug.LogWarning(transform.GetPath() + " does not have a CharacterController.");
-            this.enabled = false;
-        }
+        characterMovement = gameObject.GetComponent<CharacterMovement>();
     }
 
     void Start() {
@@ -27,8 +24,15 @@ public class PushedByWind : MonoBehaviour
         if (!windPushArea && other.gameObject.transform.parent) {
             windPushArea = other.gameObject.transform.parent.GetComponent<WindPushArea>();
         }
+
         if (windPushArea) {
-            controller.Move(windPushArea.windVelocity * Time.deltaTime);
+            if (characterMovement) {
+                characterMovement.AddVelocity(windPushArea.windVelocity / characterMovement.mass);
+            } else if (controller) {
+                controller.Move(windPushArea.windVelocity * Time.deltaTime);
+            } else {
+                transform.position = transform.position + windPushArea.windVelocity * Time.deltaTime;
+            }
         }
     }
 }

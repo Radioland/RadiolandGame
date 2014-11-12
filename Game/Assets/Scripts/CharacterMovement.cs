@@ -26,6 +26,7 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] private float slideSpeed = 5.0f;
     [SerializeField] [Tooltip("Time required to start being classified as falling.")]
     private float fallingTime = 0.2f;
+    public float mass = 1.0f;
 
     // Smoothing.
     [SerializeField] private float groundSmoothDampTime = 0.05f;
@@ -76,6 +77,8 @@ public class CharacterMovement : MonoBehaviour
     // Setting backups.
     private float originalGravity;
     private float originalJumpHeight;
+    private float originalAirSmoothDampTime;
+    private float originalMass;
 
     private float jumpVerticalSpeed {
         get { return Mathf.Sqrt(2 * jumpHeight * gravity); }
@@ -112,6 +115,8 @@ public class CharacterMovement : MonoBehaviour
 
         originalGravity = gravity;
         originalJumpHeight = jumpHeight;
+        originalAirSmoothDampTime = airSmoothDampTime;
+        originalMass = mass;
     }
 
     void Start() {
@@ -276,10 +281,17 @@ public class CharacterMovement : MonoBehaviour
         velocity += extraVelocity;
     }
 
+    // Set and reset properties.
     public void SetJumpHeight(float height) { jumpHeight = height; }
     public void ResetJumpHeight() { jumpHeight = originalJumpHeight; }
     public void SetGravity(float newGravity) { gravity = newGravity; }
     public void ResetGravity() { gravity = originalGravity; }
+    public void SetAirSmoothDampTime(float newAirSmoothDampTime) {
+        airSmoothDampTime = newAirSmoothDampTime; }
+    public void ResetAirSmoothDampTime() {
+        airSmoothDampTime = originalAirSmoothDampTime; }
+    public void SetMass(float newMass) { mass = newMass; }
+    public void ResetMass() { mass = originalMass; }
 
     private void StickToWorldspace(Transform root, Transform camera,
                                   ref float directionOut, ref float speedOut,
