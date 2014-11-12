@@ -13,6 +13,7 @@ public class PowerupManager : MonoBehaviour
         get { return m_energy; }
         set { m_energy = Mathf.Clamp(value, 0.0f, 1.0f); }
     }
+    public bool IsFullEnergy() { return m_energy >= 0.998f; }
 
     private Powerup activePowerup; // Only allow one active powerup at a time.
 
