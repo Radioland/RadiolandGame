@@ -29,9 +29,11 @@ public class DuplicateObject : MonoBehaviour {
 		if (flipRotZ)
 			rot.z += 180;
 
-		GameObject duplicate = (GameObject)Instantiate(gameObject, pos, Quaternion.Euler(rot.x, rot.y, rot.z));
+		GameObject duplicate = (GameObject)Instantiate(gameObject);
 		duplicate.transform.parent = transform.parent;
 		duplicate.transform.localPosition = pos;
+		duplicate.transform.localRotation = Quaternion.Euler(rot);
+		duplicate.transform.localScale = transform.localScale;
 		Destroy(duplicate.GetComponent<DuplicateObject>());
 	}
 
