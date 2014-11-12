@@ -6,7 +6,9 @@ public class SmoothMoveToTarget : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private string targetTag;
     [SerializeField] private Vector3 initialVelocity;
-    [SerializeField] private float accelerationScale = 0.2f;
+    [SerializeField] private float smoothX = 0.3f;
+    [SerializeField] private float smoothY = 0.3f;
+    [SerializeField] private float smoothZ = 0.3f;
     [SerializeField] private bool lookAtTarget = true;
 
     private Vector3 velocity;
@@ -27,10 +29,13 @@ public class SmoothMoveToTarget : MonoBehaviour
         if (!target) { return; }
 
         Vector3 difference = target.position - transform.position;
-        Vector3 acceleration = difference * accelerationScale;
-        velocity += acceleration * Time.deltaTime;
+        Vector3 targetVelocity = difference;
 
-        transform.Translate(velocity * Time.deltaTime);
+        velocity.x = Mathf.Lerp(velocity.x, targetVelocity.x, smoothX);
+        velocity.y = Mathf.Lerp(velocity.y, targetVelocity.y, smoothY);
+        velocity.z = Mathf.Lerp(velocity.z, targetVelocity.z, smoothZ);
+
+        transform.position = transform.position + velocity * Time.deltaTime;
 
         if (lookAtTarget) {
             transform.LookAt(target);
