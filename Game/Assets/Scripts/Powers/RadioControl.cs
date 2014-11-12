@@ -19,8 +19,10 @@ public class RadioControl : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] private float stationCutoff = 0.2f;
     [SerializeField] private AudioSource staticSource;
     [SerializeField] [Range(0.0f, 1.0f)] private float staticMaxVolume = 0.5f;
-    [SerializeField] private float staticFadeTime = 3.0f;
-    [SerializeField] private float staticLingerTime = 1.0f;
+    [SerializeField] private float staticLingerTime = 1.0f; // Full strength after inactivity time.
+    [SerializeField] private float staticFadeTime = 3.0f; // Fade after linger over this time.
+    [SerializeField] private float screenUILingerTime = 3.0f; // Full strength after inactivity time.
+    [SerializeField] private float screenUIFadeTime = 1.0f; // Fade after linger over this time.
 
     [SerializeField] private List<RadioUI> radioUIs;
 
@@ -28,16 +30,21 @@ public class RadioControl : MonoBehaviour
     [SerializeField] private GameObject screenUIPrefab;
     private GameObject screenUIObject;
     private RadioUI screenUI;
+    // Secondary UI fade.
+    private float lastStartedTimeScreenUI;
+    private float lastActiveTimeScreenUI;
+    private float lastDecreaseAlpha;
+    private float lastIncreaseAlpha;
 
     private RadioStation[] stations;
     private bool inUse;
-    private float lastStartedTime;
-    private float lastActiveTime;
-    private float lastDecreaseVolume;
-    private float lastIncreaseVolume;
     private float maxSignal;
 
-    private float GUILingerTime;
+    // Static.
+    private float lastStartedTimeStatic;
+    private float lastActiveTimeStatic;
+    private float lastDecreaseVolume;
+    private float lastIncreaseVolume;
 
     void Awake() {
         if (!powerupManager) {
@@ -58,13 +65,13 @@ public class RadioControl : MonoBehaviour
         maxSignal = 0.0f;
         m_currentFrequency = 0.5f;
 
-        GUILingerTime = -5;
-
         screenUIObject = (GameObject) GameObject.Instantiate(screenUIPrefab);
         screenUI = screenUIObject.GetComponent<RadioUI>();
 
         radioUIs.Add(screenUI);
 
+        lastStartedTimeScreenUI = -1000.0f;
+        lastActiveTimeScreenUI = -1000.0f;
         ResetStatic();
     }
 
@@ -74,8 +81,8 @@ public class RadioControl : MonoBehaviour
 
     void ResetStatic() {
         inUse = false;
-        lastStartedTime = -1000.0f;
-        lastActiveTime = -1000.0f;
+        lastStartedTimeStatic = -1000.0f;
+        lastActiveTimeStatic = -1000.0f;
         lastIncreaseVolume = 0.0f;
         lastDecreaseVolume = 0.0f;
     }
@@ -103,15 +110,17 @@ public class RadioControl : MonoBehaviour
         // Track activity using raw input.
         float rawScroll = Input.GetAxisRaw("Mouse ScrollWheel") + Input.GetAxisRaw("Tune");
         if (Mathf.Abs(rawScroll) > 0.001f) {
-            GUILingerTime = Time.time;
             if (!inUse) {
                 inUse = true;
-                if (Time.time - lastActiveTime > staticLingerTime) {
-                    lastStartedTime = Time.time;
+                if (Time.time - lastActiveTimeStatic > staticLingerTime) {
+                    lastStartedTimeStatic = Time.time;
+                }
+                if (Time.time - lastActiveTimeScreenUI > screenUILingerTime) {
+                    lastStartedTimeScreenUI = Time.time;
                 }
             }
-            lastActiveTime = Time.time;
-
+            lastActiveTimeStatic = Time.time;
+            lastActiveTimeScreenUI = Time.time;
         } else {
             inUse = false;
         }
@@ -148,14 +157,14 @@ public class RadioControl : MonoBehaviour
             float staticStrength = (1.0f - maxSignal / stationCutoff) * staticMaxVolume;
 
             float volume;
-            if (inUse || Time.time - lastActiveTime < staticLingerTime) {
+            if (inUse || Time.time - lastActiveTimeStatic < staticLingerTime) {
                 // Fade in.
-                float tStart = (Time.time - lastStartedTime) / staticFadeTime;
+                float tStart = (Time.time - lastStartedTimeStatic) / staticFadeTime;
                 volume = Mathf.Lerp(lastDecreaseVolume, staticStrength, Mathf.Clamp01(tStart));
                 lastIncreaseVolume = volume;
             } else {
                 // Fade out.
-                float tEnd = (Time.time - staticLingerTime - lastActiveTime) / staticFadeTime;
+                float tEnd = (Time.time - staticLingerTime - lastActiveTimeStatic) / staticFadeTime;
                 volume = Mathf.Lerp(lastIncreaseVolume, 0.0f, Mathf.Clamp01(tEnd));
                 lastDecreaseVolume = volume;
             }
@@ -168,11 +177,18 @@ public class RadioControl : MonoBehaviour
         }
 
         // Fade the secondary UI in and out.
-        if (inUse || Time.time - GUILingerTime < 1.5f) {
-            screenUIObject.SetActive(true);
+        float alpha;
+        if (inUse || Time.time - lastActiveTimeScreenUI < screenUILingerTime) {
+            // Fade in.
+            float tStart = (Time.time - lastStartedTimeScreenUI) / screenUIFadeTime;
+            alpha = Mathf.Lerp(lastDecreaseAlpha, 1.0f, Mathf.Clamp01(tStart));
+            lastIncreaseAlpha = alpha;
+        } else {
+            // Fade out.
+            float tEnd = (Time.time - screenUILingerTime - lastActiveTimeScreenUI) / screenUIFadeTime;
+            alpha = Mathf.Lerp(lastIncreaseAlpha, 0.0f, Mathf.Clamp01(tEnd));
+            lastDecreaseAlpha = alpha;
         }
-        else {
-            screenUIObject.SetActive(false);
-        }
+        screenUI.SetAlpha(alpha);
     }
 }
