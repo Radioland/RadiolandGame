@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RestoreEnergy : MonoBehaviour
+public class EnergySource : MonoBehaviour
 {
-    [SerializeField] private float maxRestoreRate = 0.1f;
     [SerializeField] private float maxRestoreRadius = 10.0f;
+    [SerializeField] private TriggerEffects restoreEffects;
 
     private Transform playerTransform;
     private PowerupManager powerupManager;
 
     void Awake() {
-        // Assumes only one player.
         GameObject player = GameObject.FindWithTag("Player");
+
         playerTransform = player.transform;
+
         powerupManager = player.GetComponent<PowerupManager>();
         if (!powerupManager) {
             Debug.LogWarning(this.GetPath() + " could not find PowerupManager on " +
@@ -27,12 +28,13 @@ public class RestoreEnergy : MonoBehaviour
     void Update() {
         float distance = Vector3.Distance(playerTransform.position, transform.position);
 
-        float contribution = (1.0f - Mathf.InverseLerp(0.0f, maxRestoreRadius, distance));
-
-        float energy = contribution * maxRestoreRate * Time.deltaTime;
-        powerupManager.energy += energy;
+        if (!powerupManager.IsFullEnergy() && distance < maxRestoreRadius) {
+            restoreEffects.enabled = true;
+        } else {
+            restoreEffects.enabled = false;
+        }
     }
-
+    
     void OnDrawGizmosSelected() {
         Gizmos.DrawWireSphere(transform.position, maxRestoreRadius);
     }
