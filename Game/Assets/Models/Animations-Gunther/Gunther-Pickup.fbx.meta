@@ -221,7 +221,7 @@ ModelImporter:
     4300002: buttons
     4300004: body
     4300006: hair
-    7400000: Take 001
+    7400000: Pickup
     9500000: //RootNode
     13700000: body
     13700002: buttons
@@ -244,7 +244,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     clipAnimations:
     - serializedVersion: 16
-      name: Take 001
+      name: Pickup
       takeName: Take 001
       firstFrame: 1
       lastFrame: 80
@@ -256,8 +256,8 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0

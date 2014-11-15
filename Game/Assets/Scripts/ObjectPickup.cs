@@ -2,21 +2,58 @@
 using System.Collections;
 
 public class ObjectPickup : MonoBehaviour {
-    GameObject objectiveGUI;
+    [SerializeField] private EffectManager pickupEffects;
 
-    void Start () {
-        objectiveGUI = GameObject.Find ("ObjectiveUI");
+    private Animator animator;
+    private int pickupTriggerHash;
+    private int pickupStateHash;
+    private CharacterMovement characterMovement;
+    private bool pickingUp;
+    //private GameObject objectiveGUI;
+
+    void Awake() {
+        animator = gameObject.GetComponentInChildren<Animator>();
+        pickupTriggerHash = Animator.StringToHash("Pickup");
+        pickupStateHash = Animator.StringToHash("Base Layer.Pickup");
+        pickingUp = false;
+
+        characterMovement = gameObject.GetComponent<CharacterMovement>();
+        //objectiveGUI = GameObject.Find("ObjectiveUI");
+    }
+
+    void Start() {
+
     }
 
     void OnTriggerEnter (Collider c) {
         if (c.gameObject.tag == "pickupable") {
-            Destroy(c.gameObject);
-            objectiveGUI.GetComponent<ObjectiveGUI>().IncrementTargets();
+            if (pickupEffects) {
+                pickupEffects.StartEvent();
+            }
+
+            animator.SetTrigger(pickupTriggerHash);
+            pickingUp = true;
+
+            //Destroy(c.gameObject);
+            //objectiveGUI.GetComponent<ObjectiveGUI>().IncrementTargets();
         }
     }
     
     void Update () {
+        bool inPickupState = animator.GetCurrentAnimatorStateInfo(0).nameHash == pickupStateHash;
 
+        if (!pickingUp && inPickupState) {
+            pickingUp = true;
+        }
+
+        if (pickingUp) {
+            if (!inPickupState) {
+                characterMovement.SetControllable(true);
+                pickingUp = false;
+            } else {
+                characterMovement.SetControllable(false);
+            }
+        }
     }
     
 }

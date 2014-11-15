@@ -41,7 +41,6 @@ public class Dance : MonoBehaviour
             lastDanceTime = Time.time;
 
             animator.SetBool(danceBoolHash, true);
-            characterMovement.SetControllable(false);
         }
 
         bool inDanceState = animator.GetCurrentAnimatorStateInfo(0).nameHash == danceStateHash;
@@ -57,6 +56,10 @@ public class Dance : MonoBehaviour
                 stopping = false;
                 dancing = false;
             }
+        }
+
+        if (dancing) {
+            characterMovement.SetControllable(false);
         }
     }
     
