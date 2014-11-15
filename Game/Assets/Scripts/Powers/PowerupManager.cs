@@ -52,7 +52,7 @@ public class PowerupManager : MonoBehaviour
     }
 
     public bool CanUsePowerup(Powerup testPowerup) {
-        return (testPowerup.energyCost < energy);
+        return (testPowerup.energyCost <= energy);
     }
 
     public void SetActivePowerup(Powerup newActivePowerup) {
