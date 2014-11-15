@@ -36,18 +36,20 @@ public class CharacterMovement : MonoBehaviour
 
     // State (read-only visible to other scripts).
     private bool m_moving;
-    public bool moving { get { return m_moving; } }
     private bool m_inJumpWindup;
-    public bool inJumpWindup { get { return m_inJumpWindup; } }
     private bool m_jumping;
-    public bool jumping { get { return m_jumping; } }
     private bool m_sliding;
+    private bool m_falling;
+    private float m_speed;
+    private bool m_controllable;
+    public bool moving { get { return m_moving; } }
+    public bool inJumpWindup { get { return m_inJumpWindup; } }
+    public bool jumping { get { return m_jumping; } }
     public bool sliding { get { return m_sliding; } }
     public bool grounded { get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; } }
-    private bool m_falling;
     public bool falling { get { return m_falling; } }
-    private float m_speed = 0f;
     public float speed { get { return m_speed; } }
+    public bool controllable { get { return m_controllable; } }
 
     // Collision, jumping, sliding.
     private CharacterController controller;
@@ -89,11 +91,7 @@ public class CharacterMovement : MonoBehaviour
             Debug.LogWarning("No camera control set on CharacterMovement!");
         }
 
-        // Setup initial state.
-        m_moving = false;
-        m_inJumpWindup = false;
-        m_jumping = false;
-        m_sliding = false;
+        ResetState();
 
         controller = gameObject.GetComponent<CharacterController>();
         verticalSpeed = 0.0f;
@@ -123,6 +121,16 @@ public class CharacterMovement : MonoBehaviour
 
     }
 
+    void ResetState() {
+        m_moving = false;
+        m_inJumpWindup = false;
+        m_jumping = false;
+        m_sliding = false;
+        m_falling = false;
+        m_speed = 0.0f;
+        m_controllable = true;
+    }
+
     void OnControllerColliderHit(ControllerColliderHit hit) {
         contactPoint = hit.point;
     }
@@ -135,13 +143,18 @@ public class CharacterMovement : MonoBehaviour
         }
 
         // Get input values from controller/keyboard.
-        leftX = Input.GetAxis("Horizontal");
-        leftY = Input.GetAxis("Vertical");
-        float strafeInput = Input.GetAxis("Strafe");
+        leftX = controllable ? Input.GetAxis("Horizontal") : 0;
+        leftY = controllable ? Input.GetAxis("Vertical") : 0;
+        float strafeInput = controllable ? Input.GetAxis("Strafe") : 0;
 
-        m_moving = false;
+        bool inputReceived = false;
         if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
-            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01) {
+            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
+            Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
+            inputReceived = true;
+            SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
+        }
+        if (inputReceived && controllable) {
             m_moving = true;
         }
 
@@ -226,7 +239,7 @@ public class CharacterMovement : MonoBehaviour
 
             verticalSpeed -= gravity * Time.deltaTime;
 
-            if (m_jumping) {
+            if (jumping) {
                 // Check if predicted to be landing within landingTime.
                 // d = v * t + 1/2 a * t^2
                 float distance = -(verticalSpeed * landingTime +
@@ -245,10 +258,14 @@ public class CharacterMovement : MonoBehaviour
     void ApplyJump() {
         if (Input.GetButtonDown("Jump")) {
             lastJumpInputTime = Time.time;
+            SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
         }
 
         // Do not allow jumping while sliding.
         if (sliding && slopeAngle > jumpSlopeLimit) { return; }
+
+        // Do not allow jumping while not controllable.
+        if (!controllable) { return; }
 
         // PreTimeout lets you trigger a jump slightly before landing.
         if (Time.time < lastJumpInputTime + jumpPreTimeout &&
@@ -262,7 +279,7 @@ public class CharacterMovement : MonoBehaviour
             }
         }
 
-        if (m_inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
+        if (inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
             m_inJumpWindup = false;
             m_jumping = true;
             verticalSpeed = jumpVerticalSpeed;
@@ -286,12 +303,11 @@ public class CharacterMovement : MonoBehaviour
     public void ResetJumpHeight() { jumpHeight = originalJumpHeight; }
     public void SetGravity(float newGravity) { gravity = newGravity; }
     public void ResetGravity() { gravity = originalGravity; }
-    public void SetAirSmoothDampTime(float newAirSmoothDampTime) {
-        airSmoothDampTime = newAirSmoothDampTime; }
-    public void ResetAirSmoothDampTime() {
-        airSmoothDampTime = originalAirSmoothDampTime; }
+    public void SetAirSmoothDampTime(float newAirSmoothDampTime) { airSmoothDampTime = newAirSmoothDampTime; }
+    public void ResetAirSmoothDampTime() { airSmoothDampTime = originalAirSmoothDampTime; }
     public void SetMass(float newMass) { mass = newMass; }
     public void ResetMass() { mass = originalMass; }
+    public void SetControllable(bool isControllable) { m_controllable = isControllable; }
 
     private void StickToWorldspace(Transform root, Transform camera,
                                   ref float directionOut, ref float speedOut,
