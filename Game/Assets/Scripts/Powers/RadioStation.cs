@@ -5,6 +5,7 @@ using System.Collections;
 
 public class RadioStation : MonoBehaviour
 {
+    [SerializeField] [Range(0.0f, 1.0f)] private float maxVolume = 1.0f;
     public float frequency;
     public float signalStrength {
         get {
@@ -37,7 +38,7 @@ public class RadioStation : MonoBehaviour
     }
 
     void Update() {
-        audioSource.volume = signalStrength;
+        audioSource.volume = signalStrength * maxVolume;
 
         // End if the station signal is no longer strong enough.
         if (powerup && powerup.primed && !powerup.inUse &&

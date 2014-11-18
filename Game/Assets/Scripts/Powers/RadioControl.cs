@@ -9,7 +9,7 @@ public class RadioControl : MonoBehaviour
     public float powerupMinSignalStrength = 0.25f;
     public float backgroundStrength { get { return (1.0f - maxSignal / stationCutoff); } }
 
-    private float m_currentFrequency;
+    [SerializeField] private float m_currentFrequency;
     public float currentFrequency { get { return m_currentFrequency; } }
 
     // Private variables set in the inspector.
@@ -63,7 +63,6 @@ public class RadioControl : MonoBehaviour
         }
 
         maxSignal = 0.0f;
-        m_currentFrequency = 0.5f;
 
         screenUIObject = (GameObject) GameObject.Instantiate(screenUIPrefab);
         screenUI = screenUIObject.GetComponent<RadioUI>();
