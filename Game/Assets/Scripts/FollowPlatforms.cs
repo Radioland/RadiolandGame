@@ -26,7 +26,7 @@ public class FollowPlatforms : MonoBehaviour
     void Update() {
         Platform platform = GetPlatformUnder();
         if (platform) {
-            controller.Move(platform.deltaPosition);
+            Push(platform);
         }
     }
 
@@ -52,7 +52,10 @@ public class FollowPlatforms : MonoBehaviour
     }
 
     void Push(Platform platform) {
-        controller.Move(platform.lastVelocity * Time.deltaTime * 1.1f);
+        Vector3 movement = platform.lastVelocity * Time.deltaTime;
+        // Apply an extra push vertically to prevent falling through platforms.
+        movement.y = movement.y * 1.5f + 0.01f;
+        controller.Move(movement);
 
         // Alternate push method.
         //Vector3 normal = collision.contacts[0].normal;
