@@ -19,10 +19,16 @@ public class Metal : Powerup
     
     public override void Update() {
         base.Update();
+
+        if (Time.time - lastStartedTime > duration) {
+            EndPowerup();
+        }
     }
     
     public override void UsePowerup() {
         base.UsePowerup();
+
+        inUse = true;
         
         if (metalEffects) {
             metalEffects.StartEvent();
