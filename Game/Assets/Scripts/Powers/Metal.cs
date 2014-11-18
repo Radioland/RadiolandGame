@@ -20,7 +20,7 @@ public class Metal : Powerup
     public override void Update() {
         base.Update();
 
-        if (Time.time - lastStartedTime > duration) {
+        if (inUse && Time.time - lastStartedTime > duration) {
             EndPowerup();
         }
     }
