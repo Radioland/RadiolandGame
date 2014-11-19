@@ -16,7 +16,10 @@ public class Effect : MonoBehaviour
     protected float lastTimeTriggered;
     protected float lastTimeStarted;
     protected float lastTimeEnded;
-    protected float percentDurationElapsed;
+
+    protected float percentDurationElapsed {
+        get { return (Time.time - lastTimeStarted) / duration; }
+    }
 
     protected virtual void Awake() {
         isPlaying = false;
@@ -31,8 +34,6 @@ public class Effect : MonoBehaviour
     }
 
     protected virtual void Update() {
-        percentDurationElapsed = (Time.time - lastTimeStarted) / duration;
-
         if (isPlaying && !hasStarted && (Time.time - lastTimeTriggered > startDelay)) {
             StartEffect();
         }

@@ -23,6 +23,7 @@ public class ScreenFadeEffect : Effect {
     
     protected override void Update() {
         base.Update();
+
         if (isPlaying && hasStarted) {
             alphaFadeValue = Mathf.Clamp01(percentDurationElapsed);
             if (!fadeOut) {
