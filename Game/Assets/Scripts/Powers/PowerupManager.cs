@@ -13,11 +13,17 @@ public class PowerupManager : MonoBehaviour
     [SerializeField] private float m_energy;
     public float energy {
         get { return m_energy; }
-        set { m_energy = Mathf.Clamp(value, 0.0f, 1.0f); }
+        set {
+            m_energy = Mathf.Clamp(value, 0.0f, 1.0f);
+            if (radioControl) {
+                radioControl.RespondToEnergyChange();
+            }
+        }
     }
     public bool IsFullEnergy() { return m_energy >= 0.998f; }
 
     private Powerup activePowerup; // Only allow one active powerup at a time.
+    private RadioControl radioControl;
 
     void Awake() {
         powerups = gameObject.GetComponents<Powerup>();
@@ -75,5 +81,9 @@ public class PowerupManager : MonoBehaviour
         if (usePowerupEffects) {
             usePowerupEffects.StopEvent();
         }
+    }
+
+    public void SetRadioControl(RadioControl newRadioControl) {
+        radioControl = newRadioControl;
     }
 }

@@ -42,6 +42,8 @@ public class RadioControl : MonoBehaviour
     void Awake() {
         if (!powerupManager) {
             Debug.LogWarning("[UI] Please set PowerupManager for RadioControl.");
+        } else {
+            powerupManager.SetRadioControl(this);
         }
 
         if (!staticSource) {
@@ -139,6 +141,10 @@ public class RadioControl : MonoBehaviour
                     station.UsePowerup();
                 }
             }
+
+            foreach (RadioUI radioUI in radioUIs) {
+                radioUI.TriggerStart();
+            }
         }
 
         maxSignal = 0.0f;
@@ -168,6 +174,12 @@ public class RadioControl : MonoBehaviour
             }
 
             staticSource.volume = volume;
+        }
+    }
+
+    public void RespondToEnergyChange() {
+        foreach (RadioUI radioUI in radioUIs) {
+            radioUI.TriggerStart();
         }
     }
 }

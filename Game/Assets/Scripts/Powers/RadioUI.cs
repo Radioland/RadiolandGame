@@ -56,6 +56,7 @@ public class RadioUI : MonoBehaviour
     public void TriggerStart() {
         if (Time.time - lastActiveTime > lingerTime) {
             lastStartedTime = Time.time;
+            lastActiveTime = Time.time;
         }
     }
 
