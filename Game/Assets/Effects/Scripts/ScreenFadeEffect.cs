@@ -8,8 +8,10 @@ public class ScreenFadeEffect : Effect {
     [Tooltip("Fade the screen out (and the texture in)? Otherwise does the opposite.")]
     [SerializeField] private bool fadeOut = true;
     [SerializeField] private AnimationCurve alphaAdjust;
+    [SerializeField] private bool stayAfterEnd = false;
 
     private float alphaFadeValue;
+    private bool hasPlayed;
 
     protected override void Awake() {
         base.Awake();
@@ -32,7 +34,7 @@ public class ScreenFadeEffect : Effect {
     }
 
     void OnGUI() {
-        if (isPlaying && hasStarted) {
+        if ((isPlaying && hasStarted) || (hasPlayed && stayAfterEnd)) {
             GUI.color = new Color(alphaFadeValue, alphaFadeValue, alphaFadeValue, alphaFadeValue);
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), fadeTexture);
         }
@@ -44,6 +46,8 @@ public class ScreenFadeEffect : Effect {
     
     public override void StartEffect() {
         base.StartEffect();
+
+        hasPlayed = true;
     }
     
     public override void EndEffect() {
