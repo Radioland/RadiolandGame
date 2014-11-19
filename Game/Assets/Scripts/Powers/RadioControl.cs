@@ -21,8 +21,6 @@ public class RadioControl : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] private float staticMaxVolume = 0.5f;
     [SerializeField] private float staticLingerTime = 1.0f; // Full strength after inactivity time.
     [SerializeField] private float staticFadeTime = 3.0f; // Fade after linger over this time.
-    [SerializeField] private float screenUILingerTime = 3.0f; // Full strength after inactivity time.
-    [SerializeField] private float screenUIFadeTime = 1.0f; // Fade after linger over this time.
 
     [SerializeField] private List<RadioUI> radioUIs;
 
@@ -30,11 +28,6 @@ public class RadioControl : MonoBehaviour
     [SerializeField] private GameObject screenUIPrefab;
     private GameObject screenUIObject;
     private RadioUI screenUI;
-    // Secondary UI fade.
-    private float lastStartedTimeScreenUI;
-    private float lastActiveTimeScreenUI;
-    private float lastDecreaseAlpha;
-    private float lastIncreaseAlpha;
 
     private RadioStation[] stations;
     private bool inUse;
@@ -49,6 +42,8 @@ public class RadioControl : MonoBehaviour
     void Awake() {
         if (!powerupManager) {
             Debug.LogWarning("[UI] Please set PowerupManager for RadioControl.");
+        } else {
+            powerupManager.SetRadioControl(this);
         }
 
         if (!staticSource) {
@@ -69,8 +64,6 @@ public class RadioControl : MonoBehaviour
 
         radioUIs.Add(screenUI);
 
-        lastStartedTimeScreenUI = -1000.0f;
-        lastActiveTimeScreenUI = -1000.0f;
         ResetStatic();
     }
 
@@ -114,12 +107,16 @@ public class RadioControl : MonoBehaviour
                 if (Time.time - lastActiveTimeStatic > staticLingerTime) {
                     lastStartedTimeStatic = Time.time;
                 }
-                if (Time.time - lastActiveTimeScreenUI > screenUILingerTime) {
-                    lastStartedTimeScreenUI = Time.time;
+
+                foreach (RadioUI radioUI in radioUIs) {
+                    radioUI.TriggerActivity();
                 }
             }
             lastActiveTimeStatic = Time.time;
-            lastActiveTimeScreenUI = Time.time;
+
+            foreach (RadioUI radioUI in radioUIs) {
+                radioUI.TriggerActivity();
+            }
         } else {
             inUse = false;
         }
@@ -143,6 +140,10 @@ public class RadioControl : MonoBehaviour
                 if (station.signalStrength > powerupMinSignalStrength) {
                     station.UsePowerup();
                 }
+            }
+
+            foreach (RadioUI radioUI in radioUIs) {
+                radioUI.TriggerActivity();
             }
         }
 
@@ -174,20 +175,11 @@ public class RadioControl : MonoBehaviour
 
             staticSource.volume = volume;
         }
+    }
 
-        // Fade the secondary UI in and out.
-        float alpha;
-        if (inUse || Time.time - lastActiveTimeScreenUI < screenUILingerTime) {
-            // Fade in.
-            float tStart = (Time.time - lastStartedTimeScreenUI) / screenUIFadeTime;
-            alpha = Mathf.Lerp(lastDecreaseAlpha, 1.0f, Mathf.Clamp01(tStart));
-            lastIncreaseAlpha = alpha;
-        } else {
-            // Fade out.
-            float tEnd = (Time.time - screenUILingerTime - lastActiveTimeScreenUI) / screenUIFadeTime;
-            alpha = Mathf.Lerp(lastIncreaseAlpha, 0.0f, Mathf.Clamp01(tEnd));
-            lastDecreaseAlpha = alpha;
+    public void RespondToEnergyChange() {
+        foreach (RadioUI radioUI in radioUIs) {
+            radioUI.TriggerActivity();
         }
-        screenUI.SetAlpha(alpha);
     }
 }
