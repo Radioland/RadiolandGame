@@ -15,7 +15,7 @@ public class StartMenu : MonoBehaviour {
 	void Update () {
 		if (Input.GetButtonDown(buttonName:"Submit")) {
 			continueButton.SetActive(true);
-			continueButton.GetComponent<Button>().;
+			continueButton.GetComponent<Button>();
 			newGameButton.SetActive(true);
 			exitButton.SetActive(true);
 			initialText.SetActive(false);
