@@ -5,6 +5,7 @@ public class PowerupManager : MonoBehaviour
 {
     [SerializeField] private Renderer powerupReadyGlow;
     [SerializeField] private string glowColorName = "_TintColor";
+    [SerializeField] private EffectManager usePowerupEffects;
 
     [HideInInspector] public Powerup[] powerups;
 
@@ -60,9 +61,17 @@ public class PowerupManager : MonoBehaviour
             activePowerup.EndPowerup();
         }
         activePowerup = newActivePowerup;
+
+        if (usePowerupEffects) {
+            usePowerupEffects.StartEvent();
+        }
     }
 
     public void EndPowerup() {
         activePowerup = null;
+
+        if (usePowerupEffects) {
+            usePowerupEffects.StopEvent();
+        }
     }
 }
