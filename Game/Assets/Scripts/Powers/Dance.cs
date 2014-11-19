@@ -69,4 +69,15 @@ public class Dance : MonoBehaviour
             stopping = true;
         }
     }
+
+    // Called via SendMessage in CharacterMovement.
+    void JumpTriggered() {
+        // Jump immediately cancels dancing.
+        if (dancing) {
+            stopping = false;
+            dancing = false;
+            animator.SetBool(danceBoolHash, false);
+            characterMovement.SetControllable(true);
+        }
+    }
 }

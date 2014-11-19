@@ -33,8 +33,8 @@ public class LowGravity : JumpPowerup
     }
 
     // Called via SendMessage in CharacterMovement.
-    protected override void StartJump() {
-        base.StartJump();
+    protected override void JumpStarted() {
+        base.JumpStarted();
 
         if (inUse) {
             characterMovement.SetGravity(gravity);

@@ -274,7 +274,7 @@ public class CharacterMovement : MonoBehaviour
                 lastJumpTime = Time.time;
                 m_inJumpWindup = true;
 
-                SendMessage("StartJump", SendMessageOptions.DontRequireReceiver);
+                SendMessage("JumpStarted", SendMessageOptions.DontRequireReceiver);
             }
         }
 
@@ -289,6 +289,7 @@ public class CharacterMovement : MonoBehaviour
 
     public void TriggerJump() {
         lastJumpInputTime = Time.time;
+        SendMessage("JumpTriggered", SendMessageOptions.DontRequireReceiver);
         SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
     }
 

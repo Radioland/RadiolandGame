@@ -31,7 +31,7 @@ public class JumpPowerup : Powerup
     }
 
     // Called via SendMessage in CharacterMovement.
-    protected virtual void StartJump() {
+    protected virtual void JumpStarted() {
         if (primed && !inUse) {
             inUse = true;
         }
