@@ -17,7 +17,6 @@ public class RadioUI : MonoBehaviour
     private float currentAlpha;
     private float currentGlowAlpha;
 
-    private float lastStartedTime;
     private float lastActiveTime;
     private float lastDecreaseAlpha;
     private float lastIncreaseAlpha;
@@ -27,7 +26,6 @@ public class RadioUI : MonoBehaviour
 
         currentAlpha = 1.0f;
 
-        lastStartedTime = -1000.0f;
         lastActiveTime = -1000.0f;
     }
 
@@ -40,7 +38,7 @@ public class RadioUI : MonoBehaviour
             float alpha;
             if (Time.time - lastActiveTime < lingerTime) {
                 // Fade in.
-                float tStart = (Time.time - lastStartedTime) / fadeTime;
+                float tStart = (Time.time - lastActiveTime) / fadeTime;
                 alpha = Mathf.Lerp(lastDecreaseAlpha, 1.0f, Mathf.Clamp01(tStart));
                 lastIncreaseAlpha = alpha;
             } else {
@@ -53,15 +51,10 @@ public class RadioUI : MonoBehaviour
         }
     }
 
-    public void TriggerStart() {
+    public void TriggerActivity() {
         if (Time.time - lastActiveTime > lingerTime) {
-            lastStartedTime = Time.time;
             lastActiveTime = Time.time;
         }
-    }
-
-    public void TriggerActivity() {
-        lastActiveTime = Time.time;
     }
 
     public void SetSliderValue(float newValue) {

@@ -109,7 +109,7 @@ public class RadioControl : MonoBehaviour
                 }
 
                 foreach (RadioUI radioUI in radioUIs) {
-                    radioUI.TriggerStart();
+                    radioUI.TriggerActivity();
                 }
             }
             lastActiveTimeStatic = Time.time;
@@ -143,7 +143,7 @@ public class RadioControl : MonoBehaviour
             }
 
             foreach (RadioUI radioUI in radioUIs) {
-                radioUI.TriggerStart();
+                radioUI.TriggerActivity();
             }
         }
 
@@ -179,7 +179,7 @@ public class RadioControl : MonoBehaviour
 
     public void RespondToEnergyChange() {
         foreach (RadioUI radioUI in radioUIs) {
-            radioUI.TriggerStart();
+            radioUI.TriggerActivity();
         }
     }
 }
