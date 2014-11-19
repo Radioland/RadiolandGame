@@ -11,7 +11,7 @@ public class Region : MonoBehaviour
 {
     public Vector3 dimensions = new Vector3(35, 10, 10);
     [SerializeField] private bool isCentered = false;
-    [SerializeField] private bool absoluteDimensions = true;
+    [SerializeField] private bool relativeDimensions = true; // Scale with (global) lossyScale.
     [SerializeField] private Color gizmoColor = Color.yellow;
 
     private Vector3 globalCenter;
@@ -22,7 +22,7 @@ public class Region : MonoBehaviour
 
     private Vector3 scaledDimensions {
         get {
-            if (absoluteDimensions) {
+            if (relativeDimensions) {
                 return dimensions;
             } else {
                 return new Vector3(dimensions.x * transform.lossyScale.x,
