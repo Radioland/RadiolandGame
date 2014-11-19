@@ -5,6 +5,7 @@ public class JumpPowerup : Powerup
 {
     [SerializeField] protected EffectManager onJumpEffects;
     [SerializeField] private float groundedExtraTime = 0.1f;
+    [SerializeField] private bool useTriggersJump = true;
 
     protected Animator animator;
 
@@ -48,6 +49,10 @@ public class JumpPowerup : Powerup
 
         if (onJumpEffects) {
             onJumpEffects.StartEvent();
+        }
+
+        if (useTriggersJump) {
+            characterMovement.TriggerJump();
         }
     }
 

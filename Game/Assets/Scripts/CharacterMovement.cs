@@ -257,8 +257,7 @@ public class CharacterMovement : MonoBehaviour
 
     void ApplyJump() {
         if (Input.GetButtonDown("Jump")) {
-            lastJumpInputTime = Time.time;
-            SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
+            TriggerJump();
         }
 
         // Do not allow jumping while sliding.
@@ -286,6 +285,11 @@ public class CharacterMovement : MonoBehaviour
 
             SendMessage("Jump", SendMessageOptions.DontRequireReceiver);
         }
+    }
+
+    public void TriggerJump() {
+        lastJumpInputTime = Time.time;
+        SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
     }
 
     public void Bounce(float bounceSpeed) {
