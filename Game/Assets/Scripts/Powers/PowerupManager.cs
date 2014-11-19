@@ -5,6 +5,7 @@ public class PowerupManager : MonoBehaviour
 {
     [SerializeField] private Renderer powerupReadyGlow;
     [SerializeField] private string glowColorName = "_TintColor";
+    [SerializeField] private ParticleSystem usePowerupParticles;
     [SerializeField] private EffectManager usePowerupEffects;
 
     [HideInInspector] public Powerup[] powerups;
@@ -44,6 +45,7 @@ public class PowerupManager : MonoBehaviour
                     powerupReadyGlow.enabled = true;
                     powerupReadyGlow.material.SetColor(glowColorName, powerup.color);
                 }
+                usePowerupParticles.startColor = powerup.color;
                 powerupReady = true;
             }
         }
