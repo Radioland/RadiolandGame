@@ -25,21 +25,20 @@ public class ObjectPickup : MonoBehaviour {
 
     }
 
-    void OnTriggerEnter (Collider c) {
+    void OnTriggerEnter(Collider c) {
         if (c.gameObject.tag == "pickupable") {
             if (pickupEffects) {
                 pickupEffects.StartEvent();
             }
 
             animator.SetTrigger(pickupTriggerHash);
-            pickingUp = true;
 
             //Destroy(c.gameObject);
             //objectiveGUI.GetComponent<ObjectiveGUI>().IncrementTargets();
         }
     }
     
-    void Update () {
+    void Update() {
         bool inPickupState = animator.GetCurrentAnimatorStateInfo(0).nameHash == pickupStateHash;
 
         if (!pickingUp && inPickupState) {
@@ -50,6 +49,7 @@ public class ObjectPickup : MonoBehaviour {
             if (!inPickupState) {
                 characterMovement.SetControllable(true);
                 pickingUp = false;
+                pickupEffects.StopEvent();
             } else {
                 characterMovement.SetControllable(false);
             }
