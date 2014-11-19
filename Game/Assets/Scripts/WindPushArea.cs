@@ -3,7 +3,14 @@ using System.Collections;
 
 public class WindPushArea : MonoBehaviour
 {
-    public Vector3 windVelocity;
+    [SerializeField] private Vector3 windVelocityLocal;
+    public Vector3 windVelocity {
+        get {
+            return (transform.forward * windVelocityLocal.z +
+                    transform.right * windVelocityLocal.x +
+                    transform.up * windVelocityLocal.y);
+        }
+    }
 
     void Awake() {
 
@@ -15,5 +22,9 @@ public class WindPushArea : MonoBehaviour
 
     void Update() {
 
+    }
+
+    void OnDrawGizmos() {
+        Gizmos.DrawRay(transform.position, windVelocity.normalized);
     }
 }
