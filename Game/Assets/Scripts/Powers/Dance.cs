@@ -5,6 +5,7 @@ public class Dance : MonoBehaviour
 {
     public bool dancing;
     [SerializeField] private float minDanceTime = 0.5f;
+    [SerializeField] private EffectManager danceEffects;
 
     private CharacterMovement characterMovement;
     private Animator animator;
@@ -41,6 +42,10 @@ public class Dance : MonoBehaviour
             lastDanceTime = Time.time;
 
             animator.SetBool(danceBoolHash, true);
+
+            if (danceEffects) {
+                danceEffects.StartEvent();
+            }
         }
 
         bool inDanceState = animator.GetCurrentAnimatorStateInfo(0).nameHash == danceStateHash;
@@ -52,9 +57,7 @@ public class Dance : MonoBehaviour
             }
 
             if (!inDanceState) {
-                characterMovement.SetControllable(true);
-                stopping = false;
-                dancing = false;
+                StopDancing();
             }
         }
 
@@ -74,10 +77,18 @@ public class Dance : MonoBehaviour
     void JumpTriggered() {
         // Jump immediately cancels dancing.
         if (dancing) {
-            stopping = false;
-            dancing = false;
-            animator.SetBool(danceBoolHash, false);
-            characterMovement.SetControllable(true);
+            StopDancing();
+        }
+    }
+
+    void StopDancing() {
+        animator.SetBool(danceBoolHash, false);
+        characterMovement.SetControllable(true);
+        stopping = false;
+        dancing = false;
+
+        if (danceEffects) {
+            danceEffects.StopEvent();
         }
     }
 }
