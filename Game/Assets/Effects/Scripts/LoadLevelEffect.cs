@@ -4,6 +4,7 @@ using System.Collections;
 public class LoadLevelEffect : Effect
 {
     // Variables to specify in the editor.
+    [SerializeField] private bool loadNext = true;
     [SerializeField] private int levelToLoad;
     
     protected override void Awake() {
@@ -25,7 +26,11 @@ public class LoadLevelEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
-        Application.LoadLevel(levelToLoad);
+        if (loadNext) {
+            Application.LoadLevel(Application.loadedLevel + 1);
+        } else {
+            Application.LoadLevel(levelToLoad);
+        }
     }
     
     public override void EndEffect() {

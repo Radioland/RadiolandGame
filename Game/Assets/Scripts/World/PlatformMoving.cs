@@ -12,6 +12,7 @@ public class PlatformMoving : MonoBehaviour {
 
     void Start () {
         topVelocity = velocity;
+        startTime = Time.time;
     }
     
     void Update () {
@@ -25,7 +26,6 @@ public class PlatformMoving : MonoBehaviour {
         }
 
         transform.localPosition += velocity * Time.deltaTime;
-    
     }
 
     public Vector3 GetVelocity() {

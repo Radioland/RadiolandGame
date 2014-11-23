@@ -30,6 +30,14 @@ public class GameController : MonoBehaviour
             Exit();
         }
 
+        // Cheats
+        if (Input.GetKeyDown(KeyCode.Equals)) {
+            Application.LoadLevel(Application.loadedLevel + 1);
+        }
+        if (Input.GetKeyDown(KeyCode.Minus)) {
+            Application.LoadLevel(Application.loadedLevel - 1);
+        }
+
         if (Input.GetKeyDown(KeyCode.M)) { masterMute = !masterMute; }
         AudioListener.volume = masterMute ? 0.0f : 1.0f;
     }
