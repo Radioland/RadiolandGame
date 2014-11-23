@@ -300,9 +300,9 @@ public class CharacterMovement : MonoBehaviour
         lastJumpTime = Time.time;
     }
 
-    public void AddVelocity(Vector3 extraVelocity) {
-        velocity += extraVelocity;
-    }
+    // Velocity controls.
+    public void AddVelocity(Vector3 extraVelocity) { velocity += extraVelocity; }
+    public void SetVelocity(Vector3 newVelocity) { velocity = newVelocity; }
 
     // Set and reset properties.
     public void SetJumpHeight(float height) { jumpHeight = height; }
