@@ -54,7 +54,7 @@ public class FollowPlatforms : MonoBehaviour
     void Push(Platform platform) {
         Vector3 movement = platform.lastVelocity * Time.deltaTime;
         // Apply an extra push vertically to prevent falling through platforms.
-        movement.y = movement.y * 1.5f + 0.01f;
+        movement.y = movement.y * 1.5f + 0.02f;
         controller.Move(movement);
 
         // Alternate push method.
