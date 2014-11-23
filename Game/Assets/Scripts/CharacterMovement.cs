@@ -158,6 +158,8 @@ public class CharacterMovement : MonoBehaviour
         }
         if (inputReceived && controllable) {
             m_moving = true;
+        } else {
+            m_moving = false;
         }
 
         charAngle = 0f;
