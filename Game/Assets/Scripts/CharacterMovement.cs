@@ -294,6 +294,7 @@ public class CharacterMovement : MonoBehaviour
     }
 
     public void Bounce(float bounceSpeed) {
+        SendMessage("BounceTriggered", SendMessageOptions.DontRequireReceiver);
         verticalSpeed = bounceSpeed;
         m_jumping = true;
         lastJumpTime = Time.time;
