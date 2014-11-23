@@ -153,6 +153,8 @@ public class CharacterMovement : MonoBehaviour
             Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
             inputReceived = true;
             SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
+        } else {
+            SendMessage("NoMovementInput", SendMessageOptions.DontRequireReceiver);
         }
         if (inputReceived && controllable) {
             m_moving = true;
