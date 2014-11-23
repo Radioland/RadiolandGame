@@ -27,7 +27,11 @@ public class PushedByWind : MonoBehaviour
 
         if (windPushArea) {
             if (characterMovement) {
-                characterMovement.AddVelocity(windPushArea.windVelocity / characterMovement.mass);
+                if (characterMovement.grounded) {
+                    characterMovement.AddVelocity(windPushArea.windVelocity / characterMovement.mass);
+                } else {
+                    characterMovement.SetVelocity(windPushArea.windVelocity / characterMovement.mass);
+                }
             } else if (controller) {
                 controller.Move(windPushArea.windVelocity * Time.deltaTime);
             } else {

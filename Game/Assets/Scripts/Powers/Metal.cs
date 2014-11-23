@@ -25,6 +25,13 @@ public class Metal : Powerup
         }
     }
     
+    // Called via SendMessage in CharacterMovement.
+    protected void BounceTriggered() {
+        if (inUse) {
+            EndPowerup();
+        }
+    }
+
     public override void UsePowerup() {
         base.UsePowerup();
 
