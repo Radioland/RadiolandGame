@@ -5,6 +5,8 @@ public class Dance : MonoBehaviour
 {
     public bool dancing;
     [SerializeField] private float minDanceTime = 0.5f;
+    [SerializeField] private float minInputStopTime = 0.5f;
+    [SerializeField] private float inputPersistTime = 0.1f;
     [SerializeField] private EffectManager danceEffects;
 
     private CharacterMovement characterMovement;
@@ -13,6 +15,9 @@ public class Dance : MonoBehaviour
     private int danceStateHash;
     private bool stopping;
     private float lastDanceTime;
+    private float lastInputTime;
+    private float lastInputStartedTime;
+    private bool stillReceivingInput;
 
     void Awake() {
         dancing = false;
@@ -29,6 +34,8 @@ public class Dance : MonoBehaviour
 
         stopping = false;
         lastDanceTime = -1000.0f;
+        lastInputTime = -1000.0f;
+        lastInputStartedTime = -1000.0f;
     }
 
     void Start() {
@@ -68,8 +75,22 @@ public class Dance : MonoBehaviour
     
     // Called via SendMessage in CharacterMovement.
     void InputReceived() {
-        if (dancing) {
-            stopping = true;
+        lastInputTime = Time.time;
+
+        if (dancing && stillReceivingInput) {
+            if (Time.time - lastInputStartedTime > minInputStopTime) {
+                stopping = true;
+            }
+        } else {
+            lastInputStartedTime = Time.time;
+        }
+        stillReceivingInput = true;
+    }
+
+    // Called via SendMessage in CharacterMovement.
+    void NoMovementInput() {
+        if (Time.time - lastInputTime > inputPersistTime) {
+            stillReceivingInput = false;
         }
     }
 
