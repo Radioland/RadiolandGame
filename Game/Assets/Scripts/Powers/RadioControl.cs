@@ -130,7 +130,7 @@ public class RadioControl : MonoBehaviour
         // Fade glow image based on energy percentage.
         if (powerupManager) {
             foreach (RadioUI radioUI in radioUIs) {
-                radioUI.SetGlowAlpha(powerupManager.energy);
+                radioUI.SetEnergy(powerupManager.energy);
             }
         }
 
