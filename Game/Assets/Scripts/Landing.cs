@@ -27,7 +27,7 @@ public class Landing : MonoBehaviour
     }
     
     // Called via SendMessage in CharacterMovement.
-    private void Grounded(float verticalSpeed) {
+    void Grounded(float verticalSpeed) {
         if (landingEffects && -verticalSpeed > minEffectSpeed) {
             float t = Mathf.InverseLerp(minEffectSpeed, maxEffectSpeed, -verticalSpeed);
 
