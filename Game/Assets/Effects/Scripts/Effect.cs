@@ -9,7 +9,6 @@ public class Effect : MonoBehaviour
     [SerializeField] private float startDelay = 0.0f;
     [SerializeField] protected float duration = 1.0f;
     [SerializeField] private float cooldown = 0.0f;
-
     [HideInInspector] public bool isPlaying;
     [HideInInspector] public bool hasStarted;
 
@@ -38,7 +37,7 @@ public class Effect : MonoBehaviour
             StartEffect();
         }
 
-        if (isPlaying && hasStarted && (Time.time - lastTimeTriggered > duration + startDelay)) {
+        if (isPlaying && hasStarted && (Time.time - lastTimeStarted > duration)) {
             EndEffect();
         }
     }

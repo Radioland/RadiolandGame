@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 // The player orbits around the camera, see CharacterMovement.StickToWorldspace.
@@ -107,7 +107,7 @@ public class CameraControl : MonoBehaviour
         distanceUp = Mathf.Clamp(distanceUp, minDistanceUp, maxDistanceUp);
 
         // Only update camera look direction if moving or rotating.
-        if (characterMovement.speed > 0.1f || Mathf.Abs(rightX) > 0.1f || Mathf.Abs(rightY) > 0.1f) {
+        if (characterMovement.controlSpeed > 0.1f || Mathf.Abs(rightX) > 0.1f || Mathf.Abs(rightY) > 0.1f) {
             lookDir = Vector3.Lerp(followTransform.right * (leftX < 0 ? 1f : -1f),
                                    followTransform.forward * (leftY < 0 ? -1f : 1f),
                                    Mathf.Abs(Vector3.Dot(cameraTransform.forward, followTransform.forward)));

@@ -40,7 +40,7 @@ public class CharacterMovement : MonoBehaviour
     private bool m_jumping;
     private bool m_sliding;
     private bool m_falling;
-    private float m_speed;
+    private float m_controlSpeed;
     private bool m_controllable;
     public bool moving { get { return m_moving; } }
     public bool inJumpWindup { get { return m_inJumpWindup; } }
@@ -48,7 +48,8 @@ public class CharacterMovement : MonoBehaviour
     public bool sliding { get { return m_sliding; } }
     public bool grounded { get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; } }
     public bool falling { get { return m_falling; } }
-    public float speed { get { return m_speed; } }
+    public float controlSpeed { get { return m_controlSpeed; } }
+    public float speed { get { return (velocity + Vector3.up * verticalSpeed).magnitude; } }
     public bool controllable { get { return m_controllable; } }
 
     // Collision, jumping, sliding.
@@ -127,7 +128,7 @@ public class CharacterMovement : MonoBehaviour
         m_jumping = false;
         m_sliding = false;
         m_falling = false;
-        m_speed = 0.0f;
+        m_controlSpeed = 0.0f;
         m_controllable = true;
     }
 
@@ -169,14 +170,14 @@ public class CharacterMovement : MonoBehaviour
         // Translate controls stick coordinates into world/cam/character space.
         StickToWorldspace(transform, cameraControl.cameraTransform, ref direction,
                           ref inputSpeed, ref charAngle, false);
-        m_speed = inputSpeed;
+        m_controlSpeed = inputSpeed;
 
         // Don't rotate within a dead zone.
-        if (m_speed > 0.05f) {
+        if (m_controlSpeed > 0.05f) {
             transform.Rotate(new Vector3(0, charAngle, 0));
         }
 
-        Vector3 motion = (transform.forward * m_speed + transform.right * strafeInput) * walkSpeed;
+        Vector3 motion = (transform.forward * m_controlSpeed + transform.right * strafeInput) * walkSpeed;
         motion = Vector3.ClampMagnitude(motion, walkSpeed);
 
         ApplyGravity();
@@ -192,7 +193,7 @@ public class CharacterMovement : MonoBehaviour
 
         // Update animations.
         if (animator) {
-            animator.SetFloat(speedHash, Mathf.Abs(m_speed));
+            animator.SetFloat(speedHash, Mathf.Abs(m_controlSpeed));
             animator.SetFloat(strafeHash, strafeInput);
             animator.SetBool(jumpingHash, jumping);
         }
