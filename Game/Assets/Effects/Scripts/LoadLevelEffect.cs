@@ -27,9 +27,12 @@ public class LoadLevelEffect : Effect
         base.StartEffect();
 
         if (loadNext) {
-            Application.LoadLevel(Application.loadedLevel + 1);
-        } else {
+            levelToLoad = Application.loadedLevel + 1;
+        }
+        if (Application.levelCount > levelToLoad || levelToLoad < 0) {
             Application.LoadLevel(levelToLoad);
+        } else {
+            Debug.LogWarning("Could not load level " + levelToLoad + ", out of range.");
         }
     }
     
