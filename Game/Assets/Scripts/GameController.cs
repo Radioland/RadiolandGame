@@ -10,11 +10,14 @@ public class GameController : MonoBehaviour
 
     private Vector3 fallbackRespawnPosition;
     private GameObject latestCheckpoint;
+    private Respawn respawnScript;
 
     void Awake() {
         player = GameObject.FindWithTag("Player");
 
         fallbackRespawnPosition = player.transform.position;
+
+        respawnScript = gameObject.GetComponentInChildren<Respawn>();
     }
 
     void Start() {
@@ -49,12 +52,14 @@ public class GameController : MonoBehaviour
     public void KillPlayer() {
         // TODO: effects, penalty, respawn animation, etc.
 
+        Vector3 respawnPosition;
         if (latestCheckpoint) {
             Region latestCheckpointRegion = latestCheckpoint.GetComponent<Region>();
-            player.transform.position = latestCheckpointRegion.GetCenter();
+			respawnPosition = latestCheckpointRegion.GetCenter();
         } else {
-            player.transform.position = fallbackRespawnPosition;
+			respawnPosition = fallbackRespawnPosition;
         }
+        respawnScript.RespawnPlayer(respawnPosition);
     }
 
     public void Exit() {
