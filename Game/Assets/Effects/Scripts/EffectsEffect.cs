@@ -1,19 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnableObjectEffect : Effect
+public class EffectsEffect : Effect
 {
     // Variables to specify in the editor.
-    [SerializeField] private GameObject objectToEnable;
-    [SerializeField] private bool disableAtStart = true;
-    [SerializeField] private bool disableOnEnd = true;
+    [SerializeField] private EffectManager effects;
     
     protected override void Awake() {
         base.Awake();
-        
-        if (objectToEnable && disableAtStart) {
-            objectToEnable.SetActive(false);
-        }
     }
     
     protected override void Start() {
@@ -31,16 +25,16 @@ public class EnableObjectEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
         
-        if (objectToEnable) {
-            objectToEnable.SetActive(true);
+        if (effects) {
+            effects.StartEvent();
         }
     }
     
     public override void EndEffect() {
         base.EndEffect();
 
-        if (objectToEnable && disableOnEnd) {
-            objectToEnable.SetActive(false);
+        if (effects) {
+            effects.StopEvent();
         }
     }
 }
