@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class TurnScriptOnOffEffect : Effect
+public class TurnScriptsOnOffEffect : Effect
 {
     // Variables to specify in the editor.
-    public MonoBehaviour script;
+    public List<MonoBehaviour> scripts;
     [SerializeField] private bool startEnabled = true;
     [SerializeField] private bool endEnabled = true;
     
@@ -26,8 +27,8 @@ public class TurnScriptOnOffEffect : Effect
     
     public override void StartEffect() {
         base.StartEffect();
-        
-        if (script) {
+
+        foreach (MonoBehaviour script in scripts) {
             script.enabled = startEnabled;
         }
     }
@@ -35,7 +36,7 @@ public class TurnScriptOnOffEffect : Effect
     public override void EndEffect() {
         base.EndEffect();
         
-        if (script) {
+        foreach (MonoBehaviour script in scripts) {
             script.enabled = endEnabled;
         }
     }
