@@ -80,7 +80,6 @@ public class RadioControl : MonoBehaviour
     }
 
     void Update() {
-
         // TODO: replace with better controller/mouse input management.
         float scrollValue = Input.GetAxis("Mouse ScrollWheel") + Input.GetAxis("Tune");
 
@@ -180,6 +179,14 @@ public class RadioControl : MonoBehaviour
     public void RespondToEnergyChange() {
         foreach (RadioUI radioUI in radioUIs) {
             radioUI.TriggerActivity();
+        }
+    }
+
+    public void UnlockStation(int stationId) {
+        foreach (RadioStation station in stations) {
+            if (station.id == stationId) {
+                station.Unlock();
+            }
         }
     }
 }

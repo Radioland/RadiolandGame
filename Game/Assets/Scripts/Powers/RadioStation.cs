@@ -9,6 +9,7 @@ public class RadioStation : MonoBehaviour
     public float frequency;
     public float signalStrength {
         get {
+            if (!unlocked) { return 0.0f; }
             // Lerp signalStrength from 0 to 1 within frequencyFadeLimit.
             // When outside of frequencyFadeLimit from the current frequency, clamp to 0.
             float frequencyDifference = Mathf.Abs(radioControl.currentFrequency - frequency);
@@ -18,6 +19,9 @@ public class RadioStation : MonoBehaviour
         }
     }
     public Powerup powerup;
+    [SerializeField] private bool m_unlocked = false;
+    public bool unlocked { get { return m_unlocked; } }
+    public int id;
 
     [HideInInspector] public RadioControl radioControl;
     [HideInInspector] public AudioSource audioSource;
@@ -52,10 +56,14 @@ public class RadioStation : MonoBehaviour
     }
 
     public void UsePowerup() {
-        if (powerup) {
+        if (powerup && unlocked) {
             powerup.TryToUsePowerup();
         } else {
             Debug.LogWarning("Found no powerup for " + this.GetPath());
         }
+    }
+
+    public void Unlock() {
+        m_unlocked = true;
     }
 }
