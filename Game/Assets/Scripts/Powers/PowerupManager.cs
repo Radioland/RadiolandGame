@@ -75,12 +75,22 @@ public class PowerupManager : MonoBehaviour
         }
     }
 
-    public void EndPowerup() {
+    // Call when a powerup ends or is interrupted.
+    public void SignalEndPowerup() {
         activePowerup = null;
 
         if (usePowerupEffects) {
             usePowerupEffects.StopEvent();
         }
+    }
+
+    // Call to externally stop any powerups that might be running.
+    public void StopAnyPowerups() {
+        if (activePowerup) {
+            activePowerup.EndPowerup();
+        }
+
+        SignalEndPowerup();
     }
 
     public void SetRadioControl(RadioControl newRadioControl) {

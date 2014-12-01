@@ -17,6 +17,7 @@ public class Respawn : MonoBehaviour
     [SerializeField] private PositionCameraEffect positionCameraEffect;
 
     private GameObject player;
+    private CharacterMovement characterMovement;
     private PowerupManager powerupManager;
     private bool respawning;
 
@@ -24,6 +25,7 @@ public class Respawn : MonoBehaviour
         respawning = false;
 
         player = GameObject.FindWithTag("Player");
+        characterMovement = player.GetComponent<CharacterMovement>();
         powerupManager = player.GetComponent<PowerupManager>();
 
         GameObject hairObject = GameObject.FindWithTag("hair");
@@ -34,7 +36,7 @@ public class Respawn : MonoBehaviour
         positionCameraEffect.cameraTransform = Camera.main.transform;
         positionCameraEffect.lookAtTarget = player.transform;
 
-        scriptsDisableEffect.scripts.Add(player.GetComponent<CharacterMovement>());
+        scriptsDisableEffect.scripts.Add(characterMovement);
         scriptsDisableEffect.scripts.Add(player.GetComponent<CameraControl>());
         scriptsDisableEffect.scripts.Add(player.GetComponentInChildren<RadioControl>());
 
@@ -67,5 +69,7 @@ public class Respawn : MonoBehaviour
         respawning = false;
 
         powerupManager.energy = 1.0f;
+        characterMovement.Stop();
+        powerupManager.StopAnyPowerups();
     }
 }

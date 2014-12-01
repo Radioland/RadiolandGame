@@ -88,6 +88,6 @@ public class Powerup : MonoBehaviour
     public virtual void EndPowerup() {
         primed = false;
         inUse = false;
-        powerupManager.EndPowerup();
+        powerupManager.SignalEndPowerup();
     }
 }
