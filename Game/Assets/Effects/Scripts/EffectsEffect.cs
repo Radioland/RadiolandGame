@@ -5,6 +5,7 @@ public class EffectsEffect : Effect
 {
     // Variables to specify in the editor.
     [SerializeField] private EffectManager effects;
+    [SerializeField] private bool overrideDurations = false;
     
     protected override void Awake() {
         base.Awake();
@@ -33,7 +34,7 @@ public class EffectsEffect : Effect
     public override void EndEffect() {
         base.EndEffect();
 
-        if (effects) {
+        if (effects && overrideDurations) {
             effects.StopEvent();
         }
     }
