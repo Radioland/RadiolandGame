@@ -1,23 +1,25 @@
 fileFormatVersion: 2
-guid: ab252d3a96e1109409c31cf908ae3830
+guid: b85f3e9fdba132a4fbdcd5111fe148e7
 ModelImporter:
   serializedVersion: 16
   fileIDToRecycleName:
-    100000: //RootNode
-    100002: bubble
-    100004: bubble1
-    100006: bubbleface
-    100008: transform1
-    100010: transform2
-    400000: //RootNode
-    400002: bubble
-    400004: bubble1
-    400006: bubbleface
-    400008: transform1
-    400010: transform2
-    2300000: bubble1
-    3300000: bubble1
-    4300000: bubble1
+    100000: bottle
+    100002: cork
+    100004: note
+    100006: //RootNode
+    400000: bottle
+    400002: cork
+    400004: note
+    400006: //RootNode
+    2300000: bottle
+    2300002: cork
+    2300004: note
+    3300000: bottle
+    3300002: cork
+    3300004: note
+    4300000: note
+    4300002: bottle
+    4300004: cork
     9500000: //RootNode
   materials:
     importMaterials: 0
@@ -38,7 +40,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: .200000003
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1
