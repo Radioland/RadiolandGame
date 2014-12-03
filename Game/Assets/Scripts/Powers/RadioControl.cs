@@ -91,7 +91,7 @@ public class RadioControl : MonoBehaviour
             scrollValue -= 0.01f;
         }
 
-        m_currentFrequency -= scrollValue;
+        m_currentFrequency -= scrollValue * Time.timeScale; // Don't allow tuning while paused.
         m_currentFrequency = Mathf.Clamp01(m_currentFrequency);
 
         foreach (RadioUI radioUI in radioUIs) {

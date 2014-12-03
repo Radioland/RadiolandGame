@@ -8,6 +8,10 @@ public class GameController : MonoBehaviour
     [SerializeField] private float fallbackKillY = -100.0f;
     public bool masterMute = false;
 
+    [SerializeField] private GameObject pauseBackground;
+    private bool m_paused = false;
+    public bool paused { get { return m_paused; } }
+
     private Vector3 fallbackRespawnPosition;
     private GameObject latestCheckpoint;
     private Respawn respawnScript;
@@ -33,16 +37,36 @@ public class GameController : MonoBehaviour
             Exit();
         }
 
-        // Cheats
+        if (Input.GetKeyDown(KeyCode.M)) { masterMute = !masterMute; }
+        AudioListener.volume = masterMute ? 0.0f : 1.0f;
+
+        HandlePause();
+
+        HandleCheats();
+    }
+
+    void HandlePause() {
+        if (Input.GetButtonDown("Pause")) {
+            m_paused = !paused;
+
+            Time.timeScale = paused ? 0.0f : 1.0f;
+            AudioListener.pause = paused;
+            if (pauseBackground) {
+                pauseBackground.SetActive(paused);
+            }
+
+            CharacterMovement characterMovement = player.GetComponent<CharacterMovement>();
+            characterMovement.SetControllable(!paused);
+        }
+    }
+
+    void HandleCheats() {
         if (Input.GetKeyDown(KeyCode.Equals)) {
             Application.LoadLevel(Application.loadedLevel + 1);
         }
         if (Input.GetKeyDown(KeyCode.Minus)) {
             Application.LoadLevel(Application.loadedLevel - 1);
         }
-
-        if (Input.GetKeyDown(KeyCode.M)) { masterMute = !masterMute; }
-        AudioListener.volume = masterMute ? 0.0f : 1.0f;
     }
 
     public void SetLatestCheckpoint(GameObject checkpoint) {
@@ -50,8 +74,6 @@ public class GameController : MonoBehaviour
     }
 
     public void KillPlayer() {
-        // TODO: effects, penalty, respawn animation, etc.
-
         Vector3 respawnPosition;
         if (latestCheckpoint) {
             Region latestCheckpointRegion = latestCheckpoint.GetComponent<Region>();
