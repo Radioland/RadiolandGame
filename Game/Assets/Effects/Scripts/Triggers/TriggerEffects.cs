@@ -28,6 +28,8 @@ public class TriggerEffects : MonoBehaviour
     }
 
     protected void StartEvent() {
+        if (!enabled) { return; }
+
         if (effectManager) {
             effectManager.StartEvent();
             if (destroyAfterTrigger) {
