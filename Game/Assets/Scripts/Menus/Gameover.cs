@@ -5,13 +5,46 @@ public class Gameover : MonoBehaviour {
 
 	[SerializeField] private GameObject newGameButton;
 	[SerializeField] private GameObject exitButton;
+	[SerializeField] private GameObject checkBox;
+	
+	private RectTransform checkBoxTransform;
+
+	private float startTime;
+	
+	[SerializeField] private int mouseIndex;
+
 	
 	void Start () {
-		
+		startTime = Time.time;
+		mouseIndex = 1;
+		checkBoxTransform = checkBox.GetComponent<RectTransform>();
 	}
 	
 	void Update () {
-
+		if (Input.GetButtonDown(buttonName:"Submit")) {
+			if (mouseIndex == 1) {
+				GoNewGame();
+			}
+			else {
+				GoExit();
+			}
+		}
+		if (mouseIndex == 0) {
+			if (Input.GetAxisRaw("Vertical") != 0 && Time.time - startTime > 0.5f) {
+				mouseIndex = 1;
+				startTime = Time.time;
+			}
+			checkBoxTransform.anchorMin = new Vector2(0.48f,0.47f);
+			checkBoxTransform.anchorMax = new Vector2(0.52f, 0.58f);
+		}
+		else {
+			if (Input.GetAxisRaw("Vertical") != 0 && Time.time - startTime > 0.5f) {
+				mouseIndex = 0;
+				startTime = Time.time;
+			}
+			checkBoxTransform.anchorMin = new Vector2(0.48f,0.27f);
+			checkBoxTransform.anchorMax = new Vector2(0.52f, 0.38f);
+		}
 	}
 	
 	public void GoNewGame() {
