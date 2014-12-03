@@ -54,13 +54,16 @@ public class Powerup : MonoBehaviour
         }
     }
 
-    public bool SufficientResources() {
-        return (!powerupManager || powerupManager.CanUsePowerup(this)) &&
-               (!radioStation || radioStation.StrongSignal());
+    public bool HasStrongSignal() {
+        return (!radioStation || radioStation.StrongSignal());
+    }
+
+    public bool HasSufficientResources() {
+        return (!powerupManager || powerupManager.CanUsePowerup(this));
     }
 
     public virtual bool CanUsePowerup() {
-        return !primed && SufficientResources();
+        return !primed && HasSufficientResources() && HasStrongSignal();
     }
 
     public void TryToUsePowerup() {

@@ -46,7 +46,7 @@ public class PowerupManager : MonoBehaviour
         // Show powerupReadyGlow if a powerup is ready.
         bool powerupReady = false;
         foreach (Powerup powerup in powerups) {
-            if (powerup.SufficientResources()) {
+            if (powerup.HasStrongSignal()) {
                 if (!powerupReadyGlow.enabled) {
                     powerupReadyGlow.enabled = true;
                     powerupReadyGlow.material.SetColor(glowColorName, powerup.color);
