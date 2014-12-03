@@ -56,8 +56,8 @@ public class StartMenu : MonoBehaviour {
 				mouseIndex = 2;
 				startTime = Time.time;
 			}
-			checkBoxTransform.anchorMin = new Vector2(0.48f,0.67f);
-			checkBoxTransform.anchorMax = new Vector2(0.52f, 0.78f);
+			checkBoxTransform.anchorMin = new Vector2(0.8017539f,0.204f);
+			checkBoxTransform.anchorMax = new Vector2(0.8402153f, 0.3047594f);
 		}
 		else if (mouseIndex == 1) {
 			if (Input.GetAxisRaw("Vertical") < 0 && Time.time - startTime > 0.5f) {
@@ -68,8 +68,8 @@ public class StartMenu : MonoBehaviour {
 				mouseIndex = 0;
 				startTime = Time.time;
 			}
-			checkBoxTransform.anchorMin = new Vector2(0.48f,0.47f);
-			checkBoxTransform.anchorMax = new Vector2(0.52f, 0.58f);
+			checkBoxTransform.anchorMin = new Vector2(0.8017539f,0.1027469f);
+			checkBoxTransform.anchorMax = new Vector2(0.84021532f, 0.204f);
 		}
 		else {
 			if (Input.GetAxisRaw("Vertical") < 0 && Time.time - startTime > 0.5f) {
@@ -80,8 +80,8 @@ public class StartMenu : MonoBehaviour {
 				mouseIndex = 1;
 				startTime = Time.time;
 			}
-			checkBoxTransform.anchorMin = new Vector2(0.48f,0.27f);
-			checkBoxTransform.anchorMax = new Vector2(0.52f, 0.38f);
+			checkBoxTransform.anchorMin = new Vector2(0.8017539f,0.0f);
+			checkBoxTransform.anchorMax = new Vector2(0.84021532f, 0.1027469f);
 		}
 
 	}
