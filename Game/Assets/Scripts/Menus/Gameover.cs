@@ -16,13 +16,13 @@ public class Gameover : MonoBehaviour {
 	
 	void Start () {
 		startTime = Time.time;
-		mouseIndex = 1;
+		mouseIndex = 0;
 		checkBoxTransform = checkBox.GetComponent<RectTransform>();
 	}
 	
 	void Update () {
 		if (Input.GetButtonDown(buttonName:"Submit")) {
-			if (mouseIndex == 1) {
+			if (mouseIndex == 0) {
 				GoNewGame();
 			}
 			else {
