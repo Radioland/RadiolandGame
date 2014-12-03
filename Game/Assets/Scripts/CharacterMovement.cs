@@ -261,15 +261,15 @@ public class CharacterMovement : MonoBehaviour
     }
 
     void ApplyJump() {
+        // Do not allow jumping while not controllable.
+        if (!controllable) { return; }
+
         if (Input.GetButtonDown("Jump")) {
             TriggerJump();
         }
 
         // Do not allow jumping while sliding.
         if (sliding && slopeAngle > jumpSlopeLimit) { return; }
-
-        // Do not allow jumping while not controllable.
-        if (!controllable) { return; }
 
         // PreTimeout lets you trigger a jump slightly before landing.
         if (Time.time < lastJumpInputTime + jumpPreTimeout &&
