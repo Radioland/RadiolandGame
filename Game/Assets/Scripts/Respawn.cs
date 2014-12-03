@@ -10,6 +10,7 @@ public class Respawn : MonoBehaviour
     [SerializeField] private GameObject respawnPrefab;
     [SerializeField] private EffectManager respawnEffects;
     [SerializeField] private float respawnTime = 8.0f;
+    [SerializeField] private bool refillEnergy = true;
 
     [SerializeField] private TurnScriptsOnOffEffect scriptsDisableEffect;
     [SerializeField] private SetActiveEffect playerDisableEffect;
@@ -68,7 +69,9 @@ public class Respawn : MonoBehaviour
     void FinishRespawn() {
         respawning = false;
 
-        powerupManager.energy = 1.0f;
+        if (refillEnergy) {
+            powerupManager.energy = 1.0f;
+        }
         characterMovement.Stop();
         powerupManager.StopAnyPowerups();
     }

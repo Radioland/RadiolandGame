@@ -20,6 +20,8 @@ public class EffectManager : MonoBehaviour
 
     // Triggers all effects on this object.
     public void StartEvent() {
+        if (!enabled) { return; }
+
         foreach (Effect effect in effects) {
             effect.TriggerEffect();
         }
