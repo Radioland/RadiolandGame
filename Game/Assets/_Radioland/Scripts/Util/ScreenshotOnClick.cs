@@ -8,10 +8,10 @@ public class ScreenshotOnClick : MonoBehaviour {
 	private bool takeHiResShot = false;
 	
 	void LateUpdate() {
-		takeHiResShot |= Input.GetKeyDown("k");
+		takeHiResShot |= Input.GetKeyDown("g");
 		if (takeHiResShot) 
 		{
-			Application.CaptureScreenshot("screenshot"+System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")+".png", superSize);
+			Application.CaptureScreenshot("screenshots/screenshot"+System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")+".png", superSize);
 			Debug.Log("Took screenshot");
 			takeHiResShot = false;
 		}
