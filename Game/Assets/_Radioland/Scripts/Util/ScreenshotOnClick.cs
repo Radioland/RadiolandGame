@@ -11,7 +11,7 @@ public class ScreenshotOnClick : MonoBehaviour {
 		takeHiResShot |= Input.GetKeyDown("k");
 		if (takeHiResShot) 
 		{
-			Application.CaptureScreenshot("Screenshot.png", superSize);
+			Application.CaptureScreenshot("screenshot"+System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")+".png", superSize);
 			Debug.Log("Took screenshot");
 			takeHiResShot = false;
 		}
