@@ -19,7 +19,7 @@ public class SmoothMoveToTarget : MonoBehaviour
     private float speedScale;
     private float timeStarted;
 
-    void Awake() {
+    private void Awake() {
         if (!target && targetTag.Length > 0) {
             target = GameObject.FindWithTag(targetTag).transform;
         }
@@ -28,11 +28,11 @@ public class SmoothMoveToTarget : MonoBehaviour
         timeStarted = Time.time;
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         if (!target) { return; }
 
         float t = (Time.time - timeStarted) / speedRampTime;

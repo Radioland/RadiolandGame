@@ -7,8 +7,8 @@ public class SetParentEffect : Effect
     [Tooltip("Leave empty to orphan on trigger.")]
     [SerializeField] private GameObject newParent;
 
-    static GameObject orphanedEffectParent;
-    
+    private static GameObject orphanedEffectParent;
+
     protected override void Awake() {
         base.Awake();
 
@@ -18,19 +18,19 @@ public class SetParentEffect : Effect
             orphanedEffectParent.transform.position = Vector3.zero;
         }
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
@@ -40,7 +40,7 @@ public class SetParentEffect : Effect
             gameObject.transform.parent = orphanedEffectParent.transform;
         }
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
     }

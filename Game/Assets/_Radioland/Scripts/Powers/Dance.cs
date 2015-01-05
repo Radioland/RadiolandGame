@@ -19,7 +19,7 @@ public class Dance : MonoBehaviour
     private float lastInputStartedTime;
     private bool stillReceivingInput;
 
-    void Awake() {
+    private void Awake() {
         dancing = false;
 
         characterMovement = gameObject.GetComponent<CharacterMovement>();
@@ -38,11 +38,11 @@ public class Dance : MonoBehaviour
         lastInputStartedTime = -1000.0f;
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         if (characterMovement.grounded && Input.GetButtonDown("Dance")) {
             dancing = true;
             stopping = false;
@@ -72,9 +72,9 @@ public class Dance : MonoBehaviour
             characterMovement.SetControllable(false);
         }
     }
-    
+
     // Called via SendMessage in CharacterMovement.
-    void InputReceived() {
+    private void InputReceived() {
         lastInputTime = Time.time;
 
         if (dancing && stillReceivingInput) {
@@ -88,21 +88,21 @@ public class Dance : MonoBehaviour
     }
 
     // Called via SendMessage in CharacterMovement.
-    void NoMovementInput() {
+    private void NoMovementInput() {
         if (Time.time - lastInputTime > inputPersistTime) {
             stillReceivingInput = false;
         }
     }
 
     // Called via SendMessage in CharacterMovement.
-    void JumpTriggered() {
+    private void JumpTriggered() {
         // Jump immediately cancels dancing.
         if (dancing) {
             StopDancing();
         }
     }
 
-    void StopDancing() {
+    private void StopDancing() {
         animator.SetBool(danceBoolHash, false);
         characterMovement.SetControllable(true);
         stopping = false;

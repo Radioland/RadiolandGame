@@ -18,15 +18,15 @@ public class PulseTriggerEffects : TriggerEffects
         lastStartedTime = Time.time + Random.Range(minStartupTime, maxStartupTime);
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void SetPulseTime() {
+    private void SetPulseTime() {
         currentPulseTime = Random.Range(minPulseTime, maxPulseTime);
     }
 
-    void Update() {
+    private void Update() {
         if (Time.time - lastStartedTime > currentPulseTime) {
             StartEvent();
             SetPulseTime();

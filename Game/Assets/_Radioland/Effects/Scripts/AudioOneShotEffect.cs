@@ -31,7 +31,7 @@ public class AudioOneShotEffect : Effect
 
         audio.PlayOneShot(audioClip, volumeScale);
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
     }

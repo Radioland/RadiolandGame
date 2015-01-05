@@ -10,17 +10,17 @@ public class SpringPlatform : MonoBehaviour
     private float restHeight;
     private float currentVelocity;
 
-    void Awake() {
+    private void Awake() {
         restHeight = transform.position.y;
 
         currentVelocity = 0.0f;
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         // Spring:       F = -kX
         // Acceleration: F =  ma
         // Damping:      F = -cv

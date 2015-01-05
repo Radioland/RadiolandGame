@@ -87,7 +87,7 @@ public class Powerup : MonoBehaviour
         primed = true;
         powerupManager.energy -= energyCost;
     }
-    
+
     public virtual void EndPowerup() {
         primed = false;
         inUse = false;

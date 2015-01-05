@@ -4,21 +4,21 @@ using System.Collections;
 public class Checkpoint : MonoBehaviour
 {
     private GameController gameController;
-    
-    void Awake() {
+
+    private void Awake() {
         GameObject gameControllerObject = GameObject.FindWithTag("GameController");
         gameController = gameControllerObject.GetComponent<GameController>();
     }
-    
-    void Start() {
-        
+
+    private void Start() {
+
     }
-    
-    void Update() {
-        
+
+    private void Update() {
+
     }
-    
-    void OnTriggerEnter(Collider other) {
+
+    private void OnTriggerEnter(Collider other) {
         if (other.gameObject.CompareTag("Player")) {
             gameController.SetLatestCheckpoint(gameObject);
         }

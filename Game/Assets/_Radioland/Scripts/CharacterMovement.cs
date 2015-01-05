@@ -87,7 +87,7 @@ public class CharacterMovement : MonoBehaviour
         get { return Mathf.Sqrt(2 * jumpHeight * gravity); }
     }
 
-    void Awake() {
+    private void Awake() {
         if (!cameraControl) {
             Debug.LogWarning("No camera control set on CharacterMovement!");
         }
@@ -118,11 +118,11 @@ public class CharacterMovement : MonoBehaviour
         originalMass = mass;
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void ResetState() {
+    private void ResetState() {
         m_moving = false;
         m_inJumpWindup = false;
         m_jumping = false;
@@ -132,11 +132,11 @@ public class CharacterMovement : MonoBehaviour
         m_controllable = true;
     }
 
-    void OnControllerColliderHit(ControllerColliderHit hit) {
+    private void OnControllerColliderHit(ControllerColliderHit hit) {
         contactPoint = hit.point;
     }
 
-    void Update() {
+    private void Update() {
         if (grounded) {
             lastGroundedTime = Time.time;
 
@@ -199,7 +199,7 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
-    void ApplySliding() {
+    private void ApplySliding() {
         m_sliding = false;
 
         slopeAngle = 0.0f;
@@ -227,7 +227,7 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
-    void ApplyGravity() {
+    private void ApplyGravity() {
         if (grounded) {
             if (falling) {
                 float landingVerticalSpeed = verticalSpeed;
@@ -260,7 +260,7 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
-    void ApplyJump() {
+    private void ApplyJump() {
         // Do not allow jumping while not controllable.
         if (!controllable) { return; }
 

@@ -52,7 +52,7 @@ public class AllRenderersFlickerEffect : Effect
         ChangeVisibility(true);
     }
 
-    void ChangeVisibility(bool newVisibility) {
+    private void ChangeVisibility(bool newVisibility) {
         currentlyVisible = newVisibility;
         lastTimeChanged = Time.time;
 

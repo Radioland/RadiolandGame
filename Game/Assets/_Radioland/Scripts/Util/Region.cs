@@ -32,21 +32,21 @@ public class Region : MonoBehaviour
         }
     }
 
-    void Awake() {
+    private void Awake() {
         boxCollider = gameObject.GetComponent<BoxCollider>();
 
         UpdateProperties();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         UpdateProperties();
     }
 
-    void UpdateProperties() {
+    private void UpdateProperties() {
         if (isCentered) {
             globalCenter = transform.position;
             localCenter  = Vector3.zero;
@@ -86,7 +86,7 @@ public class Region : MonoBehaviour
         return new Vector3(randomX, randomY, randomZ);
     }
 
-    void OnDrawGizmos() {
+    private void OnDrawGizmos() {
         Gizmos.color = gizmoColor;
 
         Matrix4x4 rotationMatrix = Matrix4x4.TRS(transform.position,

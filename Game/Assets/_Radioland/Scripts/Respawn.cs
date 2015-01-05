@@ -22,7 +22,7 @@ public class Respawn : MonoBehaviour
     private PowerupManager powerupManager;
     private bool respawning;
 
-    void Awake() {
+    private void Awake() {
         respawning = false;
 
         player = GameObject.FindWithTag("Player");
@@ -44,11 +44,11 @@ public class Respawn : MonoBehaviour
         playerDisableEffect.objectToSetActive = GameObject.FindWithTag("playermodel");
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
 
     }
 
@@ -66,7 +66,7 @@ public class Respawn : MonoBehaviour
         Invoke("FinishRespawn", respawnTime);
     }
 
-    void FinishRespawn() {
+    private void FinishRespawn() {
         respawning = false;
 
         if (refillEnergy) {

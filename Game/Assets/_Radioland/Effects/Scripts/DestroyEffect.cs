@@ -6,7 +6,7 @@ public class DestroyEffect : Effect
     // Variables to specify in the editor.
     [SerializeField] private GameObject objectToDestroy;
     [SerializeField] private bool defaultToSelf = false;
-    
+
     protected override void Awake() {
         base.Awake();
 
@@ -14,19 +14,19 @@ public class DestroyEffect : Effect
             objectToDestroy = gameObject;
         }
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
@@ -34,7 +34,7 @@ public class DestroyEffect : Effect
             Destroy(objectToDestroy);
         }
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
     }

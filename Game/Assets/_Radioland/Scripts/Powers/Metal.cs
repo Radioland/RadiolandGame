@@ -8,15 +8,15 @@ public class Metal : Powerup
     [SerializeField] private float jumpHeight = 2.0f;
     [SerializeField] private float airSmoothDampTime = 0.10f;
     [SerializeField] private EffectManager metalEffects;
-    
+
     public override void Awake() {
         base.Awake();
     }
-    
+
     public override void Start() {
         base.Start();
     }
-    
+
     public override void Update() {
         base.Update();
 
@@ -24,7 +24,7 @@ public class Metal : Powerup
             EndPowerup();
         }
     }
-    
+
     // Called via SendMessage in CharacterMovement.
     protected void BounceTriggered() {
         if (inUse) {
@@ -36,7 +36,7 @@ public class Metal : Powerup
         base.UsePowerup();
 
         inUse = true;
-        
+
         if (metalEffects) {
             metalEffects.StartEvent();
         }
@@ -46,10 +46,10 @@ public class Metal : Powerup
         characterMovement.SetJumpHeight(jumpHeight);
         characterMovement.SetAirSmoothDampTime(airSmoothDampTime);
     }
-    
+
     public override void EndPowerup() {
         base.EndPowerup();
-        
+
         if (metalEffects) {
             metalEffects.StopEvent();
         }

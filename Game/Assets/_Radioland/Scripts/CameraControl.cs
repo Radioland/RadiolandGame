@@ -47,12 +47,11 @@ public class CameraControl : MonoBehaviour
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
 
-
     // Camera reset.
     private float lastResetTime;
     private float resetDuration = 0.3f;
 
-    void Awake() {
+    private void Awake() {
         if (!followTransform) { followTransform = transform; }
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
         if (!characterMovement) {
@@ -77,15 +76,15 @@ public class CameraControl : MonoBehaviour
         lastResetTime = -1000.0f;
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
 
     }
 
-    void LateUpdate() {
+    private void LateUpdate() {
         viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
 
         cameraTransform.localRotation = Quaternion.Lerp(cameraTransform.localRotation,
@@ -144,7 +143,7 @@ public class CameraControl : MonoBehaviour
         cameraTransform.LookAt(followTransform);
     }
 
-    void ApplyMouseLook(ref float rightX, ref float rightY) {
+    private void ApplyMouseLook(ref float rightX, ref float rightY) {
         // http://forum.unity3d.com/threads/a-free-simple-smooth-mouselook.73117/
         // Get raw mouse input for a cleaner reading on more sensitive mice.
         Vector2 mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));

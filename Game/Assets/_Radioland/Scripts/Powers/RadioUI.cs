@@ -24,7 +24,7 @@ public class RadioUI : MonoBehaviour
     private float lastDecreaseAlpha;
     private float lastIncreaseAlpha;
 
-    void Awake() {
+    private void Awake() {
         images = gameObject.GetComponentsInChildren<Image>();
 
         currentAlpha = 1.0f;
@@ -37,11 +37,11 @@ public class RadioUI : MonoBehaviour
         }
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         if (fadeOut) {
             float alpha;
             if (Time.time - lastActiveTime < lingerTime) {

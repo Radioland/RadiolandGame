@@ -10,12 +10,12 @@ public class PlatformMoving : MonoBehaviour {
     public float movementTime;
     public float pauseTime;
 
-    void Start () {
+    private void Start() {
         topVelocity = velocity;
         startTime = Time.time;
     }
-    
-    void Update () {
+
+    private void Update() {
         if (Time.time - startTime > movementTime) {
             velocity = new Vector3(0,0,0);
         }

@@ -14,15 +14,15 @@ public class AllChildEffects : Effect
 
         childEffectsList = new List<Effect>();
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
 
@@ -37,11 +37,11 @@ public class AllChildEffects : Effect
             }
         }
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
 

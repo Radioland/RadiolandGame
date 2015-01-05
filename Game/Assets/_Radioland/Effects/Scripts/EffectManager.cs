@@ -6,15 +6,15 @@ public class EffectManager : MonoBehaviour
 {
     private Effect[] effects;
 
-    void Awake() {
+    private void Awake() {
         effects = gameObject.GetComponents<Effect>();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
 
     }
 
@@ -29,7 +29,7 @@ public class EffectManager : MonoBehaviour
 
     // Prematurely end all effects (ahead of their own durations).
     // Useful for interrupting abilities, when an object dies, etc.
-    public void StopEvent() {        
+    public void StopEvent() {
         foreach (Effect effect in effects) {
             effect.EndEffect();
         }

@@ -3,11 +3,11 @@ using System.Collections;
 
 public class PlayerLevelManager : MonoBehaviour
 {
-    void Awake() {
+    private void Awake() {
         PlayerPrefs.SetInt("level", Application.loadedLevel);
     }
 
-    void Update() {
+    private void Update() {
 
     }
 }

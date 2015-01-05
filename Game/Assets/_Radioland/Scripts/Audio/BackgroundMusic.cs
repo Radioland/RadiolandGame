@@ -10,18 +10,18 @@ public class BackgroundMusic : MonoBehaviour
     private RadioControl radioControl;
     private AudioSource audioSource;
 
-    void Awake() {
+    private void Awake() {
         GameObject player = GameObject.FindWithTag("Player");
         radioControl = player.GetComponentInChildren<RadioControl>();
 
         audioSource = gameObject.GetComponent<AudioSource>();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         if (radioControl && audioSource) {
             audioSource.volume = radioControl.backgroundStrength * maxVolume;
         }

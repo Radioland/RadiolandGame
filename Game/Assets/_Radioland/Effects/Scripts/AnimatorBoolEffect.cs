@@ -6,7 +6,7 @@ public class AnimatorBoolEffect : Effect
     // Variables to specify in the editor.
     [SerializeField] private Animator animator;
     [SerializeField] private string boolToSet;
-    
+
     protected override void Awake() {
         base.Awake();
 
@@ -14,28 +14,28 @@ public class AnimatorBoolEffect : Effect
             animator = gameObject.GetComponent<Animator>();
         }
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
         animator.SetBool(boolToSet, true);
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
-        
+
         animator.SetBool(boolToSet, false);
     }
 }

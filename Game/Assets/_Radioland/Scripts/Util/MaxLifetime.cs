@@ -4,18 +4,18 @@ using System.Collections;
 public class MaxLifetime : MonoBehaviour
 {
     public float maxTimeToLive = 10.0f;
-    
+
     private float creationTime;
-    
-    void Awake() {
+
+    private void Awake() {
         creationTime = Time.time;
     }
-    
-    void Start() {
-        
+
+    private void Start() {
+
     }
-    
-    void Update() {
+
+    private void Update() {
         if (Time.time - creationTime > maxTimeToLive) {
             Destroy(gameObject);
         }

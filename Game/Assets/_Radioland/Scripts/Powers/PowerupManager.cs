@@ -25,7 +25,7 @@ public class PowerupManager : MonoBehaviour
     private Powerup activePowerup; // Only allow one active powerup at a time.
     private RadioControl radioControl;
 
-    void Awake() {
+    private void Awake() {
         powerups = gameObject.GetComponents<Powerup>();
 
         foreach (Powerup powerup in powerups) {
@@ -33,11 +33,11 @@ public class PowerupManager : MonoBehaviour
         }
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         // Debug energy refill.
         if (Input.GetKeyDown(KeyCode.F)) {
             energy = 1.0f;

@@ -12,16 +12,16 @@ public class TutorialConditionalEvents : MonoBehaviour
     private CharacterMovement characterMovement;
     private PowerupManager powerupManager;
 
-    void Awake() {
+    private void Awake() {
         player = GameObject.FindWithTag("Player");
         powerupManager = player.GetComponentInChildren<PowerupManager>();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         if (reachStationTarget.StrongSignal() && reachStationEffects && reachStationEffects.enabled) {
             reachStationEffects.StartEvent();
             reachStationEffects.enabled = false;

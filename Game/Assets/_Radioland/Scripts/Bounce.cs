@@ -9,20 +9,20 @@ public class Bounce : MonoBehaviour
     private float firstBounceSpeed;
     private bool bouncing;
 
-    void Awake() {
+    private void Awake() {
         characterMovement = gameObject.GetComponent<CharacterMovement>();
 
         bouncing = false;
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
 
     }
-    
+
     // Called via SendMessage in CharacterMovement.
     private void Grounded(float verticalSpeed) {
         RaycastHit hit;

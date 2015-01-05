@@ -10,15 +10,15 @@ public class Platform : MonoBehaviour
 
     private Vector3 lastPosition;
 
-    void Awake() {
+    private void Awake() {
         m_lastVelocity = Vector3.zero;
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void LateUpdate() {
+    private void LateUpdate() {
         m_lastVelocity = deltaPosition / Time.deltaTime;
         lastPosition = transform.position;
     }

@@ -3,25 +3,25 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class ObjectiveGUI : MonoBehaviour {
-    int targetsFound;
-    int totalTargets;
-    
-    Text text;
+    private int targetsFound;
+    private int totalTargets;
 
-    void Start () {
+    private Text text;
+
+    private void Start() {
         targetsFound = 0;
         totalTargets = 5;
         text = GetComponent<Text>();
     }
 
-    void Update () {
+    private void Update() {
         text.text = targetsFound.ToString() + "/" + totalTargets.ToString();
     }
-    
+
     public void SetTotalTargets(int targets) {
         totalTargets = targets;
     }
-    
+
     public void IncrementTargets() {
         targetsFound += 1;
     }

@@ -26,12 +26,12 @@ public class RadioStation : MonoBehaviour
     [HideInInspector] public RadioControl radioControl;
     [HideInInspector] public AudioSource audioSource;
 
-    void Awake() {
+    private void Awake() {
         audioSource = gameObject.GetComponent<AudioSource>();
         audioSource.volume = 0;
     }
 
-    void Start() {
+    private void Start() {
         if (!radioControl) {
             Debug.LogWarning("There is no RadioControl linked to this RadioStation!");
         }
@@ -41,7 +41,7 @@ public class RadioStation : MonoBehaviour
         }
     }
 
-    void Update() {
+    private void Update() {
         audioSource.volume = signalStrength * maxVolume;
 
         // End if the station signal is no longer strong enough.

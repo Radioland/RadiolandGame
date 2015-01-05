@@ -7,11 +7,11 @@ public class StartTriggerEffects : TriggerEffects
         base.Awake();
     }
 
-    void Start() {
+    private void Start() {
         StartEvent();
     }
 
-    void Update() {
+    private void Update() {
 
     }
 }

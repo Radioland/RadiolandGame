@@ -16,11 +16,11 @@ public class ScreenFadeEffect : Effect {
     protected override void Awake() {
         base.Awake();
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
 
@@ -34,23 +34,23 @@ public class ScreenFadeEffect : Effect {
         }
     }
 
-    void OnGUI() {
+    private void OnGUI() {
         if ((isPlaying && hasStarted) || (hasPlayed && stayAfterEnd)) {
             GUI.color = new Color(alphaFadeValue, alphaFadeValue, alphaFadeValue, alphaFadeValue);
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), fadeTexture);
         }
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
         hasPlayed = true;
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
     }

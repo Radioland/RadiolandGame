@@ -10,15 +10,15 @@ public class ChangeAudioEffect : Effect
     private AudioSource audioSourceOld;
     private AudioSource audioSourceNew;
     private float maxVolume;
-    
+
     protected override void Awake() {
         base.Awake();
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
 
@@ -31,11 +31,11 @@ public class ChangeAudioEffect : Effect
             }
         }
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
@@ -49,7 +49,7 @@ public class ChangeAudioEffect : Effect
         audioSourceNew.volume = 0;
         audioSourceNew.Play();
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
 

@@ -14,20 +14,20 @@ public class Landing : MonoBehaviour
     [SerializeField] private float minStartSpeed = 0.2f;
     [SerializeField] private float maxStartSpeed = 3.0f;
 
-    void Awake() {
+    private void Awake() {
 
     }
-    
-    void Start() {
-        
+
+    private void Start() {
+
     }
-    
-    void Update() {
-        
+
+    private void Update() {
+
     }
-    
+
     // Called via SendMessage in CharacterMovement.
-    void Grounded(float verticalSpeed) {
+    private void Grounded(float verticalSpeed) {
         if (landingEffects && -verticalSpeed > minEffectSpeed) {
             float t = Mathf.InverseLerp(minEffectSpeed, maxEffectSpeed, -verticalSpeed);
 

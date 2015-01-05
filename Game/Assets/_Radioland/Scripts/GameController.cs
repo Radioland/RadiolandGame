@@ -16,7 +16,7 @@ public class GameController : MonoBehaviour
     private GameObject latestCheckpoint;
     private Respawn respawnScript;
 
-    void Awake() {
+    private void Awake() {
         player = GameObject.FindWithTag("Player");
 
         fallbackRespawnPosition = player.transform.position;
@@ -24,11 +24,11 @@ public class GameController : MonoBehaviour
         respawnScript = gameObject.GetComponentInChildren<Respawn>();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         if (player.transform.position.y < fallbackKillY) {
             KillPlayer();
         }
@@ -45,7 +45,7 @@ public class GameController : MonoBehaviour
         HandleCheats();
     }
 
-    void HandlePause() {
+    private void HandlePause() {
         if (Input.GetButtonDown("Pause")) {
             m_paused = !paused;
 
@@ -60,7 +60,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    void HandleCheats() {
+    private void HandleCheats() {
         if (Input.GetKeyDown(KeyCode.Equals)) {
             Application.LoadLevel(Application.loadedLevel + 1);
         }
@@ -77,9 +77,9 @@ public class GameController : MonoBehaviour
         Vector3 respawnPosition;
         if (latestCheckpoint) {
             Region latestCheckpointRegion = latestCheckpoint.GetComponent<Region>();
-			respawnPosition = latestCheckpointRegion.GetCenter();
+            respawnPosition = latestCheckpointRegion.GetCenter();
         } else {
-			respawnPosition = fallbackRespawnPosition;
+            respawnPosition = fallbackRespawnPosition;
         }
         respawnScript.RespawnPlayer(respawnPosition);
     }

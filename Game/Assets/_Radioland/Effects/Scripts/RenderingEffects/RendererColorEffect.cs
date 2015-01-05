@@ -12,7 +12,7 @@ public class RendererColorEffect : Effect
     [SerializeField] private string shaderColorName = "_Color";
 
     private Color originalColor;
-    
+
     protected override void Awake() {
         base.Awake();
 
@@ -22,11 +22,11 @@ public class RendererColorEffect : Effect
             Debug.LogWarning(rendererToChange.GetPath() + " has no material color named " + shaderColorName);
         }
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
 
@@ -38,19 +38,19 @@ public class RendererColorEffect : Effect
             }
         }
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
-        
+
         if (rendererToChange.material.HasProperty(shaderColorName)) {
             rendererToChange.material.SetColor(shaderColorName, newColor);
         }
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
 

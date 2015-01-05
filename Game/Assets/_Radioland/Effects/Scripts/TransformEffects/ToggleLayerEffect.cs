@@ -12,7 +12,7 @@ public class ToggleLayerEffect : Effect
 
     private List<GameObject> objectsToToggle;
     private List<int> originalLayers;
-    
+
     protected override void Awake() {
         base.Awake();
 
@@ -31,19 +31,19 @@ public class ToggleLayerEffect : Effect
             }
         }
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
@@ -51,10 +51,10 @@ public class ToggleLayerEffect : Effect
             toggleObject.layer = newLayer;
         }
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
-        
+
         if (revertAtEnd) {
             for (int i = 0; i < objectsToToggle.Count; i++) {
                 GameObject toggleObject = objectsToToggle[i];
