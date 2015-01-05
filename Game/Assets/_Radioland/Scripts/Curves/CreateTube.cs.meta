@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 4fcca7c923c6cba40befa7d45f2658c0
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - spline: {instanceID: 0}
+  - proceduralMeshPrefab: {fileID: 116248, guid: ea05d20c5997a244393d62d66d9d33f8,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
