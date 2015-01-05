@@ -11,23 +11,23 @@ public class CollisionTriggerEffects : TriggerEffects
         base.Awake();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
 
     }
 
-    void OnCollisionEnter(Collision collision) {
+    private void OnCollisionEnter(Collision collision) {
         StartEventIfMatch(collision.collider.gameObject.tag);
     }
 
-    void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other) {
         StartEventIfMatch(other.gameObject.tag);
     }
 
-    void StartEventIfMatch(string colliderTag) {
+    private void StartEventIfMatch(string colliderTag) {
         if (testColliderTag.Length == 0 ||
             colliderTag.Equals(testColliderTag)) {
             StartEvent();

@@ -18,19 +18,19 @@ public class ParticleEffect : Effect
 
         effectParticleSystem.Stop();
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
@@ -43,14 +43,14 @@ public class ParticleEffect : Effect
             }
             effectParticleSystem.transform.position = position;
         }
-        
+
         effectParticleSystem.Play();
         effectParticleSystem.enableEmission = true;
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
-        
+
         effectParticleSystem.enableEmission = false;
     }
 }

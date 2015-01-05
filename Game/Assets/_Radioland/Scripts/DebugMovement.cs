@@ -10,17 +10,17 @@ public class DebugMovement : MonoBehaviour
 
     private CharacterMovement characterMovement;
 
-    void Awake() {
+    private void Awake() {
         isActive = false;
 
         characterMovement = gameObject.GetComponent<CharacterMovement>();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         // Toggle enabled state.
         if (Input.GetKeyDown(KeyCode.J)) {
             isActive = !isActive;

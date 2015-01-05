@@ -6,7 +6,7 @@ public class EnergySource : MonoBehaviour
     [SerializeField] private float maxRestoreRadius = 10.0f;
     [SerializeField] private TriggerEffects normalRestoreEffects;
     [SerializeField] private TriggerEffects danceRestoreEffects;
-    
+
     private Animator animator;
     private int danceHash = Animator.StringToHash("isDance");
 
@@ -14,7 +14,7 @@ public class EnergySource : MonoBehaviour
     private PowerupManager powerupManager;
     private Dance dance;
 
-    void Awake() {
+    private void Awake() {
         animator = gameObject.GetComponentInChildren<Animator>();
 
         GameObject player = GameObject.FindWithTag("Player");
@@ -33,11 +33,11 @@ public class EnergySource : MonoBehaviour
         }
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         float distance = Vector3.Distance(playerTransform.position, transform.position);
 
         //if (!powerupManager.IsFullEnergy() && distance < maxRestoreRadius) {
@@ -56,8 +56,8 @@ public class EnergySource : MonoBehaviour
             danceRestoreEffects.enabled  = false;
         }
     }
-    
-    void OnDrawGizmosSelected() {
+
+    private void OnDrawGizmosSelected() {
         Gizmos.DrawWireSphere(transform.position, maxRestoreRadius);
     }
 }

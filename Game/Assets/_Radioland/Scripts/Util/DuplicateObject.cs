@@ -13,7 +13,7 @@ public class DuplicateObject : MonoBehaviour
 
     // Note: this should run as Start and _not_ Awake since this script is
     // Destroyed on the duplicate object to stop recursion.
-    void Start() {
+    private void Start() {
         Vector3 pos = transform.localPosition;
         if (flipPosX) { pos.x *= -1; }
         if (flipPosY) { pos.y *= -1; }

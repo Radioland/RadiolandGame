@@ -8,16 +8,16 @@ public class Hair : MonoBehaviour
     private Vector3 originalLocalPosition;
     private Quaternion originalLocalRotation;
 
-    void Awake() {
+    private void Awake() {
         originalLocalPosition = transform.localPosition;
         originalLocalRotation = transform.localRotation;
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
 
     }
 

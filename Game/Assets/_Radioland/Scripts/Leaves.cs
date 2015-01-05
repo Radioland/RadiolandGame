@@ -9,27 +9,27 @@ public class Leaves : MonoBehaviour
 
     private CharacterMovement characterMovement;
 
-    void Awake() {
+    private void Awake() {
         characterMovement = gameObject.GetComponent<CharacterMovement>();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
 
     }
 
-    void OnTriggerStay(Collider other) {
+    private void OnTriggerStay(Collider other) {
         TriggerLeaves(other);
     }
 
-    void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other) {
         TriggerLeaves(other);
     }
 
-    void TriggerLeaves(Collider other) {
+    private void TriggerLeaves(Collider other) {
         if ((characterMovement.moving || characterMovement.falling) && other.CompareTag("leaves")) {
             float scale = speedScale.Evaluate(characterMovement.controlSpeed);
             if (effectAudio) { effectAudio.ScaleVolume(scale); }

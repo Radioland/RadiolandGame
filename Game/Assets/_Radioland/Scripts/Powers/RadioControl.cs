@@ -39,7 +39,7 @@ public class RadioControl : MonoBehaviour
     private float lastDecreaseVolume;
     private float lastIncreaseVolume;
 
-    void Awake() {
+    private void Awake() {
         if (!powerupManager) {
             Debug.LogWarning("[UI] Please set PowerupManager for RadioControl.");
         } else {
@@ -67,11 +67,11 @@ public class RadioControl : MonoBehaviour
         ResetStatic();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void ResetStatic() {
+    private void ResetStatic() {
         inUse = false;
         lastStartedTimeStatic = -1000.0f;
         lastActiveTimeStatic = -1000.0f;
@@ -79,7 +79,7 @@ public class RadioControl : MonoBehaviour
         lastDecreaseVolume = 0.0f;
     }
 
-    void Update() {
+    private void Update() {
         // TODO: replace with better controller/mouse input management.
         float scrollValue = Input.GetAxis("Mouse ScrollWheel") + Input.GetAxis("Tune");
 

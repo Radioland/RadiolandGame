@@ -13,7 +13,7 @@ public class Wobble : MonoBehaviour
     [SerializeField] private float maxPauseTime = 0.0f;
     [SerializeField] private float minCooldown = 0.0f;
     [SerializeField] private float maxCooldown = 0.0f;
-    
+
     private float lastStartedTime;
     private Quaternion initialRotation;
     private Quaternion rotationChange;
@@ -22,15 +22,15 @@ public class Wobble : MonoBehaviour
     private float pauseTime;
     private float cooldown;
 
-    void Awake() {
+    private void Awake() {
         StartWobble();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void StartWobble() {
+    private void StartWobble() {
         lastStartedTime = Time.time;
 
         initialRotation = transform.localRotation;
@@ -44,7 +44,7 @@ public class Wobble : MonoBehaviour
         cooldown = Random.Range(minCooldown, maxCooldown);
     }
 
-    void Update() {
+    private void Update() {
 
         if (Time.time < lastStartedTime + wobbleTime) {
             // Wobble to targetRotation and then back.

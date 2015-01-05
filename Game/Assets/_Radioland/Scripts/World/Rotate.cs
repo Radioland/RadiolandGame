@@ -6,15 +6,15 @@ public class Rotate : MonoBehaviour
     [Tooltip("Euler angle degrees per second.")]
     [SerializeField] private Vector3 angularSpeed;
 
-    void Awake() {
+    private void Awake() {
 
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         transform.Rotate(angularSpeed * Time.deltaTime);
     }
 }

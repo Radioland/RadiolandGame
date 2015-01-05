@@ -9,7 +9,7 @@ public class FollowPlatforms : MonoBehaviour
     private CharacterController controller;
     private CharacterMovement characterMovement;
 
-    void Awake() {
+    private void Awake() {
         controller = gameObject.GetComponent<CharacterController>();
         characterMovement = gameObject.GetComponent<CharacterMovement>();
 
@@ -19,11 +19,11 @@ public class FollowPlatforms : MonoBehaviour
         }
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
         Platform platform = GetPlatformUnder();
         if (platform) {
             Push(platform);
@@ -31,7 +31,7 @@ public class FollowPlatforms : MonoBehaviour
     }
 
     // Called via SendMessage in CharacterMovement.
-    void Jump() {
+    private void Jump() {
         if (!characterMovement) { return; }
 
         Platform platform = GetPlatformUnder();
@@ -41,14 +41,14 @@ public class FollowPlatforms : MonoBehaviour
     }
 
     // Called via SendMessage in CharacterMovement.
-    void Grounded(float verticalSpeed) {
+    private void Grounded(float verticalSpeed) {
         SpringPlatform springPlatform = GetSpringPlatformUnder();
         if (springPlatform) {
             springPlatform.ApplyForce(verticalSpeed * characterMovement.mass);
         }
     }
 
-    Platform GetPlatformUnder() {
+    private Platform GetPlatformUnder() {
         Vector3 start = transform.position + Vector3.up; // Adds 1.0f up.
         float distance = 1.0f + raycastDistance; // Counteracts the 1.0f up.
 
@@ -59,7 +59,7 @@ public class FollowPlatforms : MonoBehaviour
         return null;
     }
 
-    SpringPlatform GetSpringPlatformUnder() {
+    private SpringPlatform GetSpringPlatformUnder() {
         Vector3 start = transform.position + Vector3.up; // Adds 1.0f up.
         float distance = 1.0f + raycastDistance; // Counteracts the 1.0f up.
 
@@ -70,7 +70,7 @@ public class FollowPlatforms : MonoBehaviour
         return null;
     }
 
-    void Push(Platform platform) {
+    private void Push(Platform platform) {
         Vector3 movement = platform.lastVelocity * Time.deltaTime;
         // Apply an extra push vertically to prevent falling through platforms.
         movement.y = movement.y * 1.5f + 0.02f;
@@ -80,14 +80,14 @@ public class FollowPlatforms : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision) {
+    private void OnCollisionEnter(Collision collision) {
         Platform platform = collision.gameObject.GetComponent<Platform>();
         if (platform) {
             Push(platform);
         }
     }
 
-    void OnCollisionStay(Collision collision) {
+    private void OnCollisionStay(Collision collision) {
         Platform platform = collision.gameObject.GetComponent<Platform>();
         if (platform) {
             Push(platform);

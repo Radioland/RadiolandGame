@@ -16,10 +16,10 @@ public class CreateEffect : Effect
     [SerializeField] private bool chainEffectsOnEnd = false;
     [Range(0.0f, 1.0f)] [SerializeField] private float chanceToSpawn = 1.0f;
 
-    static GameObject createEffectParent;
+    private static GameObject createEffectParent;
 
     private GameObject createdObject;
-    
+
     protected override void Awake() {
         base.Awake();
 
@@ -33,19 +33,19 @@ public class CreateEffect : Effect
             createEffectParent.transform.position = Vector3.zero;
         }
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
 
@@ -76,7 +76,7 @@ public class CreateEffect : Effect
             }
         }
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
 

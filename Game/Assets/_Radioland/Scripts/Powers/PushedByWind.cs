@@ -5,21 +5,21 @@ public class PushedByWind : MonoBehaviour
 {
     private CharacterController controller;
     private CharacterMovement characterMovement;
-    
-    void Awake() {
+
+    private void Awake() {
         controller = gameObject.GetComponent<CharacterController>();
         characterMovement = gameObject.GetComponent<CharacterMovement>();
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void Update() {
+    private void Update() {
 
     }
-    
-    void OnTriggerStay(Collider other) {
+
+    private void OnTriggerStay(Collider other) {
         WindPushArea windPushArea = other.gameObject.GetComponent<WindPushArea>();
         if (!windPushArea && other.gameObject.transform.parent) {
             windPushArea = other.gameObject.transform.parent.GetComponent<WindPushArea>();

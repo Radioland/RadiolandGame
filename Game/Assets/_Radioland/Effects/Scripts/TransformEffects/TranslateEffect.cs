@@ -8,11 +8,11 @@ public class TranslateEffect : Effect
     protected override void Awake() {
         base.Awake();
     }
-    
+
     protected override void Start() {
         base.Start();
     }
-    
+
     protected override void Update() {
         base.Update();
 
@@ -20,15 +20,15 @@ public class TranslateEffect : Effect
             transform.position = transform.position + finalTranslationDelta / duration * Time.deltaTime;
         }
     }
-    
+
     public override void TriggerEffect() {
         base.TriggerEffect();
     }
-    
+
     public override void StartEffect() {
         base.StartEffect();
     }
-    
+
     public override void EndEffect() {
         base.EndEffect();
     }

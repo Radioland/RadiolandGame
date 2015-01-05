@@ -11,7 +11,7 @@ public class ObjectPickup : MonoBehaviour {
     private bool pickingUp;
     //private GameObject objectiveGUI;
 
-    void Awake() {
+    private void Awake() {
         animator = gameObject.GetComponentInChildren<Animator>();
         pickupTriggerHash = Animator.StringToHash("Pickup");
         pickupStateHash = Animator.StringToHash("Base Layer.Pickup");
@@ -21,11 +21,11 @@ public class ObjectPickup : MonoBehaviour {
         //objectiveGUI = GameObject.Find("ObjectiveUI");
     }
 
-    void Start() {
+    private void Start() {
 
     }
 
-    void OnTriggerEnter(Collider c) {
+    private void OnTriggerEnter(Collider c) {
         if (c.gameObject.tag == "pickupable") {
             if (pickupEffects) {
                 pickupEffects.StartEvent();
@@ -37,8 +37,8 @@ public class ObjectPickup : MonoBehaviour {
             //objectiveGUI.GetComponent<ObjectiveGUI>().IncrementTargets();
         }
     }
-    
-    void Update() {
+
+    private void Update() {
         bool inPickupState = animator.GetCurrentAnimatorStateInfo(0).nameHash == pickupStateHash;
 
         if (!pickingUp && inPickupState) {
@@ -55,5 +55,5 @@ public class ObjectPickup : MonoBehaviour {
             }
         }
     }
-    
+
 }
