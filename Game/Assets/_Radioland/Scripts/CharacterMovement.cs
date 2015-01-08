@@ -6,52 +6,48 @@ public class CharacterMovement : MonoBehaviour
 {
     public CameraControl cameraControl;
 
-    [SerializeField] [Range(0.0f, 20.0f)] private float walkSpeed = 5.0f;
-    [SerializeField] private float directionSpeed = 1.5f; // Affects turn rate.
-    [SerializeField] [Range(0.0f, 100.0f)] private float gravity = 30.0f;
-    // Speed is calculated to reach this height.
-    [SerializeField] [Range(0.0f, 10.0f)] private float jumpHeight = 2.0f;
+    #region Movement characteristic values to specify in the editor.
+    [SerializeField] [Range(0f, 20f)] private float maxWalkSpeed = 5f;
+    [SerializeField] [Range(0f, 100f)] private float gravity = 30f;
+    [SerializeField] [Range(0f, 10f)] private float jumpHeight = 2.0f;
     [SerializeField] [Tooltip("Extra time to become grounded before jumping.")]
     private float jumpPreTimeout = 0.1f;
     [SerializeField] [Tooltip("Extra time to jump after starting to fall.")]
-    private float jumpPostTimeout = 0.2f;
-    [SerializeField] private float jumpCooldown = 0.35f;
+    private float jumpPostTimeout = 0.3f;
+    [SerializeField] private float jumpCooldown = 0.5f;
     [SerializeField] private float jumpWindupTime = 0.1f;
-    [SerializeField] private float landingTime = 0.2f;
+    [SerializeField] [Tooltip("Look-ahead time to start landing animation.")]
+    private float landingTime = 0.2f;
     [SerializeField] [Tooltip("Start sliding when the slope exceeds this (degrees).")]
-    private float slideSlopeLimit = 60.0f;
+    private float slideSlopeLimit = 60f;
     [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")]
-    private float jumpSlopeLimit = 75.0f;
-    [SerializeField] private float slideSpeed = 5.0f;
+    private float jumpSlopeLimit = 75f;
+    [SerializeField] private float slideSpeed = 5f;
     [SerializeField] [Tooltip("Time required to start being classified as falling.")]
     private float fallingTime = 0.2f;
-    public float mass = 1.0f;
+    public float mass = 1f;
+    #endregion Movement characteristic values to specify in the editor.
 
-    // Smoothing.
+    #region Smoothing controls.
     [SerializeField] private float groundSmoothDampTime = 0.05f;
     [SerializeField] private float airSmoothDampTime = 0.7f;
     private Vector3 velocityDamp = Vector3.zero;
     private Vector3 velocity = Vector3.zero;
+    #endregion Smoothing controls.
 
-    // State (read-only visible to other scripts).
-    private bool m_moving;
-    private bool m_inJumpWindup;
-    private bool m_jumping;
-    private bool m_sliding;
-    private bool m_falling;
-    private float m_controlSpeed;
-    private bool m_controllable;
-    public bool moving { get { return m_moving; } }
-    public bool inJumpWindup { get { return m_inJumpWindup; } }
-    public bool jumping { get { return m_jumping; } }
-    public bool sliding { get { return m_sliding; } }
+    #region State (read-only visible to other scripts).
+    public bool moving { get; private set; }
+    public bool inJumpWindup { get; private set; }
+    public bool jumping { get; private set; }
+    public bool sliding { get; private set; }
     public bool grounded { get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; } }
-    public bool falling { get { return m_falling; } }
-    public float controlSpeed { get { return m_controlSpeed; } }
+    public bool falling { get; private set; }
+    public float controlSpeed { get; private set; }
     public float speed { get { return (velocity + Vector3.up * verticalSpeed).magnitude; } }
-    public bool controllable { get { return m_controllable; } }
+    public bool controllable { get; private set; }
+    #endregion State (read-only visible to other scripts).
 
-    // Collision, jumping, sliding.
+    #region Collision, jumping, sliding, and input.
     private CharacterController controller;
     private CollisionFlags collisionFlags;
     private RaycastHit hit;
@@ -59,47 +55,40 @@ public class CharacterMovement : MonoBehaviour
     private float lastJumpInputTime;
     private float lastJumpTime;
     private float lastGroundedTime;
-    private float rayDistance;
+    private const float slopeRayDistance = 0.1f;
     private Vector3 contactPoint;
     private float slopeAngle;
-
-    // Input.
+    private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * gravity); } }
     private float leftX = 0f;
     private float leftY = 0f;
-    private float direction = 0f;
-    private float charAngle = 0f;
+    #endregion Collision, jumping, sliding, and input.
 
-    // Animation.
+    #region Animation
     private Animator animator;
     private int speedHash;
     private int strafeHash;
     private int jumpingHash;
     private int landingHash;
+    #endregion Animation
 
-    // Setting backups.
+    #region Setting backups.
     private float originalGravity;
     private float originalJumpHeight;
     private float originalAirSmoothDampTime;
     private float originalMass;
-
-    private float jumpVerticalSpeed {
-        get { return Mathf.Sqrt(2 * jumpHeight * gravity); }
-    }
+    #endregion Setting backups.
 
     private void Awake() {
-        if (!cameraControl) {
-            Debug.LogWarning("No camera control set on CharacterMovement!");
-        }
+        if (!cameraControl) { Debug.LogWarning("No camera control set on CharacterMovement!"); }
 
         ResetState();
 
         controller = gameObject.GetComponent<CharacterController>();
-        verticalSpeed = 0.0f;
-        lastJumpInputTime = -1000.0f;
-        lastJumpTime = -1000.0f;
-        lastGroundedTime = -1000.0f;
-        rayDistance = 0.1f;
-        slopeAngle = 0.0f;
+        verticalSpeed = 0f;
+        lastJumpInputTime = -1000f;
+        lastJumpTime = -1000f;
+        lastGroundedTime = -1000f;
+        slopeAngle = 0f;
 
         // Fetch animator properties.
         animator = gameObject.GetComponentInChildren<Animator>();
@@ -122,17 +111,17 @@ public class CharacterMovement : MonoBehaviour
     }
 
     private void ResetState() {
-        m_moving = false;
-        m_inJumpWindup = false;
-        m_jumping = false;
-        m_sliding = false;
-        m_falling = false;
-        m_controlSpeed = 0.0f;
-        m_controllable = true;
+        moving = false;
+        inJumpWindup = false;
+        jumping = false;
+        sliding = false;
+        falling = false;
+        controlSpeed = 0f;
+        controllable = true;
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit hit) {
-        contactPoint = hit.point;
+    private void OnControllerColliderHit(ControllerColliderHit controllerHit) {
+        contactPoint = controllerHit.point;
     }
 
     private void Update() {
@@ -147,37 +136,28 @@ public class CharacterMovement : MonoBehaviour
         leftY = controllable ? Input.GetAxis("Vertical") : 0;
         float strafeInput = controllable ? Input.GetAxis("Strafe") : 0;
 
-        bool inputReceived = false;
         if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
             Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
             Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
-            inputReceived = true;
+            moving = controllable;
             SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
         } else {
+            moving = false;
             SendMessage("NoMovementInput", SendMessageOptions.DontRequireReceiver);
         }
-        if (inputReceived && controllable) {
-            m_moving = true;
-        } else {
-            m_moving = false;
-        }
-
-        charAngle = 0f;
-        direction = 0f;
-        float inputSpeed = 0f;
 
         // Translate controls stick coordinates into world/cam/character space.
-        StickToWorldspace(transform, cameraControl.cameraTransform, ref direction,
-                          ref inputSpeed, ref charAngle, false);
-        m_controlSpeed = inputSpeed;
+        float charAngle, inputSpeed;
+        StickToWorldspace(transform, cameraControl.cameraTransform,
+                          out inputSpeed, out charAngle, false);
+        controlSpeed = inputSpeed;
 
         // Don't rotate within a dead zone.
-        if (m_controlSpeed > 0.05f) {
-            transform.Rotate(new Vector3(0, charAngle, 0));
-        }
+        if (controlSpeed > 0.05f) { transform.Rotate(new Vector3(0, charAngle, 0)); }
 
-        Vector3 motion = (transform.forward * m_controlSpeed + transform.right * strafeInput) * walkSpeed;
-        motion = Vector3.ClampMagnitude(motion, walkSpeed);
+        float walkSpeed = maxWalkSpeed;
+        Vector3 motion = (transform.forward * controlSpeed + transform.right * strafeInput) * walkSpeed;
+        motion = Vector3.ClampMagnitude(motion, maxWalkSpeed);
 
         ApplyGravity();
         ApplyJump();
@@ -192,18 +172,18 @@ public class CharacterMovement : MonoBehaviour
 
         // Update animations.
         if (animator) {
-            animator.SetFloat(speedHash, Mathf.Abs(m_controlSpeed));
+            animator.SetFloat(speedHash, Mathf.Abs(controlSpeed));
             animator.SetFloat(strafeHash, strafeInput);
             animator.SetBool(jumpingHash, jumping);
         }
     }
 
     private void ApplySliding() {
-        m_sliding = false;
+        sliding = false;
 
         slopeAngle = 0.0f;
         // First simply check under the character for a slope.
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, rayDistance)) {
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, slopeRayDistance)) {
             slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
         } else {
             // Also check from a contactPoint (for particularly steep slopes).
@@ -212,7 +192,7 @@ public class CharacterMovement : MonoBehaviour
         }
 
         if (slopeAngle > slideSlopeLimit) {
-            m_sliding = true;
+            sliding = true;
 
             // Compute moveDirection to point down the slope.
             Vector3 hitNormal = hit.normal;
@@ -232,13 +212,13 @@ public class CharacterMovement : MonoBehaviour
                 float landingVerticalSpeed = verticalSpeed;
                 verticalSpeed = 0.0f;
                 SendMessage("Grounded", landingVerticalSpeed, SendMessageOptions.DontRequireReceiver);
-                m_falling = false;
+                falling = false;
             }
-            m_jumping = false;
+            jumping = false;
             animator.SetBool(landingHash, false);
         } else {
             if (Time.time - lastGroundedTime > fallingTime && verticalSpeed < 0.0f) {
-                m_falling = true;
+                falling = true;
             }
 
             verticalSpeed -= gravity * Time.deltaTime;
@@ -263,9 +243,7 @@ public class CharacterMovement : MonoBehaviour
         // Do not allow jumping while not controllable.
         if (!controllable) { return; }
 
-        if (Input.GetButtonDown("Jump")) {
-            TriggerJump();
-        }
+        if (Input.GetButtonDown("Jump")) { TriggerJump(); }
 
         // Do not allow jumping while sliding.
         if (sliding && slopeAngle > jumpSlopeLimit) { return; }
@@ -276,15 +254,15 @@ public class CharacterMovement : MonoBehaviour
             // PostTimeout lets you trigger a jump slightly after starting to fall.
             if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
                 lastJumpTime = Time.time;
-                m_inJumpWindup = true;
+                inJumpWindup = true;
 
                 SendMessage("JumpStarted", SendMessageOptions.DontRequireReceiver);
             }
         }
 
         if (inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
-            m_inJumpWindup = false;
-            m_jumping = true;
+            inJumpWindup = false;
+            jumping = true;
             verticalSpeed = jumpVerticalSpeed;
 
             SendMessage("Jump", SendMessageOptions.DontRequireReceiver);
@@ -300,7 +278,7 @@ public class CharacterMovement : MonoBehaviour
     public void Bounce(float bounceSpeed) {
         SendMessage("BounceTriggered", SendMessageOptions.DontRequireReceiver);
         verticalSpeed = bounceSpeed;
-        m_jumping = true;
+        jumping = true;
         lastJumpTime = Time.time;
     }
 
@@ -312,7 +290,7 @@ public class CharacterMovement : MonoBehaviour
         verticalSpeed = 0;
     }
 
-    // Set and reset properties.
+    #region Set and reset properties.
     public void SetJumpHeight(float height) { jumpHeight = height; }
     public void ResetJumpHeight() { jumpHeight = originalJumpHeight; }
     public void SetGravity(float newGravity) { gravity = newGravity; }
@@ -321,11 +299,11 @@ public class CharacterMovement : MonoBehaviour
     public void ResetAirSmoothDampTime() { airSmoothDampTime = originalAirSmoothDampTime; }
     public void SetMass(float newMass) { mass = newMass; }
     public void ResetMass() { mass = originalMass; }
-    public void SetControllable(bool isControllable) { m_controllable = isControllable; }
+    public void SetControllable(bool isControllable) { controllable = isControllable; }
+    #endregion Set and reset properties.
 
     private void StickToWorldspace(Transform root, Transform camera,
-                                  ref float directionOut, ref float speedOut,
-                                  ref float angleOut, bool isPivoting) {
+                                   out float speedOut, out float angleOut, bool isPivoting) {
         Vector3 rootDirection = root.forward;
 
         Vector3 stickDirection = new Vector3(leftX, 0, leftY);
@@ -352,11 +330,6 @@ public class CharacterMovement : MonoBehaviour
                       axisSign, Color.red);
 
         float angleRootToMove = Vector3.Angle(rootDirection, moveDirection) * (axisSign.y >= 0 ? -1f : 1f);
-        if (!isPivoting) {
-            angleOut = angleRootToMove;
-        }
-        angleRootToMove /= 180f;
-
-        directionOut = angleRootToMove * directionSpeed;
+        angleOut = isPivoting ? 0f: angleRootToMove;
     }
 }
