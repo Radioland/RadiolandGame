@@ -2,7 +2,6 @@
 using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
-
 public class CharacterMovement : MonoBehaviour
 {
     public CameraControl cameraControl;
@@ -360,5 +359,4 @@ public class CharacterMovement : MonoBehaviour
 
         directionOut = angleRootToMove * directionSpeed;
     }
-
 }

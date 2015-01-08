@@ -63,11 +63,12 @@ public class CreateTube : MonoBehaviour
         triangles = new List<int>();
 
         float radiansPerSegment = Mathf.PI * 2f / radiusSegments;
-        Vector3 curveCenter, curveForward, curveUp, curveRight;
-        float nextTheta, nextX, nextY;
 
-        // Create the start cap.
         if (!spline.loop) {
+            Vector3 curveCenter, curveForward, curveUp, curveRight;
+            float nextTheta, nextX, nextY;
+
+            // Create the start cap.
             curveCenter = spline.GetPoint(0f);
             curveForward = spline.GetDirection(0f);
             CurveUtils.GetUpAndRight(curveForward, out curveUp, out curveRight);
@@ -136,9 +137,9 @@ public class CreateTube : MonoBehaviour
         tubeMesh.Optimize();
         tubeMeshFilter.mesh = tubeMesh;
 
-        MeshCollider collider = tubeMeshFilter.gameObject.GetComponent<MeshCollider>();
-        if (collider) {
-            DestroyImmediate(collider);
+        MeshCollider meshCollider = tubeMeshFilter.gameObject.GetComponent<MeshCollider>();
+        if (meshCollider ) {
+            DestroyImmediate(meshCollider );
             tubeMeshFilter.gameObject.AddComponent<MeshCollider>();
         }
 
@@ -207,14 +208,12 @@ public class CreateTube : MonoBehaviour
             twisted = true;
         }
 
-        float startTheta, endTheta, startX, startY, endX, endY;
-
         if (startT <= 0f) {
             for (int i = 0; i < radiusSegments; i++) {
-                startTheta = radiansPerSegment * i;
+                float startTheta = radiansPerSegment * i;
 
-                startX = radius * Mathf.Cos(startTheta);
-                startY = radius * Mathf.Sin(startTheta);
+                float startX = radius * Mathf.Cos(startTheta);
+                float startY = radius * Mathf.Sin(startTheta);
                 vertices.Add(startCurveCenter + startCurveRight * startX + startCurveUp * startY);
             }
         }
@@ -226,12 +225,12 @@ public class CreateTube : MonoBehaviour
         vertices.Add(endCurveCenter + endCurveRight * radius);
 
         for (int i = 0; i < radiusSegments - 1; i++) {
-            if (endT == 1f && spline.loop) { startVertex = 0; }
+            if (Mathf.Approximately(endT, 1f) && spline.loop) { startVertex = 0; }
 
-            endTheta = radiansPerSegment * (i + 1);
+            float endTheta = radiansPerSegment * (i + 1);
 
-            endX = radius * Mathf.Cos(endTheta);
-            endY = radius * Mathf.Sin(endTheta);
+            float endX = radius * Mathf.Cos(endTheta);
+            float endY = radius * Mathf.Sin(endTheta);
 
             vertices.Add(endCurveCenter + endCurveRight * endX + endCurveUp * endY);
 
@@ -258,20 +257,20 @@ public class CreateTube : MonoBehaviour
 
         int lengthSegments = lengthSegmentsPerCurve * spline.CurveCount;
         float t;
-        Vector3 curveCenter, curveForward, curveUp, curveRight;
 
         for (int i = 0; i < lengthSegments; i++) {
             t = i / (float)lengthSegments;
-            curveCenter = spline.GetPoint(t);
-            curveForward = spline.GetDirection(t);
+            Vector3 curveCenter = spline.GetPoint(t);
+            Vector3 curveForward = spline.GetDirection(t);
             //curveForward = GetAveragedForward(t);
+            Vector3 curveUp, curveRight;
             CurveUtils.GetUpAndRight(curveForward, out curveUp, out curveRight);
             // Highlight problem points. This shows how GetAveragedForward is useful.
-            if (curveForward.magnitude == 0) {
+            if (curveForward.magnitude <= 0.0001) {
                 Gizmos.color = Color.magenta;
                 Gizmos.DrawCube(curveCenter, new Vector3(0.2f, 0.2f, 0.2f));
             }
-            if (curveUp.magnitude == 0) {
+            if (curveUp.magnitude <= 0.0001) {
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawCube(curveCenter, new Vector3(0.1f, 0.1f, 0.1f));
             }
