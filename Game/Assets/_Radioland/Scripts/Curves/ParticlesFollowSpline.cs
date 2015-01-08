@@ -4,15 +4,25 @@ public class ParticlesFollowSpline : MonoBehaviour
 {
     [SerializeField] private ParticleSystem system;
     [SerializeField] private BezierSpline spline;
-    [SerializeField] [Range(0f, 1f)] private float smoothing = 0.2f;
 
-    [SerializeField] private bool loop = false;
-    [SerializeField] private float loopTime = 1f;
+    [SerializeField] [Tooltip("Higher values interpolate to target position faster.")]
+    [Range(0f, 1f)] private float smoothing = 0.2f;
+
+    [SerializeField] [Tooltip("Ignored if the spline does not loop.")]
+    private float loopTime = 1f;
+
+    private void Reset() {
+        system = gameObject.GetComponentInChildren<ParticleSystem>();
+        spline = gameObject.GetComponentInChildren<BezierSpline>();
+
+        if (system) { Debug.Log("Found " + system.GetPath() + " for " + this.GetPath()); }
+        if (spline) { Debug.Log("Found " + spline.GetPath() + " for " + this.GetPath()); }
+    }
 
     private void Awake() {
         system.simulationSpace = ParticleSystemSimulationSpace.World;
 
-        if (loop) {
+        if (spline.loop) {
             system.emissionRate = system.maxParticles / loopTime;
 
             // Work within a lifetime range of [loopTime, 2 * loopTime].
@@ -39,7 +49,7 @@ public class ParticlesFollowSpline : MonoBehaviour
             ParticleSystem.Particle particle = particles[i];
 
             float t;
-            if (loop) {
+            if (spline.loop) {
                 if (particle.lifetime < particle.startLifetime / 2f) {
                     particle.lifetime += particle.startLifetime / 2f;
                 }
