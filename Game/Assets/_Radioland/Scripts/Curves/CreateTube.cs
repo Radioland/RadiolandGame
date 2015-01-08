@@ -16,18 +16,33 @@ public class CreateTube : MonoBehaviour
     [SerializeField] [Tooltip("Do not save created meshes as assets.")]
     private bool debug = false;
 
+    // Refine recursively when the forward vectors are too dissimilar.
     // The dot product of perpendicular vectors is zero.
     // The dot product of parallel unit vectors is one.
     // Recurse in tube segment creation when the dot product of segment
     // start and end forward (direction) vectors is below this value.
     private const float refineTheshold = 0.98f;
+
+    // Counteract twists along the spline.
+    // If the up vectors are close to antiparallel, the spline twists.
+    // This case will pass the dot product test, so check if the up vector sum
+    // is low enough to indicate them being nearly antiparallel.
+    // If they are, twist vertex pairings using a {radiusSegments / 2} offset.
+    // [0:0, 1:1, 2:2, 3:3, 4:4, 5:5] twists to [0:3, 1:4, 2:5, 3:0, 4:1, 5:2]
     private const float minSumMagnitude = 0.5f;
+
     private const float gizmoScale = 0.5f;
     private const string tubeMeshAssetPath = "Assets/_Radioland/ProceduralMeshes/";
 
     private List<Vector3> vertices;
     private List<Vector2> uvs;
     private List<int> triangles;
+
+    private void Reset() {
+        spline = gameObject.GetComponentInChildren<BezierSpline>();
+
+        if (spline) { Debug.Log("Found " + spline.GetPath() + " for " + this.GetPath()); }
+    }
 
     private void Awake() {
 
@@ -43,8 +58,14 @@ public class CreateTube : MonoBehaviour
 
     public GameObject CreateNew() {
         if (!proceduralMeshPrefab) {
-            Debug.LogError("Procedural Mesh Prefab is not set on " +
-                           transform.GetPath() + ", aborting CreateNew.");
+            Debug.LogError("Procedural Mesh Prefab is not set for " +
+                           this.GetPath() + ", aborting CreateNew.");
+            return null;
+        }
+
+        if (!spline) {
+            Debug.LogError("Spline is not set for " +
+                            this.GetPath() + ", aborting CreateNew.");
             return null;
         }
 
@@ -183,9 +204,9 @@ public class CreateTube : MonoBehaviour
 
         // Hack to avoid "pinching" where the forward vector is zero.
         // This also smoothes some sections and works well with recursive refinement.
-        Vector3 startCurveForward = startT == 0f ?
+        Vector3 startCurveForward = Mathf.Approximately(startT, 0f) ?
             spline.GetDirection(startT) : GetAveragedForward(startT);
-        Vector3 endCurveForward = endT == 1f ?
+        Vector3 endCurveForward = Mathf.Approximately(endT, 1f) ?
             spline.GetDirection(endT) : GetAveragedForward(endT);
 
         // Refine recursively up to a max depth if forward vectors are too dissimilar.
@@ -256,10 +277,9 @@ public class CreateTube : MonoBehaviour
         if (!spline) { return; }
 
         int lengthSegments = lengthSegmentsPerCurve * spline.CurveCount;
-        float t;
 
         for (int i = 0; i < lengthSegments; i++) {
-            t = i / (float)lengthSegments;
+            float t = i / (float)lengthSegments;
             Vector3 curveCenter = spline.GetPoint(t);
             Vector3 curveForward = spline.GetDirection(t);
             //curveForward = GetAveragedForward(t);
