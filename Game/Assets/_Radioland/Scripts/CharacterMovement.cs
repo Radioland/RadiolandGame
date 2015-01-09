@@ -7,7 +7,8 @@ public class CharacterMovement : MonoBehaviour
     public CameraControl cameraControl;
 
     #region Movement characteristic values to specify in the editor.
-    [SerializeField] [Range(0f, 20f)] private float maxWalkSpeed = 5f;
+    [SerializeField] [Range(0f, 20f)] private float maxWalkSpeed = 8f;
+    [SerializeField] private AnimationCurve runSpeedCurve;
     [SerializeField] [Range(0f, 100f)] private float gravity = 30f;
     [SerializeField] [Range(0f, 10f)] private float jumpHeight = 2.0f;
     [SerializeField] [Tooltip("Extra time to become grounded before jumping.")]
@@ -29,7 +30,7 @@ public class CharacterMovement : MonoBehaviour
     #endregion Movement characteristic values to specify in the editor.
 
     #region Smoothing controls.
-    [SerializeField] private float groundSmoothDampTime = 0.05f;
+    [SerializeField] private float groundSmoothDampTime = 0.1f;
     [SerializeField] private float airSmoothDampTime = 0.7f;
     private Vector3 velocityDamp = Vector3.zero;
     private Vector3 velocity = Vector3.zero;
@@ -37,6 +38,7 @@ public class CharacterMovement : MonoBehaviour
 
     #region State (read-only visible to other scripts).
     public bool moving { get; private set; }
+    public bool running { get; private set; }
     public bool inJumpWindup { get; private set; }
     public bool jumping { get; private set; }
     public bool sliding { get; private set; }
@@ -52,6 +54,8 @@ public class CharacterMovement : MonoBehaviour
     private CollisionFlags collisionFlags;
     private RaycastHit hit;
     private float verticalSpeed;
+    private const float walkRunCutoff = 0.3f;
+    private float lastRunInputStartTime;
     private float lastJumpInputTime;
     private float lastJumpTime;
     private float lastGroundedTime;
@@ -59,8 +63,8 @@ public class CharacterMovement : MonoBehaviour
     private Vector3 contactPoint;
     private float slopeAngle;
     private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * gravity); } }
-    private float leftX = 0f;
-    private float leftY = 0f;
+    private float leftX;
+    private float leftY;
     #endregion Collision, jumping, sliding, and input.
 
     #region Animation
@@ -85,10 +89,13 @@ public class CharacterMovement : MonoBehaviour
 
         controller = gameObject.GetComponent<CharacterController>();
         verticalSpeed = 0f;
+        lastRunInputStartTime = -1000f;
         lastJumpInputTime = -1000f;
         lastJumpTime = -1000f;
         lastGroundedTime = -1000f;
         slopeAngle = 0f;
+        leftX = 0f;
+        leftY = 0f;
 
         // Fetch animator properties.
         animator = gameObject.GetComponentInChildren<Animator>();
@@ -112,6 +119,7 @@ public class CharacterMovement : MonoBehaviour
 
     private void ResetState() {
         moving = false;
+        running = false;
         inJumpWindup = false;
         jumping = false;
         sliding = false;
@@ -136,26 +144,33 @@ public class CharacterMovement : MonoBehaviour
         leftY = controllable ? Input.GetAxis("Vertical") : 0;
         float strafeInput = controllable ? Input.GetAxis("Strafe") : 0;
 
-        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
-            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
-            Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
-            moving = controllable;
-            SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
-        } else {
-            moving = false;
-            SendMessage("NoMovementInput", SendMessageOptions.DontRequireReceiver);
-        }
-
         // Translate controls stick coordinates into world/cam/character space.
         float charAngle, inputSpeed;
         StickToWorldspace(transform, cameraControl.cameraTransform,
                           out inputSpeed, out charAngle, false);
         controlSpeed = inputSpeed;
 
+        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) >= 0.01 ||
+            Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
+            Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
+
+            if (controllable && !running && controlSpeed < walkRunCutoff) {
+                lastRunInputStartTime = Time.time;
+            }
+            running = controllable && controlSpeed > walkRunCutoff;
+            moving = controllable;
+
+            SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
+        } else {
+            moving = false;
+            running = false;
+            SendMessage("NoMovementInput", SendMessageOptions.DontRequireReceiver);
+        }
+
         // Don't rotate within a dead zone.
         if (controlSpeed > 0.05f) { transform.Rotate(new Vector3(0, charAngle, 0)); }
 
-        float walkSpeed = maxWalkSpeed;
+        float walkSpeed = maxWalkSpeed * runSpeedCurve.Evaluate(Time.time - lastRunInputStartTime);
         Vector3 motion = (transform.forward * controlSpeed + transform.right * strafeInput) * walkSpeed;
         motion = Vector3.ClampMagnitude(motion, maxWalkSpeed);
 
