@@ -78,6 +78,7 @@ public class CharacterMovement : MonoBehaviour
     #region Setting backups.
     private float originalGravity;
     private float originalJumpHeight;
+    private float originalGroundSmoothDampTime;
     private float originalAirSmoothDampTime;
     private float originalMass;
     #endregion Setting backups.
@@ -109,6 +110,7 @@ public class CharacterMovement : MonoBehaviour
 
         originalGravity = gravity;
         originalJumpHeight = jumpHeight;
+        originalGroundSmoothDampTime = groundSmoothDampTime;
         originalAirSmoothDampTime = airSmoothDampTime;
         originalMass = mass;
     }
@@ -310,6 +312,8 @@ public class CharacterMovement : MonoBehaviour
     public void ResetJumpHeight() { jumpHeight = originalJumpHeight; }
     public void SetGravity(float newGravity) { gravity = newGravity; }
     public void ResetGravity() { gravity = originalGravity; }
+    public void SetGroundSmoothDampTime(float newGroundSmoothDampTime) { groundSmoothDampTime = newGroundSmoothDampTime; }
+    public void ResetGroundSmoothDampTime() { groundSmoothDampTime = originalGroundSmoothDampTime; }
     public void SetAirSmoothDampTime(float newAirSmoothDampTime) { airSmoothDampTime = newAirSmoothDampTime; }
     public void ResetAirSmoothDampTime() { airSmoothDampTime = originalAirSmoothDampTime; }
     public void SetMass(float newMass) { mass = newMass; }
