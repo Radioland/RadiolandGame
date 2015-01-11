@@ -72,7 +72,7 @@ public class CreateEffect : Effect
             //       use effects system? or keep a list of objects in this class?
             if (destroyOnEnd) {
                 MaxLifetime maxLifetime = createdObject.AddComponent<MaxLifetime>();
-                maxLifetime.maxTimeToLive = duration;
+                maxLifetime.maxTimeToLive = timing.duration;
             }
         }
     }

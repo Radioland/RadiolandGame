@@ -5,6 +5,11 @@ public class TranslateEffect : Effect
 {
     [SerializeField] private Vector3 finalTranslationDelta;
 
+    private void Reset() {
+        timing = new EffectTiming();
+        timing.timed = true;
+    }
+
     protected override void Awake() {
         base.Awake();
     }
@@ -17,7 +22,8 @@ public class TranslateEffect : Effect
         base.Update();
 
         if (hasStarted) {
-            transform.position = transform.position + finalTranslationDelta / duration * Time.deltaTime;
+            transform.position = transform.position +
+                                 finalTranslationDelta / timing.duration * Time.deltaTime;
         }
     }
 

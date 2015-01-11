@@ -4,10 +4,6 @@ using System.Collections;
 [RequireComponent(typeof(EffectManager))]
 public class Effect : MonoBehaviour
 {
-    // Variables to specify in the editor.
-    [SerializeField] private float startDelay = 0.0f;
-    [SerializeField] protected float duration = 1.0f;
-    [SerializeField] private float cooldown = 0.0f;
     [SerializeField] protected EffectTiming timing;
 
     [HideInInspector] public bool isPlaying;
@@ -18,7 +14,7 @@ public class Effect : MonoBehaviour
     protected float lastTimeEnded;
 
     protected float percentDurationElapsed {
-        get { return (Time.time - lastTimeStarted) / duration; }
+        get { return timing.timed ? ((Time.time - lastTimeStarted) / timing.duration) : 0f; }
     }
 
     protected virtual void Awake() {
@@ -34,11 +30,12 @@ public class Effect : MonoBehaviour
     }
 
     protected virtual void Update() {
-        if (isPlaying && !hasStarted && (Time.time - lastTimeTriggered > startDelay)) {
+        if (isPlaying && !hasStarted && (Time.time - lastTimeTriggered > timing.startDelay)) {
             StartEffect();
         }
 
-        if (isPlaying && hasStarted && (Time.time - lastTimeStarted > duration)) {
+        if (timing.timed && isPlaying && hasStarted &&
+            (Time.time - lastTimeStarted > timing.duration)) {
             EndEffect();
         }
     }
@@ -49,8 +46,8 @@ public class Effect : MonoBehaviour
 
         lastTimeTriggered = Time.time;
 
-        if (Time.time - lastTimeStarted < cooldown ||
-            Time.time - lastTimeEnded < cooldown) {
+        if (Time.time - lastTimeStarted < timing.cooldown ||
+            Time.time - lastTimeEnded < timing.cooldown) {
             return;
         }
 
@@ -58,7 +55,7 @@ public class Effect : MonoBehaviour
         hasStarted = false;
 
         // If there is no delay, start immediately - without waiting for Update.
-        if (startDelay < 0.001) {
+        if (timing.startDelay < 0.001) {
             StartEffect();
         }
     }
