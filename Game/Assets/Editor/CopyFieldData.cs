@@ -61,8 +61,8 @@ public class CopyFieldData : EditorWindow {
         Debug.Log("Copying data in " + EditorApplication.currentScene);
 
         // Find and replace "Bus" to change the component being worked on
-        TriggerEffects[] components = Resources.FindObjectsOfTypeAll<TriggerEffects>();
-        foreach (TriggerEffects component in components) {
+        Effect[] components = Resources.FindObjectsOfTypeAll<Effect>();
+        foreach (Effect component in components) {
             // Edit this line to change which field is copied into which
             //component.Transfer();
 
