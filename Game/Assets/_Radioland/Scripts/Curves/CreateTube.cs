@@ -1,8 +1,9 @@
-﻿using UnityEditor;
-using UnityEngine;
-using System;
-using System.Collections;
+﻿using UnityEngine;
 using System.Collections.Generic;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class CreateTube : MonoBehaviour
 {
@@ -167,8 +168,10 @@ public class CreateTube : MonoBehaviour
         if (debug) {
             tube.AddComponent<DestroyMeshWithObject>();
         } else {
+            #if UNITY_EDITOR
             string meshName = "Tube Mesh " + tube.GetInstanceID() + ".asset";
             AssetDatabase.CreateAsset(tubeMesh, tubeMeshAssetPath + meshName);
+            #endif
         }
 
         if (tubeMesh.triangles.Length == 0) {

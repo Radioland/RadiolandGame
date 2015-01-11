@@ -1,6 +1,8 @@
-﻿using UnityEditor;
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class BendMesh : MonoBehaviour
 {
@@ -107,11 +109,13 @@ public class BendMesh : MonoBehaviour
         mesh.RecalculateBounds();
 
         if (saveMeshes) {
+            #if UNITY_EDITOR
             string meshName = meshFilter.name + "_mesh " + meshFilter.GetInstanceID() + ".asset";
             AssetDatabase.CreateAsset(mesh, bendMeshAssetPath + meshName);
             meshFilter.mesh = mesh;
 
             bendOnPlay = false;
+            #endif
         }
     }
 }
