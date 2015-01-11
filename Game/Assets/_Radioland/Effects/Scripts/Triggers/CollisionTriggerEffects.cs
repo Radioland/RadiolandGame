@@ -28,8 +28,7 @@ public class CollisionTriggerEffects : TriggerEffects
     }
 
     private void StartEventIfMatch(string colliderTag) {
-        if (testColliderTag.Length == 0 ||
-            colliderTag.Equals(testColliderTag)) {
+        if (testColliderTag.Length == 0 || colliderTag.Equals(testColliderTag)) {
             StartEvent();
         }
     }
