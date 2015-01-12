@@ -5,7 +5,7 @@ public class TriggerEffects : MonoBehaviour
 {
     // Variables to specify in the editor.
     [SerializeField] protected EffectManager effectManager;
-    [Tooltip("Destroys this script, not its GameObject.")]
+    [Tooltip("Destroys this script after starting.")]
     [SerializeField] private bool onlyTriggerOnce = false;
 
     private void Reset() {
