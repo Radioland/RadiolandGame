@@ -4,7 +4,7 @@ using System.Collections;
 [RequireComponent(typeof(EffectManager))]
 public class Effect : MonoBehaviour
 {
-    [SerializeField] protected EffectTiming timing;
+    [SerializeField] protected EffectTiming timing = new EffectTiming();
 
     [HideInInspector] public bool isPlaying;
     [HideInInspector] public bool hasStarted;
