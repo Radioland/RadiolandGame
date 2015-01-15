@@ -11,9 +11,9 @@ public enum SplineWalkerMode
 public class SplineWalker : MonoBehaviour
 {
     [SerializeField] private BezierSpline spline;
-    [SerializeField] private float duration;
-    [SerializeField] private bool lookForward;
-    [SerializeField] private SplineWalkerMode mode;
+    [SerializeField] private float duration = 2f;
+    [SerializeField] private bool lookForward = false;
+    [SerializeField] private SplineWalkerMode mode = SplineWalkerMode.PingPong;
 
     private float progress;
     private bool goingForward = true;
