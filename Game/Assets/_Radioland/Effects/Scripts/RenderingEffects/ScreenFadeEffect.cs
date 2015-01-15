@@ -13,6 +13,11 @@ public class ScreenFadeEffect : Effect {
     private float alphaFadeValue;
     private bool hasPlayed;
 
+    private void Reset() {
+        timing = new EffectTiming();
+        timing.timed = true;
+    }
+
     protected override void Awake() {
         base.Awake();
     }

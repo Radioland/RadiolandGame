@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 
-public class TranslateEffect : Effect
+public class GeneralEffect : Effect
 {
-    [SerializeField] private Vector3 finalTranslationDelta;
-
-    private void Reset() {
-        timing = new EffectTiming();
-        timing.timed = true;
-    }
+    [SerializeField] private UnityEvent triggerEvent;
+    [SerializeField] private UnityEvent startEvent;
+    [SerializeField] private UnityEvent endEvent;
 
     protected override void Awake() {
         base.Awake();
@@ -20,22 +18,23 @@ public class TranslateEffect : Effect
 
     protected override void Update() {
         base.Update();
-
-        if (hasStarted) {
-            transform.position = transform.position +
-                                 finalTranslationDelta / timing.duration * Time.deltaTime;
-        }
     }
 
     public override void TriggerEffect() {
         base.TriggerEffect();
+
+        triggerEvent.Invoke();
     }
 
     public override void StartEffect() {
         base.StartEffect();
+
+        startEvent.Invoke();
     }
 
     public override void EndEffect() {
         base.EndEffect();
+
+        endEvent.Invoke();
     }
 }

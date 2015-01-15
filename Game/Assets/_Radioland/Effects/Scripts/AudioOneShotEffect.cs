@@ -8,6 +8,9 @@ public class AudioOneShotEffect : Effect
     [SerializeField] private AudioClip audioClip;
     [Range(0.0f, 1.0f)] [SerializeField] private float volumeScale = 1.0f;
 
+    [Tooltip("Persists past object destruction")]
+    [SerializeField] private bool playAtPoint = false;
+
     private float lastTimePlayed;
 
     protected override void Awake() {
@@ -29,7 +32,11 @@ public class AudioOneShotEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
-        audio.PlayOneShot(audioClip, volumeScale);
+        if (playAtPoint) {
+            AudioSource.PlayClipAtPoint(audioClip, transform.position, volumeScale);
+        } else {
+            audio.PlayOneShot(audioClip, volumeScale);
+        }
     }
 
     public override void EndEffect() {

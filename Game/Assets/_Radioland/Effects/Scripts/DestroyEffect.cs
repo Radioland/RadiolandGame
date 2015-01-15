@@ -5,14 +5,13 @@ public class DestroyEffect : Effect
 {
     // Variables to specify in the editor.
     [SerializeField] private GameObject objectToDestroy;
-    [SerializeField] private bool defaultToSelf = false;
+
+    private void Reset() {
+        objectToDestroy = gameObject;
+    }
 
     protected override void Awake() {
         base.Awake();
-
-        if (!objectToDestroy && defaultToSelf) {
-            objectToDestroy = gameObject;
-        }
     }
 
     protected override void Start() {

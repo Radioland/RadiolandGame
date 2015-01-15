@@ -11,7 +11,8 @@ public class Region : MonoBehaviour
 {
     public Vector3 dimensions = new Vector3(35, 10, 10);
     [SerializeField] private bool isCentered = false;
-    [SerializeField] private bool relativeDimensions = true; // Scale with (global) lossyScale.
+    [Tooltip("Scale with global scale instead of local")]
+    [SerializeField] private bool relativeDimensions = true;
     [SerializeField] private Color gizmoColor = Color.yellow;
 
     private Vector3 globalCenter;
@@ -23,11 +24,11 @@ public class Region : MonoBehaviour
     private Vector3 scaledDimensions {
         get {
             if (relativeDimensions) {
-                return dimensions;
-            } else {
                 return new Vector3(dimensions.x * transform.lossyScale.x,
                                    dimensions.y * transform.lossyScale.y,
                                    dimensions.z * transform.lossyScale.z);
+            } else {
+                return dimensions;
             }
         }
     }
@@ -82,17 +83,17 @@ public class Region : MonoBehaviour
                                      globalCenter.y + scaledDimensions.y / 2);
         float randomZ = Random.Range(globalCenter.z - scaledDimensions.z / 2,
                                      globalCenter.z + scaledDimensions.z / 2);
-
         return new Vector3(randomX, randomY, randomZ);
     }
 
     private void OnDrawGizmos() {
         Gizmos.color = gizmoColor;
 
-        Matrix4x4 rotationMatrix = Matrix4x4.TRS(transform.position,
-                                                 transform.rotation,
-                                                 transform.lossyScale);
-        Gizmos.matrix = rotationMatrix;
+        Vector3 scale = relativeDimensions ? transform.lossyScale : transform.localScale;
+        Matrix4x4 transformMatrix = Matrix4x4.TRS(transform.position,
+                                                  Quaternion.identity,
+                                                  scale);
+        Gizmos.matrix = transformMatrix;
 
         Gizmos.DrawWireCube(localCenter, dimensions);
     }
