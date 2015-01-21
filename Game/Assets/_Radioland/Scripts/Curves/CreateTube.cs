@@ -160,8 +160,8 @@ public class CreateTube : MonoBehaviour
         tubeMeshFilter.mesh = tubeMesh;
 
         MeshCollider meshCollider = tubeMeshFilter.gameObject.GetComponent<MeshCollider>();
-        if (meshCollider ) {
-            DestroyImmediate(meshCollider );
+        if (meshCollider) {
+            DestroyImmediate(meshCollider);
             tubeMeshFilter.gameObject.AddComponent<MeshCollider>();
         }
 
