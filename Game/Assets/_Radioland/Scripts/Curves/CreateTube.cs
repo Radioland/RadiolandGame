@@ -24,14 +24,6 @@ public class CreateTube : MonoBehaviour
     // start and end forward (direction) vectors is below this value.
     private const float refineTheshold = 0.98f;
 
-    // Counteract twists along the spline.
-    // If the up vectors are close to antiparallel, the spline twists.
-    // This case will pass the dot product test, so check if the up vector sum
-    // is low enough to indicate them being nearly antiparallel.
-    // If they are, twist vertex pairings using a {radiusSegments / 2} offset.
-    // [0:0, 1:1, 2:2, 3:3, 4:4, 5:5] twists to [0:3, 1:4, 2:5, 3:0, 4:1, 5:2]
-    private const float minSumMagnitude = 0.5f;
-
     private const float gizmoScale = 0.5f;
     private const string tubeMeshAssetPath = "Assets/_Radioland/ProceduralMeshes/";
 
@@ -225,13 +217,6 @@ public class CreateTube : MonoBehaviour
         CurveUtils.GetUpAndRight(startCurveForward, out startCurveUp, out startCurveRight);
         CurveUtils.GetUpAndRight(endCurveForward, out endCurveUp, out endCurveRight);
 
-        // Hack around start and end vectors being close to antiparallel.
-        bool twisted = false;
-        float sumMagnitude = (startCurveUp + endCurveUp).magnitude;
-        if (sumMagnitude < minSumMagnitude) {
-            twisted = true;
-        }
-
         if (startT <= 0f) {
             for (int i = 0; i < radiusSegments; i++) {
                 float startTheta = radiansPerSegment * i;
@@ -241,6 +226,12 @@ public class CreateTube : MonoBehaviour
                 vertices.Add(startCurveCenter + startCurveRight * startX + startCurveUp * startY);
             }
         }
+
+        // Compensate for twists in the spline.
+        // If the up vectors are close to antiparallel, the spline twists.
+        // Twist vertex pairings using a {radiusSegments / 2} offset.
+        // [0:0, 1:1, 2:2, 3:3, 4:4, 5:5] twists to [0:3, 1:4, 2:5, 3:0, 4:1, 5:2]
+        bool twisted = Vector3.Dot(startCurveUp, endCurveUp) < 0;
 
         int previousStartVertex = vertices.Count - radiusSegments;
         int previousOffset = twisted ? radiusSegments / 2 : 0;
