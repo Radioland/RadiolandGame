@@ -2,7 +2,6 @@
 using System.Collections;
 
 [RequireComponent(typeof(AudioSource))]
-
 public class RadioStation : MonoBehaviour
 {
     [SerializeField] [Range(0.0f, 1.0f)] private float maxVolume = 1.0f;
@@ -47,7 +46,7 @@ public class RadioStation : MonoBehaviour
         // End if the station signal is no longer strong enough.
         if (powerup && powerup.primed && !powerup.inUse &&
             (signalStrength < radioControl.powerupMinSignalStrength)) {
-            powerup.EndPowerup();
+            //powerup.EndPowerup();
         }
     }
 

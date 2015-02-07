@@ -134,7 +134,7 @@ public class RadioControl : MonoBehaviour
         }
 
         // Trigger powerups.
-        if (Input.GetButtonDown("UsePower")) {
+        if (Input.GetButtonDown("UsePower") && false) {
             foreach (RadioStation station in stations) {
                 if (station.signalStrength > powerupMinSignalStrength) {
                     station.UsePowerup();
