@@ -38,6 +38,8 @@ public class LowGravity : JumpPowerup
 
         if (inUse) {
             characterMovement.SetGravity(gravity);
+            Vector3 launchDirection = (transform.forward + transform.up).normalized;
+            characterMovement.AddVelocity(launchDirection * 30f);
         }
     }
 
