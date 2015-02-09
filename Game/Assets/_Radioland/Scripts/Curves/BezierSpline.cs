@@ -10,7 +10,7 @@ public enum BezierControlPointMode
     Mirrored
 }
 
-public class BezierSpline : MonoBehaviour
+public class BezierSpline : ICurve
 {
     #region Internal representation.
     [SerializeField] private Vector3[] points;
@@ -106,7 +106,7 @@ public class BezierSpline : MonoBehaviour
     #endregion Public interface for looping.
 
     #region Spline continuous property accessors.
-    public Vector3 GetPoint(float t) {
+    public override Vector3 GetPoint(float t) {
         int i;
         if (t >= 1f) {
             t = 1f;
@@ -122,7 +122,7 @@ public class BezierSpline : MonoBehaviour
                points[i], points[i + 1], points[i + 2], points[i + 3], t));
     }
 
-    public Vector3 GetVelocity(float t) {
+    public override Vector3 GetVelocity(float t) {
         int i;
         if (t >= 1f) {
             t = 1f;
@@ -136,10 +136,6 @@ public class BezierSpline : MonoBehaviour
 
         return transform.TransformPoint(Bezier.GetFirstDerivative(
                points[i], points[i + 1], points[i + 2], points[i + 3], t)) - transform.position;
-    }
-
-    public Vector3 GetDirection(float t) {
-        return GetVelocity(t).normalized;
     }
     #endregion Spline continuous property accessors.
 
