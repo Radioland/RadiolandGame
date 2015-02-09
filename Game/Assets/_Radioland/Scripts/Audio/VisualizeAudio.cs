@@ -5,8 +5,9 @@ using System.Linq;
 
 public class VisualizeAudio : MonoBehaviour
 {
+    [SerializeField] private AudioSource source;
     [SerializeField] private GameObject spectrumObjectPrefab;
-    [SerializeField] private int spectumObjectCount;
+    [SerializeField] private int spectumObjectCount = 5;
     [SerializeField] private float minScale = 0.2f;
     [SerializeField] private float maxScale = 2.0f;
     [SerializeField] private int spectrumSamples = 1024;
@@ -34,7 +35,11 @@ public class VisualizeAudio : MonoBehaviour
     }
 
     private void Update() {
-        AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+        if (source) {
+            source.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+        } else {
+            AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+        }
 
         float frequencyPerElement = AudioSettings.outputSampleRate / 2f / spectrumSamples;
         int stopIndex = Mathf.Min(Mathf.FloorToInt(upperFrequency / frequencyPerElement), spectrumSamples);
@@ -52,6 +57,7 @@ public class VisualizeAudio : MonoBehaviour
             }
 
             float relativeScaleFactor = spectrumSum / spectrumSamplesPerObject / maxAmplitude;
+            if (source) { relativeScaleFactor *= source.volume; }
             float scaleFactor = Mathf.Lerp(minScale, maxScale, relativeScaleFactor);
             spectrumObjects[i].transform.localScale = new Vector3(1f, scaleFactor, 1f);
         }
