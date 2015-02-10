@@ -22,6 +22,8 @@ public class RadioStation : MonoBehaviour
     public bool unlocked { get { return m_unlocked; } }
     public int id;
 
+    public AudioStream stream;
+
     [HideInInspector] public RadioControl radioControl;
     [HideInInspector] public AudioSource audioSource;
 
@@ -42,6 +44,9 @@ public class RadioStation : MonoBehaviour
 
     private void Update() {
         audioSource.volume = signalStrength * maxVolume;
+        if (stream) {
+            stream.volume = signalStrength * maxVolume;
+        }
 
         // End if the station signal is no longer strong enough.
         if (powerup && powerup.primed && !powerup.inUse &&
