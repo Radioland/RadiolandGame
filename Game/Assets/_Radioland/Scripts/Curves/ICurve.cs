@@ -3,6 +3,8 @@ using System.Collections;
 
 public class ICurve : MonoBehaviour
 {
+    private const float gizmoSphereRadius = 0.8f;
+
     private void Awake() {
 
     }
@@ -25,5 +27,12 @@ public class ICurve : MonoBehaviour
 
     public virtual Vector3 GetDirection(float t) {
         return GetVelocity(t).normalized;
+    }
+
+    protected virtual void OnDrawGizmos() {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(GetPoint(0), gizmoSphereRadius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(GetPoint(1), gizmoSphereRadius);
     }
 }

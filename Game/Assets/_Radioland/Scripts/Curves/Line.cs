@@ -24,4 +24,11 @@ public class Line : ICurve
     public override Vector3 GetVelocity(float t) {
         return p1 - p0;
     }
+
+    protected override void OnDrawGizmos() {
+        base.OnDrawGizmos();
+
+        Gizmos.color = Color.gray;
+        Gizmos.DrawLine(GetPoint(0), GetPoint(1));
+    }
 }

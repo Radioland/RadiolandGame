@@ -22,10 +22,10 @@ public class BezierSpline : ICurve
 
     public void Reset() {
         points = new Vector3[] {
-            new Vector3(1f, 0f, 0f),
-            new Vector3(2f, 0f, 0f),
-            new Vector3(3f, 0f, 0f),
-            new Vector3(4f, 0f, 0f)
+            new Vector3(0f, 0f, 0f),
+            new Vector3(0f, 2f, 2f),
+            new Vector3(0f, 2f, 2f),
+            new Vector3(0f, 0f, 4f)
         };
 
         modes = new BezierControlPointMode[] {
@@ -199,7 +199,9 @@ public class BezierSpline : ICurve
         points[enforcedIndex] = middle + enforcedTangent;
     }
 
-    private void OnDrawGizmos() {
+    protected override void OnDrawGizmos() {
+        base.OnDrawGizmos();
+
         Gizmos.color = Color.gray;
         int steps = gizmoStepsPerCurve * CurveCount;
         for (int i = 0; i < steps; i++) {
