@@ -10,7 +10,10 @@ public class AudioStream : MonoBehaviour
 {
     [SerializeField] private string url;
 
+    public float[] spectrum;
+
     private int stream;
+    private static bool initialized = false; // Only initialize BASS once between all instances.
 
     public enum flags
     {
@@ -27,6 +30,12 @@ public class AudioStream : MonoBehaviour
         BASS_ATTRIB_VOL = 2
     }
 
+    public enum lengths
+    {
+        BASS_DATA_FFT1024 = -2147483646,
+        BASS_DATA_FFT2048 = -2147483645
+    }
+
     [SerializeField] private float m_volume = 0f;
     public float volume {
         get { return m_volume; }
@@ -39,6 +48,9 @@ public class AudioStream : MonoBehaviour
     #region DLL - Stream Configuration and Initialization
     [DllImport("bass")]
     public static extern bool BASS_Init(int device, int freq, int flag, IntPtr hwnd, IntPtr clsid);
+
+    [DllImport("bass")]
+    public static extern int BASS_ErrorGetCode();
 
     [DllImport("bass")]
     public static extern bool BASS_SetConfig(configs config, int valuer);
@@ -56,27 +68,52 @@ public class AudioStream : MonoBehaviour
     public static extern bool BASS_Free();
     #endregion DLL - Stream Configuration and Initialization
 
-    #region DLL - Stream Control
+    #region DLL - Stream Control and Analysis
     [DllImport("bass")]
     public static extern bool BASS_SetVolume(float volume);
 
     [DllImport("bass")]
-    public static extern bool BASS_ChannelSetAttribute(int stream, attribs attrib, float value);
+    public static extern bool BASS_ChannelSetAttribute(int handle, attribs attrib, float value);
 
     [DllImport("bass")]
-    public static extern bool BASS_ChannelSlideAttribute(int stream, attribs attrib, float value, float time);
-    #endregion DLL - Stream Control
+    public static extern bool BASS_ChannelSlideAttribute(int handle, attribs attrib, float value, float time);
+
+    [DllImport("bass")]
+    public static extern long BASS_ChannelSeconds2Bytes(int handle, double pos);
+
+    [DllImport("bass")]
+    public static extern int BASS_ChannelGetData(int handle, float[] buffer, lengths length);
+    #endregion DLL - Stream Control and Analysis
 
     private void Awake() {
-        if (BASS_Init(-1, 44100, 0, IntPtr.Zero, IntPtr.Zero)) {
+        spectrum = new float[512];
+
+        if (!initialized) {
+            BASS_Free();
+
+            initialized = BASS_Init(-1, 44100, 0, IntPtr.Zero, IntPtr.Zero);
+            if (!initialized) {
+                Debug.LogError("Unable to initialize BASS, error code: " + BASS_ErrorGetCode());
+            }
+        }
+    }
+
+    private void Start() {
+        if (initialized) {
             BASS_SetConfig(configs.BASS_CONFIG_NET_PLAYLIST, 2);
             stream = BASS_StreamCreateURL(url, 0, flags.BASS_DEFAULT, IntPtr.Zero, IntPtr.Zero);
 
             if (stream != 0) {
                 volume = 0;
                 BASS_ChannelPlay(stream, false);
+            } else {
+                Debug.LogError("Unable to create stream.");
             }
         }
+    }
+
+    private void Update() {
+        BASS_ChannelGetData(stream, spectrum, lengths.BASS_DATA_FFT1024);
     }
 
     private void OnApplicationQuit() {

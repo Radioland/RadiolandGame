@@ -6,6 +6,7 @@ using System.Linq;
 public class VisualizeAudio : MonoBehaviour
 {
     [SerializeField] private AudioSource source;
+    [SerializeField] private AudioStream stream;
     [SerializeField] private GameObject spectrumObjectPrefab;
     [SerializeField] private int spectumObjectCount = 5;
     [SerializeField] private float minScale = 0.2f;
@@ -16,7 +17,11 @@ public class VisualizeAudio : MonoBehaviour
     private float[] spectrum;
     private List<GameObject> spectrumObjects;
 
+    private Vector3 originalScale;
+
     private void Awake() {
+        originalScale = spectrumObjectPrefab.transform.localScale;
+
         spectrum = new float[spectrumSamples];
 
         spectrumObjects = new List<GameObject>();
@@ -35,7 +40,10 @@ public class VisualizeAudio : MonoBehaviour
     }
 
     private void Update() {
-        if (source) {
+        if (stream) {
+            spectrum = stream.spectrum;
+            spectrumSamples = spectrum.Length;
+        } else if (source) {
             source.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
         } else {
             AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
@@ -49,6 +57,8 @@ public class VisualizeAudio : MonoBehaviour
             maxAmplitude = Mathf.Max(maxAmplitude, spectrum[i]);
         }
 
+        if (maxAmplitude <= 0.001) { return; }
+
         int spectrumSamplesPerObject = stopIndex / spectumObjectCount;
         for (int i = 0; i < spectumObjectCount; i++) {
             float spectrumSum = 0f;
@@ -57,9 +67,12 @@ public class VisualizeAudio : MonoBehaviour
             }
 
             float relativeScaleFactor = spectrumSum / spectrumSamplesPerObject / maxAmplitude;
-            if (source) { relativeScaleFactor *= source.volume; }
+            if (stream) { relativeScaleFactor *= stream.volume; }
+            else if (source) { relativeScaleFactor *= source.volume; }
             float scaleFactor = Mathf.Lerp(minScale, maxScale, relativeScaleFactor);
-            spectrumObjects[i].transform.localScale = new Vector3(1f, scaleFactor, 1f);
+            spectrumObjects[i].transform.localScale = new Vector3(originalScale.x,
+                                                                  originalScale.y * scaleFactor,
+                                                                  originalScale.z);
         }
     }
 }
