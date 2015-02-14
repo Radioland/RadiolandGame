@@ -3,7 +3,10 @@ using System.Collections;
 
 public class LowGravity : JumpPowerup
 {
-    [SerializeField] private float gravity = 4.0f;
+    [SerializeField] private float gravity = 2.5f;
+    [SerializeField] private float newSmoothDampTimes = 1.0f;
+    [SerializeField] private Vector3 launchDirection = new Vector3(0f, 0.5f, 1.0f);
+    [SerializeField] private float launchForce = 5.0f;
 
     private int longJumpHash;
 
@@ -30,6 +33,14 @@ public class LowGravity : JumpPowerup
         base.UsePowerup();
 
         animator.SetBool(longJumpHash, true);
+
+        characterMovement.SetAirSmoothDampTime(newSmoothDampTimes);
+        characterMovement.SetGroundSmoothDampTime(newSmoothDampTimes);
+
+        Vector3 launchDirectionRelative = (transform.forward * launchDirection.z +
+                                            transform.right * launchDirection.x +
+                                            transform.up * launchDirection.y).normalized;
+        characterMovement.AddVelocity(launchDirectionRelative * launchForce);
     }
 
     // Called via SendMessage in CharacterMovement.
@@ -45,6 +56,9 @@ public class LowGravity : JumpPowerup
         base.EndPowerup();
 
         characterMovement.ResetGravity();
+        characterMovement.ResetAirSmoothDampTime();
+        characterMovement.ResetGroundSmoothDampTime();
+
         animator.SetBool(longJumpHash, false);
     }
 }

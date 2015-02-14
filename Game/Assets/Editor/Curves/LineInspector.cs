@@ -5,6 +5,8 @@ using System.Collections;
 [CustomEditor(typeof(Line))]
 public class LineInspector : Editor
 {
+    private const float markerSize = 0.3f;
+
     private void OnSceneGUI() {
         // Fetch information about the Line.
         Line line = target as Line;
@@ -17,6 +19,11 @@ public class LineInspector : Editor
         // Draw the line itself.
         Handles.color = Color.white;
         Handles.DrawLine(p0, p1);
+
+        Handles.color = Color.green;
+        Handles.SphereCap(0, p0, handleRotation, HandleUtility.GetHandleSize(p0) * markerSize);
+        Handles.color = Color.red;
+        Handles.SphereCap(0, p1, handleRotation, HandleUtility.GetHandleSize(p1) * markerSize);
 
         // Draw position handles and update point coordinates if values change.
         EditorGUI.BeginChangeCheck();

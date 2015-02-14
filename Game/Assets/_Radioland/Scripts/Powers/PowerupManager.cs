@@ -65,6 +65,8 @@ public class PowerupManager : MonoBehaviour
     }
 
     public void SetActivePowerup(Powerup newActivePowerup) {
+        if (activePowerup == newActivePowerup) { return; }
+
         if (activePowerup) {
             activePowerup.EndPowerup();
         }

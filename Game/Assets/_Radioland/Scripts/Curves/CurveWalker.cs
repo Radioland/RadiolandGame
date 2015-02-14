@@ -1,19 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum SplineWalkerMode
+public enum CurveWalkerMode
 {
     Once,
     Loop,
     PingPong
 }
 
-public class SplineWalker : MonoBehaviour
+public class CurveWalker : MonoBehaviour
 {
-    [SerializeField] private BezierSpline spline;
+    [SerializeField] private ICurve curve;
     [SerializeField] private float duration = 2f;
     [SerializeField] private bool lookForward = false;
-    [SerializeField] private SplineWalkerMode mode = SplineWalkerMode.PingPong;
+    [SerializeField] private CurveWalkerMode mode = CurveWalkerMode.PingPong;
 
     private float progress;
     private bool goingForward = true;
@@ -30,9 +30,9 @@ public class SplineWalker : MonoBehaviour
         if (goingForward) {
             progress += Time.deltaTime / duration;
             if (progress > 1f) {
-                if (mode == SplineWalkerMode.Once) {
+                if (mode == CurveWalkerMode.Once) {
                     progress = 1f;
-                } else if (mode == SplineWalkerMode.Loop) {
+                } else if (mode == CurveWalkerMode.Loop) {
                     progress -= 1f;
                 } else {
                     progress = 2f - progress;
@@ -47,10 +47,10 @@ public class SplineWalker : MonoBehaviour
             }
         }
 
-        Vector3 position = spline.GetPoint(progress);
+        Vector3 position = curve.GetPoint(progress);
         transform.position = position;
         if (lookForward) {
-            transform.LookAt(position + spline.GetDirection(progress));
+            transform.LookAt(position + curve.GetDirection(progress));
         }
     }
 }
