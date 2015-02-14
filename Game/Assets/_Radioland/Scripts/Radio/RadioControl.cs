@@ -137,7 +137,8 @@ public class RadioControl : MonoBehaviour
         }
 
         // Trigger powerups.
-        if (Input.GetButtonDown("UsePower") && false) {
+        /*
+        if (Input.GetButtonDown("UsePower")) {
             foreach (RadioStation station in stations) {
                 if (station.signalStrength > powerupMinSignalStrength) {
                     station.UsePowerup();
@@ -148,6 +149,7 @@ public class RadioControl : MonoBehaviour
                 radioUI.TriggerActivity();
             }
         }
+        */
 
         maxSignal = 0.0f;
         foreach (RadioStation station in stations) {
