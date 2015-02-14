@@ -87,10 +87,10 @@ public class RadioControl : MonoBehaviour
 
         // Debug controls.
         if (Input.GetKey(KeyCode.Alpha1)) {
-            scrollValue += 0.01f;
+            scrollValue += 1f;
         }
         if (Input.GetKey(KeyCode.Alpha2)) {
-            scrollValue -= 0.01f;
+            scrollValue -= 1f;
         }
 
          // Don't allow tuning while paused.
