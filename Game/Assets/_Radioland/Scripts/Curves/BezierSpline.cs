@@ -202,10 +202,23 @@ public class BezierSpline : ICurve
     protected override void OnDrawGizmos() {
         base.OnDrawGizmos();
 
-        Gizmos.color = Color.gray;
         int steps = gizmoStepsPerCurve * CurveCount;
         for (int i = 0; i < steps; i++) {
-            Gizmos.DrawLine(GetPoint(i / (float)steps), GetPoint((i + 1) / (float)steps));
+            Vector3 p0w = GetPoint(i / (float)steps);
+            Vector3 p1w = GetPoint((i + 1) / (float)steps);
+
+            Gizmos.matrix = Matrix4x4.identity;
+            Gizmos.color = gizmoLineColor;
+            Gizmos.DrawLine(p0w, p1w);
+
+            Vector3 center = (p0w + p1w) * 0.5f;
+            float distance = Vector3.Distance(p0w, p1w);
+            Quaternion direction = Quaternion.LookRotation(p1w - p0w);
+
+            Matrix4x4 transformMatrix = Matrix4x4.TRS(center, direction, Vector3.one);
+            Gizmos.matrix = transformMatrix;
+            Gizmos.color = gizmoBoxColor;
+            Gizmos.DrawWireCube(Vector3.zero, new Vector3(gizmoBoxWidth, gizmoBoxWidth, distance));
         }
     }
 }

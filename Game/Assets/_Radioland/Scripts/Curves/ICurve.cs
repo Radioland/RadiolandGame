@@ -5,6 +5,10 @@ public class ICurve : MonoBehaviour
 {
     private const float gizmoSphereRadius = 0.8f;
 
+    protected const float gizmoBoxWidth = 0.9f;
+    protected static readonly Color gizmoLineColor = Color.blue;
+    protected static readonly Color gizmoBoxColor = new Color(0.2f, 0.3f, 0.5f);
+
     private void Awake() {
 
     }

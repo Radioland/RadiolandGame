@@ -13,6 +13,7 @@ public class Region : MonoBehaviour
     [SerializeField] private bool isCentered = false;
     [Tooltip("Scale with global scale instead of local")]
     [SerializeField] private bool relativeDimensions = true;
+    [SerializeField] private bool allowRotation = true;
     [SerializeField] private Color gizmoColor = Color.yellow;
 
     private Vector3 globalCenter;
@@ -66,7 +67,7 @@ public class Region : MonoBehaviour
         }
     }
 
-    // Boundary value accessors
+    // Boundary value accessors. These do NOT account for rotation.
     public float GetMinX() { return globalCenter.x - scaledDimensions.x / 2; }
     public float GetMaxX() { return globalCenter.x + scaledDimensions.x / 2; }
     public float GetMinY() { return globalCenter.y - scaledDimensions.y / 2; }
@@ -77,21 +78,29 @@ public class Region : MonoBehaviour
     public Vector3 GetCenter() { return globalCenter; }
 
     public Vector3 GetRandomPosition() {
-        float randomX = Random.Range(globalCenter.x - scaledDimensions.x / 2,
-                                     globalCenter.x + scaledDimensions.x / 2);
-        float randomY = Random.Range(globalCenter.y - scaledDimensions.y / 2,
-                                     globalCenter.y + scaledDimensions.y / 2);
-        float randomZ = Random.Range(globalCenter.z - scaledDimensions.z / 2,
-                                     globalCenter.z + scaledDimensions.z / 2);
-        return new Vector3(randomX, randomY, randomZ);
+        if (allowRotation) {
+            return globalCenter + (transform.right * Random.Range(-scaledDimensions.x / 2, scaledDimensions.x / 2) +
+                                   transform.up * Random.Range(-scaledDimensions.y / 2, scaledDimensions.y / 2) +
+                                   transform.forward * Random.Range(-scaledDimensions.z / 2, scaledDimensions.z / 2));
+        } else {
+            float randomX = Random.Range(globalCenter.x - scaledDimensions.x / 2,
+                                            globalCenter.x + scaledDimensions.x / 2);
+            float randomY = Random.Range(globalCenter.y - scaledDimensions.y / 2,
+                                            globalCenter.y + scaledDimensions.y / 2);
+            float randomZ = Random.Range(globalCenter.z - scaledDimensions.z / 2,
+                                            globalCenter.z + scaledDimensions.z / 2);
+            return new Vector3(randomX, randomY, randomZ);
+        }
+
     }
 
     private void OnDrawGizmos() {
         Gizmos.color = gizmoColor;
 
         Vector3 scale = relativeDimensions ? transform.lossyScale : transform.localScale;
+        Quaternion rotation = allowRotation ? transform.rotation : Quaternion.identity;
         Matrix4x4 transformMatrix = Matrix4x4.TRS(transform.position,
-                                                  Quaternion.identity,
+                                                  rotation,
                                                   scale);
         Gizmos.matrix = transformMatrix;
 
