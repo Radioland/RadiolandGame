@@ -1,22 +1,43 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class StationPower : MonoBehaviour
 {
-    [SerializeField] private RadioStation station;
+    public enum StationChoice {
+        Any,
+        Station_1,
+        Station_2,
+        Station_3
+    }
+
+    [SerializeField] private StationChoice stationChoice = StationChoice.Any;
     [SerializeField] [Tooltip("Enable when powered, disable without power.")]
     private List<MonoBehaviour> powerBehaviors;
     [SerializeField] private UnityEvent startPowerEvents;
     [SerializeField] private UnityEvent stopPowerEvents;
 
     private bool powered;
+    private RadioStation radioStation;
+    private RadioStation[] allStations;
 
     private void Awake() {
-        if (!station) {
-            Debug.LogWarning("No RadioStation linked to " + this.GetPath());
-            this.enabled = false;
+        GameObject player = GameObject.FindWithTag("Player");
+        allStations = player.GetComponentsInChildren<RadioStation>();
+
+        // Find the radioStation with our stationId.
+        // TODO: refactor?
+        foreach (RadioStation station in allStations) {
+            if (station.id == 1 && stationChoice == StationChoice.Station_1) {
+                radioStation = station;
+            } else if (station.id == 2 && stationChoice == StationChoice.Station_2) {
+                radioStation = station;
+            } else if (station.id == 3 && stationChoice == StationChoice.Station_3) {
+                radioStation = station;
+            }
         }
 
         StopPower();
@@ -27,12 +48,20 @@ public class StationPower : MonoBehaviour
     }
 
     private void Update() {
-        if (!powered && station.StrongSignal()) {
-            StartPower();
-        }
+        if (stationChoice == StationChoice.Any) {
+            if (allStations.Any(station => station.StrongSignal())) {
+                StartPower();
+            } else {
+                StopPower();
+            }
+        } else if (radioStation) {
+            if (!powered && radioStation.StrongSignal()) {
+                StartPower();
+            }
 
-        if (powered && !station.StrongSignal()) {
-            StopPower();
+            if (powered && !radioStation.StrongSignal()) {
+                StopPower();
+            }
         }
     }
 
