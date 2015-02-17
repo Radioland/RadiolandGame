@@ -94,4 +94,18 @@ using System.Collections;
         CreateObject("Visualizer Grass", "Assets/_Radioland/Environment/Prefabs/Components/props/Visualizer Grass.prefab",
                      placeAbove:true, orientToSurface:true);
     }
+
+    [MenuItem("GameObject/Create Radioland/General/Checkpoint", false, 1)]
+    [MenuItem("Radioland/General/Checkpoint", false, 1)]
+    private static void CreateCheckpoint() {
+        CreateObject("Checkpoint", "Assets/_Radioland/Prefabs/LevelGeneral/Checkpoint.prefab",
+                     placeAbove:true, orientToSurface:false);
+    }
+
+    [MenuItem("GameObject/Create Radioland/General/Small Killzone", false, 1)]
+    [MenuItem("Radioland/General/Small Killzone", false, 1)]
+    private static void CreateSmallKillzone() {
+        CreateObject("Small Killzone", "Assets/_Radioland/Prefabs/LevelGeneral/Small Killzone.prefab",
+                     placeAbove:true, orientToSurface:false);
+    }
 }
