@@ -87,4 +87,11 @@ using System.Collections;
         CreateObject("Elevator", "Assets/_Radioland/Environment/Prefabs/Elevator.prefab",
                      placeAbove:true);
     }
+
+    [MenuItem("GameObject/Create Radioland/Props/Visualizer Grass", false, 1)]
+    [MenuItem("Radioland/Props/Visualizer Grass", false, 1)]
+    private static void CreateVisualizerGrass() {
+        CreateObject("Visualizer Grass", "Assets/_Radioland/Environment/Prefabs/Components/props/Visualizer Grass.prefab",
+                     placeAbove:true, orientToSurface:true);
+    }
 }

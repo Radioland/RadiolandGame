@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using UnityEditor;
 
 // Reference: http://forum.unity3d.com/threads/web-radio-streaming-with-bass-dll.168046/
 
@@ -14,6 +15,7 @@ public class AudioStream : MonoBehaviour
 
     private int stream;
     private static bool initialized = false; // Only initialize BASS once between all instances.
+    private bool paused;
 
     public enum flags
     {
@@ -70,6 +72,9 @@ public class AudioStream : MonoBehaviour
 
     #region DLL - Stream Control and Analysis
     [DllImport("bass")]
+    public static extern bool BASS_ChannelPause(int stream);
+
+    [DllImport("bass")]
     public static extern bool BASS_SetVolume(float volume);
 
     [DllImport("bass")]
@@ -87,6 +92,7 @@ public class AudioStream : MonoBehaviour
 
     private void Awake() {
         spectrum = new float[512];
+        paused = false;
 
         if (!initialized) {
             BASS_Free();
@@ -110,10 +116,33 @@ public class AudioStream : MonoBehaviour
                 Debug.LogError("Unable to create stream.");
             }
         }
+
+        #if UNITY_EDITOR
+        EditorApplication.playmodeStateChanged = HandleOnPlayModeChanged;
+        #endif
     }
 
     private void Update() {
+        if (Time.timeScale <= 0.001f && !paused) { Pause(); }
+        if (Time.timeScale > 0.001f && paused) { Play(); }
+
         BASS_ChannelGetData(stream, spectrum, lengths.BASS_DATA_FFT1024);
+    }
+
+    private void HandleOnPlayModeChanged() {
+        if (EditorApplication.isPaused || !EditorApplication.isPlaying) { Pause(); }
+    }
+
+    private void Play() {
+        if (!paused) { return; }
+        paused = false;
+        BASS_ChannelPlay(stream, false);
+    }
+
+    private void Pause() {
+        if (paused) { return; }
+        paused = true;
+        BASS_ChannelPause(stream);
     }
 
     private void OnApplicationQuit() {
