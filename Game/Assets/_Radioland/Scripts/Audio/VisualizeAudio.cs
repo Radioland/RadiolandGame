@@ -120,7 +120,7 @@ public class VisualizeAudio : MonoBehaviour
     }
 
     public void OnDrawGizmos() {
-//        if (spectrumObjects.Count != 0) { return; }
+        // if (spectrumObjects.Count != 0) { return; }
 
         // Draw a cube around the space taken up by the cubes.
 
@@ -133,7 +133,6 @@ public class VisualizeAudio : MonoBehaviour
         Vector3 end = start + (transform.forward * spectrumObjectOffset * (spectumObjectCount));
         Vector3 center = (start + end) * 0.5f;
         float distance = Vector3.Distance(start, end);
-//        Quaternion direction = Quaternion.LookRotation(end - start);
         Quaternion direction = transform.rotation;
 
         Matrix4x4 transformMatrix = Matrix4x4.TRS(center, direction, Vector3.one);

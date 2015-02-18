@@ -21,7 +21,7 @@ using System.Collections;
         }
 
         theObject.transform.localPosition = Vector3.zero;
-        if (placeAbove && selectedObject.collider) {
+        if (placeAbove && selectedObject && selectedObject.collider) {
             float height = selectedObject.collider.bounds.size.y;
 
             RaycastHit[] hits;
