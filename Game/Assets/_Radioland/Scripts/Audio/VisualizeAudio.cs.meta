@@ -2,7 +2,9 @@ fileFormatVersion: 2
 guid: 4a74c50c83290b54eb2b031a8268fc05
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - spectrumObjectPrefab: {fileID: 163950, guid: f94398fe5cc80d840bcd06633aa638c3,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -1,37 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
+[RequireComponent(typeof(SpectrumSource))]
 public class VisualizeAudio : MonoBehaviour
 {
-    private enum StationChoice {
-        None,
-        StrongestSignal,
-        Station_1,
-        Station_2,
-        Station_3
-    }
-
-    [Header("Automatic Source Setup")]
-    [SerializeField] private StationChoice stationChoice = StationChoice.Station_1;
-    [Header("Manual Source Setup")]
-    [SerializeField] private AudioSource source;
-    [SerializeField] private AudioStream stream;
     [Header("Automatic Objects Setup")]
     [SerializeField] private GameObject spectrumObjectPrefab;
-    [SerializeField] private int spectumObjectCount = 5;
+    [SerializeField] private int spectumObjectCount = 6;
     [SerializeField] [Tooltip("This will be applied in the forward direction.")]
     private float spectrumObjectOffset = 0.5f;
     [Header("Manual Objects Setup")]
     [SerializeField] private List<GameObject> spectrumObjects;
     [Header("Configuration")]
     [SerializeField] private float minScale = 0.2f;
-    [SerializeField] private float maxScale = 2.0f;
-    [SerializeField] private int spectrumSamples = 1024;
+    [SerializeField] private float maxScale = 4.0f;
     [SerializeField] private int upperFrequency = 1024;
 
-    private RadioStation[] allStations;
+    private SpectrumSource spectrumSource;
+    private int spectrumSamples;
     private float[] spectrum;
 
     private Vector3 originalScale;
@@ -41,6 +28,8 @@ public class VisualizeAudio : MonoBehaviour
     private void Awake() {
         originalScale = spectrumObjectPrefab.transform.localScale;
 
+        spectrumSource = gameObject.GetComponent<SpectrumSource>();
+        spectrumSamples = spectrumSource.spectrumSamples;
         spectrum = new float[spectrumSamples];
 
         if (spectrumObjects.Count == 0) {
@@ -55,19 +44,6 @@ public class VisualizeAudio : MonoBehaviour
                 spectrumObjects.Add(spectrumObject);
             }
         }
-
-        GameObject player = GameObject.FindWithTag("Player");
-        allStations = player.GetComponentsInChildren<RadioStation>();
-
-        // Find the radioStation matching stationChoice.
-        foreach (RadioStation station in allStations) {
-            if ((station.id == 1 && stationChoice == StationChoice.Station_1) ||
-                (station.id == 2 && stationChoice == StationChoice.Station_2) ||
-                (station.id == 3 && stationChoice == StationChoice.Station_3)) {
-                source = station.audioSource;
-                stream = station.stream;
-            }
-        }
     }
 
     private void Start() {
@@ -75,22 +51,7 @@ public class VisualizeAudio : MonoBehaviour
     }
 
     private void Update() {
-        if (stationChoice == StationChoice.StrongestSignal) {
-            float strongestSignal = allStations.Max(x => x.signalStrength);
-            RadioStation station = allStations.First(x => Mathf.Approximately(x.signalStrength, strongestSignal));
-
-            source = station.audioSource;
-            stream = station.stream;
-        }
-
-        if (stream) {
-            spectrum = stream.spectrum;
-            spectrumSamples = spectrum.Length;
-        } else if (source) {
-            source.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
-        } else if (stationChoice == StationChoice.None) {
-            AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
-        }
+        spectrum = spectrumSource.spectrum;
 
         float frequencyPerElement = AudioSettings.outputSampleRate / 2f / spectrumSamples;
         int stopIndex = Mathf.Min(Mathf.FloorToInt(upperFrequency / frequencyPerElement), spectrumSamples);
@@ -110,8 +71,8 @@ public class VisualizeAudio : MonoBehaviour
             }
 
             float relativeScaleFactor = spectrumSum / spectrumSamplesPerObject / maxAmplitude;
-            if (stream) { relativeScaleFactor *= stream.volume; }
-            else if (source) { relativeScaleFactor *= source.volume; }
+            if (spectrumSource.stream) { relativeScaleFactor *= spectrumSource.stream.volume; }
+            else if (spectrumSource.source) { relativeScaleFactor *= spectrumSource.source.volume; }
             float scaleFactor = Mathf.Lerp(minScale, maxScale, relativeScaleFactor);
             spectrumObjects[i].transform.localScale = new Vector3(originalScale.x,
                                                                   originalScale.y * scaleFactor,
@@ -120,6 +81,7 @@ public class VisualizeAudio : MonoBehaviour
     }
 
     public void OnDrawGizmos() {
+        if (!spectrumObjectPrefab) { return; }
         // if (spectrumObjects.Count != 0) { return; }
 
         // Draw a cube around the space taken up by the cubes.
