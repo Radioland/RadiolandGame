@@ -7,7 +7,7 @@ using System.Linq;
 
 public class StationPower : MonoBehaviour
 {
-    public enum StationChoice {
+    private enum StationChoice {
         Any,
         Station_1,
         Station_2,
@@ -28,14 +28,11 @@ public class StationPower : MonoBehaviour
         GameObject player = GameObject.FindWithTag("Player");
         allStations = player.GetComponentsInChildren<RadioStation>();
 
-        // Find the radioStation with our stationId.
-        // TODO: refactor?
+        // Find the radioStation matching stationChoice.
         foreach (RadioStation station in allStations) {
-            if (station.id == 1 && stationChoice == StationChoice.Station_1) {
-                radioStation = station;
-            } else if (station.id == 2 && stationChoice == StationChoice.Station_2) {
-                radioStation = station;
-            } else if (station.id == 3 && stationChoice == StationChoice.Station_3) {
+            if ((station.id == 1 && stationChoice == StationChoice.Station_1) ||
+                (station.id == 2 && stationChoice == StationChoice.Station_2) ||
+                (station.id == 3 && stationChoice == StationChoice.Station_3)) {
                 radioStation = station;
             }
         }
