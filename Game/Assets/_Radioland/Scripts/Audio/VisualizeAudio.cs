@@ -53,8 +53,8 @@ public class VisualizeAudio : MonoBehaviour
     private void Update() {
         spectrum = spectrumSource.spectrum;
 
-        float frequencyPerElement = AudioSettings.outputSampleRate / 2f / spectrumSamples;
-        int stopIndex = Mathf.Min(Mathf.FloorToInt(upperFrequency / frequencyPerElement), spectrumSamples);
+        int stopIndex = Mathf.Min(Mathf.FloorToInt(upperFrequency / spectrumSource.frequencyPerElement),
+                                  spectrumSamples);
 
         float maxAmplitude = 0;
         for (int i = 0; i < stopIndex; i++) {
@@ -70,9 +70,12 @@ public class VisualizeAudio : MonoBehaviour
                 spectrumSum += spectrum[j + i * spectrumSamplesPerObject];
             }
 
+            // Scale the sum based on the samples and volumes.
             float relativeScaleFactor = spectrumSum / spectrumSamplesPerObject / maxAmplitude;
             if (spectrumSource.stream) { relativeScaleFactor *= spectrumSource.stream.volume; }
             else if (spectrumSource.source) { relativeScaleFactor *= spectrumSource.source.volume; }
+            if (spectrumSource.radioStation) { relativeScaleFactor /= spectrumSource.radioStation.maxVolume; }
+
             float scaleFactor = Mathf.Lerp(minScale, maxScale, relativeScaleFactor);
             spectrumObjects[i].transform.localScale = new Vector3(originalScale.x,
                                                                   originalScale.y * scaleFactor,

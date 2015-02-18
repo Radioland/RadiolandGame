@@ -12,8 +12,11 @@ public class SpectrumSource : MonoBehaviour
         Station_3
     }
 
-    public float[] spectrum;
     public int spectrumSamples = 1024;
+    [HideInInspector] public float[] spectrum;
+    [HideInInspector] public float sampleRate;
+    [HideInInspector] public float frequencyPerElement;
+    [HideInInspector] public RadioStation radioStation;
 
     [Header("Automatic Source Setup")]
     [SerializeField] private StationChoice stationChoice = StationChoice.Station_1;
@@ -36,6 +39,7 @@ public class SpectrumSource : MonoBehaviour
                 (station.id == 3 && stationChoice == StationChoice.Station_3)) {
                 source = station.audioSource;
                 stream = station.stream;
+                radioStation = station;
             }
         }
     }
@@ -47,19 +51,24 @@ public class SpectrumSource : MonoBehaviour
     private void Update() {
         if (stationChoice == StationChoice.StrongestSignal) {
             float strongestSignal = allStations.Max(x => x.signalStrength);
-            RadioStation station = allStations.First(x => Mathf.Approximately(x.signalStrength, strongestSignal));
+            radioStation = allStations.First(x => Mathf.Approximately(x.signalStrength, strongestSignal));
 
-            source = station.audioSource;
-            stream = station.stream;
+            source = radioStation.audioSource;
+            stream = radioStation.stream;
         }
 
         if (stream) {
             spectrum = stream.spectrum;
-            spectrumSamples = spectrum.Length;
+            spectrumSamples = stream.spectrum.Length;
+            sampleRate = stream.sampleRate;
         } else if (source) {
             source.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+            sampleRate = source.clip.frequency;
         } else if (stationChoice == StationChoice.None) {
             AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+            sampleRate = AudioSettings.outputSampleRate;
         }
+
+        frequencyPerElement = sampleRate / 2f / spectrumSamples;
     }
 }
