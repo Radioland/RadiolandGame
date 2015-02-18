@@ -10,7 +10,7 @@ public enum BezierControlPointMode
     Mirrored
 }
 
-public class BezierSpline : MonoBehaviour
+public class BezierSpline : ICurve
 {
     #region Internal representation.
     [SerializeField] private Vector3[] points;
@@ -22,10 +22,10 @@ public class BezierSpline : MonoBehaviour
 
     public void Reset() {
         points = new Vector3[] {
-            new Vector3(1f, 0f, 0f),
-            new Vector3(2f, 0f, 0f),
-            new Vector3(3f, 0f, 0f),
-            new Vector3(4f, 0f, 0f)
+            new Vector3(0f, 0f, 0f),
+            new Vector3(0f, 2f, 2f),
+            new Vector3(0f, 2f, 2f),
+            new Vector3(0f, 0f, 4f)
         };
 
         modes = new BezierControlPointMode[] {
@@ -106,7 +106,7 @@ public class BezierSpline : MonoBehaviour
     #endregion Public interface for looping.
 
     #region Spline continuous property accessors.
-    public Vector3 GetPoint(float t) {
+    public override Vector3 GetPoint(float t) {
         int i;
         if (t >= 1f) {
             t = 1f;
@@ -122,7 +122,7 @@ public class BezierSpline : MonoBehaviour
                points[i], points[i + 1], points[i + 2], points[i + 3], t));
     }
 
-    public Vector3 GetVelocity(float t) {
+    public override Vector3 GetVelocity(float t) {
         int i;
         if (t >= 1f) {
             t = 1f;
@@ -136,10 +136,6 @@ public class BezierSpline : MonoBehaviour
 
         return transform.TransformPoint(Bezier.GetFirstDerivative(
                points[i], points[i + 1], points[i + 2], points[i + 3], t)) - transform.position;
-    }
-
-    public Vector3 GetDirection(float t) {
-        return GetVelocity(t).normalized;
     }
     #endregion Spline continuous property accessors.
 
@@ -203,11 +199,26 @@ public class BezierSpline : MonoBehaviour
         points[enforcedIndex] = middle + enforcedTangent;
     }
 
-    private void OnDrawGizmos() {
-        Gizmos.color = Color.gray;
+    protected override void OnDrawGizmos() {
+        base.OnDrawGizmos();
+
         int steps = gizmoStepsPerCurve * CurveCount;
         for (int i = 0; i < steps; i++) {
-            Gizmos.DrawLine(GetPoint(i / (float)steps), GetPoint((i + 1) / (float)steps));
+            Vector3 p0w = GetPoint(i / (float)steps);
+            Vector3 p1w = GetPoint((i + 1) / (float)steps);
+
+            Gizmos.matrix = Matrix4x4.identity;
+            Gizmos.color = gizmoLineColor;
+            Gizmos.DrawLine(p0w, p1w);
+
+            Vector3 center = (p0w + p1w) * 0.5f;
+            float distance = Vector3.Distance(p0w, p1w);
+            Quaternion direction = Quaternion.LookRotation(p1w - p0w);
+
+            Matrix4x4 transformMatrix = Matrix4x4.TRS(center, direction, Vector3.one);
+            Gizmos.matrix = transformMatrix;
+            Gizmos.color = gizmoBoxColor;
+            Gizmos.DrawWireCube(Vector3.zero, new Vector3(gizmoBoxWidth, gizmoBoxWidth, distance));
         }
     }
 }

@@ -13,6 +13,7 @@ public class CreateTubeInspector : Editor
             GameObject tube = createTube.CreateNew();
             if (tube) {
                 Undo.RegisterCreatedObjectUndo(tube, "Create New Tube");
+                Selection.activeObject = tube;
             }
         }
     }

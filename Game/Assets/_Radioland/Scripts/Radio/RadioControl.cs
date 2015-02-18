@@ -14,6 +14,7 @@ public class RadioControl : MonoBehaviour
 
     // Private variables set in the inspector.
     [SerializeField] private PowerupManager powerupManager;
+    [SerializeField] private float frequencySweepTime = 3.0f;
     [SerializeField] private float knobTurnRatio = 4.0f;
     [Tooltip("Plays when seeking between stations.")]
     [SerializeField] [Range(0.0f, 1.0f)] private float stationCutoff = 0.2f;
@@ -81,17 +82,19 @@ public class RadioControl : MonoBehaviour
 
     private void Update() {
         // TODO: replace with better controller/mouse input management.
-        float scrollValue = Input.GetAxis("Mouse ScrollWheel") + Input.GetAxis("Tune");
+        float scrollValue = Input.GetAxis("Mouse ScrollWheel") + Input.GetAxisRaw("Tune");
+        scrollValue = Mathf.Clamp(scrollValue, -1f, 1f);
 
         // Debug controls.
         if (Input.GetKey(KeyCode.Alpha1)) {
-            scrollValue += 0.01f;
+            scrollValue += 1f;
         }
         if (Input.GetKey(KeyCode.Alpha2)) {
-            scrollValue -= 0.01f;
+            scrollValue -= 1f;
         }
 
-        m_currentFrequency -= scrollValue * Time.timeScale; // Don't allow tuning while paused.
+         // Don't allow tuning while paused.
+        m_currentFrequency -= Time.timeScale * (scrollValue * Time.deltaTime / frequencySweepTime);
         m_currentFrequency = Mathf.Clamp01(m_currentFrequency);
 
         foreach (RadioUI radioUI in radioUIs) {
@@ -134,6 +137,7 @@ public class RadioControl : MonoBehaviour
         }
 
         // Trigger powerups.
+        /*
         if (Input.GetButtonDown("UsePower")) {
             foreach (RadioStation station in stations) {
                 if (station.signalStrength > powerupMinSignalStrength) {
@@ -145,6 +149,7 @@ public class RadioControl : MonoBehaviour
                 radioUI.TriggerActivity();
             }
         }
+        */
 
         maxSignal = 0.0f;
         foreach (RadioStation station in stations) {

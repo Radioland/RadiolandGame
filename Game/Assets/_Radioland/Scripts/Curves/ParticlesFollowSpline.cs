@@ -11,12 +11,16 @@ public class ParticlesFollowSpline : MonoBehaviour
     [SerializeField] [Tooltip("Ignored if the spline does not loop.")]
     private float loopTime = 1f;
 
+    private bool stopped;
+
     private void Reset() {
         system = gameObject.GetComponentInChildren<ParticleSystem>();
         spline = gameObject.GetComponentInChildren<BezierSpline>();
 
         if (system) { Debug.Log("Found " + system.GetPath() + " for " + this.GetPath()); }
         if (spline) { Debug.Log("Found " + spline.GetPath() + " for " + this.GetPath()); }
+
+        stopped = false;
     }
 
     private void Awake() {
@@ -39,8 +43,18 @@ public class ParticlesFollowSpline : MonoBehaviour
 
     }
 
+    public void StopSystem() {
+        system.Stop();
+        stopped = true;
+    }
+
+    public void StartSystem() {
+        system.Play();
+        stopped = false;
+    }
+
     private void Update() {
-        if (!system.isPlaying) { return; }
+        if (system.isPaused) { return; }
 
         ParticleSystem.Particle[] particles = new ParticleSystem.Particle[system.particleCount];
         int particleCount = system.GetParticles(particles);
@@ -51,7 +65,11 @@ public class ParticlesFollowSpline : MonoBehaviour
             float t;
             if (spline.loop) {
                 if (particle.lifetime < particle.startLifetime / 2f) {
-                    particle.lifetime += particle.startLifetime / 2f;
+                    if (stopped) {
+                        particle.lifetime = 0f;
+                    } else {
+                        particle.lifetime += particle.startLifetime / 2f;
+                    }
                 }
                 t = (1f - (particle.lifetime / particle.startLifetime)) * 2f;
             } else {

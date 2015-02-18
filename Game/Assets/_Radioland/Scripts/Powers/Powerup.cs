@@ -2,10 +2,10 @@
 using System.Collections;
 
 [RequireComponent(typeof(PowerupManager))]
-
 public class Powerup : MonoBehaviour
 {
     [SerializeField] protected float duration = 5.0f;
+    [SerializeField] private string inputName;
     public float energyCost = 0.2f;
     public Color color;
     public bool primed;
@@ -52,6 +52,10 @@ public class Powerup : MonoBehaviour
         if (primed && !inUse && (Time.time - lastStartedTime > duration)) {
             EndPowerup();
         }
+
+        if (inputName.Length > 0 && Input.GetButtonDown(inputName) && CanUsePowerup()) {
+            TryToUsePowerup();
+        }
     }
 
     public bool HasStrongSignal() {
@@ -63,7 +67,7 @@ public class Powerup : MonoBehaviour
     }
 
     public virtual bool CanUsePowerup() {
-        return !primed && HasSufficientResources() && HasStrongSignal();
+        return !primed && !inUse && HasSufficientResources(); // && HasStrongSignal();
     }
 
     public void TryToUsePowerup() {
@@ -80,12 +84,11 @@ public class Powerup : MonoBehaviour
     }
 
     public virtual void UsePowerup() {
-        // If re-using this powerup, this first ends the current instance.
         powerupManager.SetActivePowerup(this);
 
         lastStartedTime = Time.time;
         primed = true;
-        powerupManager.energy -= energyCost;
+        //powerupManager.energy -= energyCost;
     }
 
     public virtual void EndPowerup() {
