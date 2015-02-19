@@ -7,7 +7,7 @@ using System.Collections;
     private static void CreateObject(string objectName, string objectPath,
                                      bool placeAbove=false, bool orientToSurface=false,
                                      bool matchScale=false) {
-        GameObject theObject = GameObject.Instantiate(
+        GameObject theObject = PrefabUtility.InstantiatePrefab(
                 AssetDatabase.LoadAssetAtPath(objectPath, typeof(GameObject))) as GameObject;
         if (!theObject) { return; }
 
