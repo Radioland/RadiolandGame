@@ -48,8 +48,22 @@ using System.Collections;
 
     [MenuItem("GameObject/Create Radioland/Critters/Talking Resistor", false, 1)]
     [MenuItem("Radioland/Critters/Talking Resistor", false, 1)]
-    private static void CreatePanel() {
+    private static void CreateResistor() {
         CreateObject("Talking Resistor", "Assets/_Radioland/Prefabs/Critters/Talking Resistor.prefab",
+                     placeAbove:true, orientToSurface:true);
+    }
+
+    [MenuItem("GameObject/Create Radioland/Critters/Talking Solenoid", false, 1)]
+    [MenuItem("Radioland/Critters/Talking Solenoid", false, 1)]
+    private static void CreateSolenoid() {
+        CreateObject("Talking Solenoid", "Assets/_Radioland/Prefabs/Critters/Talking Solenoid.prefab",
+                     placeAbove:true, orientToSurface:true);
+    }
+
+    [MenuItem("GameObject/Create Radioland/Critters/Talking Capacitor", false, 1)]
+    [MenuItem("Radioland/Critters/Talking Capacitor", false, 1)]
+    private static void CreateCapacitor() {
+        CreateObject("Talking Capacitor", "Assets/_Radioland/Prefabs/Critters/Talking Capacitor.prefab",
                      placeAbove:true, orientToSurface:true);
     }
 
