@@ -7,7 +7,7 @@ using System.Collections;
     private static void CreateObject(string objectName, string objectPath,
                                      bool placeAbove=false, bool orientToSurface=false,
                                      bool matchScale=false) {
-        GameObject theObject = GameObject.Instantiate(
+        GameObject theObject = PrefabUtility.InstantiatePrefab(
                 AssetDatabase.LoadAssetAtPath(objectPath, typeof(GameObject))) as GameObject;
         if (!theObject) { return; }
 
@@ -107,5 +107,12 @@ using System.Collections;
     private static void CreateSmallKillzone() {
         CreateObject("Small Killzone", "Assets/_Radioland/Prefabs/LevelGeneral/Small Killzone.prefab",
                      placeAbove:true, orientToSurface:false);
+    }
+
+    [MenuItem("GameObject/Create Radioland/Environment/Bouncy Speaker", false, 1)]
+    [MenuItem("Radioland/Environment/Bouncy Speaker", false, 1)]
+    private static void CreateBouncySpeaker() {
+        CreateObject("Bouncy Speaker", "Assets/_Radioland/Environment/Prefabs/speaker.prefab",
+                     placeAbove:true, orientToSurface:true);
     }
 }

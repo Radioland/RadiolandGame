@@ -12,6 +12,7 @@ public class AudioStream : MonoBehaviour
     [SerializeField] private string url;
 
     public float[] spectrum;
+    public float sampleRate;
 
     private int stream;
     private static bool initialized = false; // Only initialize BASS once between all instances.
@@ -29,6 +30,7 @@ public class AudioStream : MonoBehaviour
 
     public enum attribs
     {
+        BASS_ATTRIB_FREQ = 1,
         BASS_ATTRIB_VOL = 2
     }
 
@@ -78,6 +80,9 @@ public class AudioStream : MonoBehaviour
     public static extern bool BASS_SetVolume(float volume);
 
     [DllImport("bass")]
+    public static extern bool BASS_ChannelGetAttribute(int handle, attribs attrib, out float value);
+
+    [DllImport("bass")]
     public static extern bool BASS_ChannelSetAttribute(int handle, attribs attrib, float value);
 
     [DllImport("bass")]
@@ -91,7 +96,7 @@ public class AudioStream : MonoBehaviour
     #endregion DLL - Stream Control and Analysis
 
     private void Awake() {
-        spectrum = new float[512];
+        spectrum = new float[1024];
         paused = false;
 
         if (!initialized) {
@@ -112,6 +117,8 @@ public class AudioStream : MonoBehaviour
             if (stream != 0) {
                 volume = 0;
                 BASS_ChannelPlay(stream, false);
+
+                BASS_ChannelGetAttribute(stream, attribs.BASS_ATTRIB_FREQ, out sampleRate);
             } else {
                 Debug.LogError("Unable to create stream.");
             }
@@ -126,7 +133,7 @@ public class AudioStream : MonoBehaviour
         if (Time.timeScale <= 0.001f && !paused) { Pause(); }
         if (Time.timeScale > 0.001f && paused) { Play(); }
 
-        BASS_ChannelGetData(stream, spectrum, lengths.BASS_DATA_FFT1024);
+        BASS_ChannelGetData(stream, spectrum, lengths.BASS_DATA_FFT2048);
     }
 
     private void HandleOnPlayModeChanged() {

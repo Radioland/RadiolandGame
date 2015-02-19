@@ -4,7 +4,7 @@ using System.Collections;
 [RequireComponent(typeof(AudioSource))]
 public class RadioStation : MonoBehaviour
 {
-    [SerializeField] [Range(0.0f, 1.0f)] private float maxVolume = 1.0f;
+    [Range(0.0f, 1.0f)] public float maxVolume = 1.0f;
     public float frequency;
     public float signalStrength {
         get {

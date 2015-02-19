@@ -16,7 +16,8 @@ ModelImporter:
     400008: speaker_mid
     400010: speaker_root
     4300000: speaker
-    7400000: Take 001
+    7400000: Idle
+    7400002: Bounce
     9500000: //RootNode
     13700000: speaker
   materials:
@@ -34,11 +35,87 @@ ModelImporter:
     animationScaleError: .5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Idle
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 2
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: speaker
+        weight: 1
+      - path: speaker_ctrl
+        weight: 1
+      - path: speaker_root
+        weight: 1
+      - path: speaker_root/speaker_mid
+        weight: 1
+      - path: speaker_root/speaker_mid/speaker_end
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Bounce
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 14
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: speaker
+        weight: 1
+      - path: speaker_ctrl
+        weight: 1
+      - path: speaker_root
+        weight: 1
+      - path: speaker_root/speaker_mid
+        weight: 1
+      - path: speaker_root/speaker_mid/speaker_end
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: .00999999978
+    globalScale: .400000006
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1

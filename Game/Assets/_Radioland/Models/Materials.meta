@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 696a7a953eef3344ea6bf870d8780de8
+=======
+guid: 1e9a2d3e14280e746887c8f4a822e580
+>>>>>>> Added speaker prefab with animator. Moved SpectrumSource into new script.
 folderAsset: yes
 DefaultImporter:
   userData: 
