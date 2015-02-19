@@ -29,7 +29,7 @@ public class Bounce : MonoBehaviour
 
         if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.2f)) {
             BouncePlatform bouncePlatform = hit.collider.gameObject.GetComponent<BouncePlatform>();
-            if (bouncePlatform) {
+            if (bouncePlatform && bouncePlatform.bounceMode == BounceMode.Static) {
                 ApplyBounce(verticalSpeed, bouncePlatform);
             } else {
                 bouncing = false;
@@ -43,7 +43,7 @@ public class Bounce : MonoBehaviour
         }
 
         if (-firstBounceSpeed > minimumSpeed) {
-            characterMovement.Bounce(-firstBounceSpeed * bouncePlatform.elasticity);
+            characterMovement.Bounce(-firstBounceSpeed * bouncePlatform.staticElasticity);
             bouncing = true;
         } else {
             bouncing = false;

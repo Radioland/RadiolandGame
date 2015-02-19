@@ -41,6 +41,7 @@ public class CharacterMovement : MonoBehaviour
     public bool running { get; private set; }
     public bool inJumpWindup { get; private set; }
     public bool jumping { get; private set; }
+    public bool bouncing { get; private set; }
     public bool sliding { get; private set; }
     public bool grounded { get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; } }
     public bool falling { get; private set; }
@@ -59,6 +60,8 @@ public class CharacterMovement : MonoBehaviour
     private float lastJumpInputTime;
     private float lastJumpTime;
     private float lastGroundedTime;
+    private float lastBouncedTime;
+    private const float bounceCooldown = 0.5f;
     private const float slopeRayDistance = 0.1f;
     private Vector3 contactPoint;
     private float slopeAngle;
@@ -124,6 +127,7 @@ public class CharacterMovement : MonoBehaviour
         running = false;
         inJumpWindup = false;
         jumping = false;
+        bouncing = false;
         sliding = false;
         falling = false;
         controlSpeed = 0f;
@@ -137,6 +141,12 @@ public class CharacterMovement : MonoBehaviour
     private void Update() {
         if (grounded) {
             lastGroundedTime = Time.time;
+
+            if (bouncing) {
+                ResetAirSmoothDampTime();
+                ResetGroundSmoothDampTime();
+                bouncing = false;
+            }
 
             ApplySliding();
         }
@@ -293,10 +303,26 @@ public class CharacterMovement : MonoBehaviour
     }
 
     public void Bounce(float bounceSpeed) {
+        Bounce(bounceSpeed, Vector3.up);
+    }
+
+    public void Bounce(float bounceSpeed, Vector3 bounceDirection, float newSmoothDampTimes=0f) {
+        if (Time.time - lastBouncedTime < bounceCooldown) { return; }
+        lastBouncedTime = Time.time;
+
         SendMessage("BounceTriggered", SendMessageOptions.DontRequireReceiver);
-        verticalSpeed = bounceSpeed;
+        Vector3 bounceVelocity = bounceSpeed * bounceDirection;
+        verticalSpeed = Vector3.Dot(bounceVelocity, Vector3.up);
+        SetVelocity(new Vector3(Vector3.Dot(bounceVelocity, Vector3.right),
+                                0,
+                                Vector3.Dot(bounceVelocity, Vector3.forward)));
         jumping = true;
+        bouncing = true;
         lastJumpTime = Time.time;
+        if (newSmoothDampTimes > 0) {
+            SetAirSmoothDampTime(newSmoothDampTimes);
+            SetGroundSmoothDampTime(newSmoothDampTimes);
+        }
     }
 
     // Velocity controls.
