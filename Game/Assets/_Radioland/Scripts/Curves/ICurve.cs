@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[ExecuteInEditMode]
 public class ICurve : MonoBehaviour
 {
-    private const float gizmoSphereRadius = 0.8f;
+    protected static float gizmoSphereRadius = 0.8f;
+    protected static float gizmoBoxWidth = 0.9f;
 
-    protected const float gizmoBoxWidth = 0.9f;
     protected static readonly Color gizmoLineColor = Color.blue;
     protected static readonly Color gizmoBoxColor = new Color(0.2f, 0.3f, 0.5f);
 
@@ -34,6 +35,9 @@ public class ICurve : MonoBehaviour
     }
 
     protected virtual void OnDrawGizmos() {
+        gizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius");
+        gizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth");
+
         Gizmos.color = Color.green;
         Gizmos.DrawSphere(GetPoint(0), gizmoSphereRadius);
         Gizmos.color = Color.red;
