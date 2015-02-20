@@ -12,6 +12,7 @@ ModelImporter:
     2300000: pPlane5
     3300000: pPlane5
     4300000: pPlane5
+    6400000: pPlane5
     9500000: //RootNode
   materials:
     importMaterials: 0
@@ -32,9 +33,9 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: .00999999978
+    globalScale: 1
     meshCompression: 0
-    addColliders: 0
+    addColliders: 1
     importBlendShapes: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
@@ -64,6 +65,6 @@ ModelImporter:
     feetSpacing: 0
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   additionalBone: 0
   userData: 
