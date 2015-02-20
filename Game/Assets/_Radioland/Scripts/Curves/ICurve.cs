@@ -35,8 +35,8 @@ public class ICurve : MonoBehaviour
     }
 
     protected virtual void OnDrawGizmos() {
-        gizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius");
-        gizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth");
+        gizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", gizmoSphereRadius);
+        gizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", gizmoBoxWidth);
 
         Gizmos.color = Color.green;
         Gizmos.DrawSphere(GetPoint(0), gizmoSphereRadius);

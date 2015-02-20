@@ -1,38 +1,54 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class RadiolandWindow : EditorWindow {
-    private float curveGizmoBoxWidth = 0.9f;
-    private float curveGizmoSphereRadius = 0.9f;
-    private Color buttonColor = Color.red;
+public class RadiolandWindow : EditorWindow
+{
+    private Texture2D headerImage = Resources.Load("BirbBanner", typeof(Texture2D)) as Texture2D;
+    private const float headerHeight = 100f;
 
-    public static RadiolandWindow window;
+    private const float defaultCurveGizmoSphereRadius = 0.8f;
+    private const float defaultCurveGizmoBoxWidth= 0.9f;
+    private float curveGizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", defaultCurveGizmoSphereRadius);
+    private float curveGizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", 0.9f);
 
-    // Add menu named "Radioland" to the Window menu
     [MenuItem ("Window/Radioland")]
     private static void Init() {
         // Get existing open window or if none, make a new one.
-        window = (RadiolandWindow)EditorWindow.GetWindow(typeof(RadiolandWindow));
+        RadiolandWindow window = (RadiolandWindow)EditorWindow.GetWindow(typeof(RadiolandWindow));
         window.title = "Radioland";
+
+        window.curveGizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", window.curveGizmoSphereRadius);
+        window.curveGizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", window.curveGizmoBoxWidth);
     }
 
     private void OnGUI() {
-        GUILayout.Label ("Curve Settings", EditorStyles.boldLabel);
-
+        // Hack to get current window width (this allows for centering).
         EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Gizmo Box Width");
-        curveGizmoBoxWidth = EditorGUILayout.Slider(curveGizmoBoxWidth, 0f, 2f);
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
+        Rect scale = GUILayoutUtility.GetLastRect();
+
+        GUILayout.Space(headerHeight);
+        GUI.DrawTexture(new Rect(0, 0, scale.width, headerHeight), headerImage, ScaleMode.ScaleToFit);
+
+        GUILayout.Label("Curve Settings", EditorStyles.boldLabel);
+
+        // Curves: Gizmo Sphere Radius.
+        EditorGUILayout.BeginHorizontal();
+        curveGizmoSphereRadius = EditorGUILayout.Slider("Gizmo Sphere Radius", curveGizmoSphereRadius, 0f, 1f);
+        if (Mathf.Approximately(curveGizmoSphereRadius, defaultCurveGizmoSphereRadius)) { GUI.enabled = false; }
+        if (GUILayout.Button("Reset", GUILayout.ExpandWidth(false))) { curveGizmoSphereRadius = defaultCurveGizmoSphereRadius; }
+        GUI.enabled = true;
+        PlayerPrefs.SetFloat("curveGizmoSphereRadius", curveGizmoSphereRadius);
         EditorGUILayout.EndHorizontal();
 
-//        curveGizmoBoxWidth = EditorGUILayout.FloatField("Gizmo Box Width", curveGizmoBoxWidth);
-        curveGizmoSphereRadius = EditorGUILayout.FloatField("Gizmo Sphere Radius", curveGizmoSphereRadius);
+        // Curves: Gizmo Box Width.
+        EditorGUILayout.BeginHorizontal();
+        curveGizmoBoxWidth = EditorGUILayout.Slider("Gizmo Box Width", curveGizmoBoxWidth, 0f, 2f);
+        if (Mathf.Approximately(curveGizmoBoxWidth, defaultCurveGizmoBoxWidth)) { GUI.enabled = false; }
+        if (GUILayout.Button("Reset", GUILayout.ExpandWidth(false))) { curveGizmoBoxWidth = defaultCurveGizmoBoxWidth; }
+        GUI.enabled = true;
         PlayerPrefs.SetFloat("curveGizmoBoxWidth", curveGizmoBoxWidth);
-        PlayerPrefs.SetFloat("curveGizmoSphereRadius", curveGizmoSphereRadius);
-
-        buttonColor = EditorGUILayout.ColorField("Color", buttonColor);
-        GUI.color = buttonColor;
-        if (GUILayout.Button("testing" )) {
-
-        }
+        EditorGUILayout.EndHorizontal();
     }
 }
