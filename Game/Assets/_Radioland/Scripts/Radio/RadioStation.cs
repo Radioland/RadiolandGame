@@ -37,8 +37,10 @@ public class RadioStation : MonoBehaviour
             Debug.LogWarning("There is no RadioControl linked to this RadioStation!");
         }
 
-        if (powerup) {
-            powerup.radioStation = this;
+        if (powerup) { powerup.radioStation = this; }
+
+        if (stream && !stream.streamInitialized && audioSource && !audioSource.enabled) {
+            audioSource.enabled = true;
         }
     }
 

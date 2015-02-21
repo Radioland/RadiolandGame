@@ -57,7 +57,7 @@ public class SpectrumSource : MonoBehaviour
             stream = radioStation.stream;
         }
 
-        if (stream) {
+        if (stream && stream.streamInitialized) {
             spectrum = stream.spectrum;
             spectrumSamples = stream.spectrum.Length;
             sampleRate = stream.sampleRate;
