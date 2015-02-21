@@ -7,8 +7,8 @@ public class Wobble : MonoBehaviour
 
     [SerializeField] [Tooltip("Euler angles (degrees).")] private Vector3 minRotationChange;
     [SerializeField] [Tooltip("Euler angles (degrees).")] private Vector3 maxRotationChange;
-    [SerializeField] private float minWobbleTime = 1.0f;
-    [SerializeField] private float maxWobbleTime = 1.0f;
+    [SerializeField] private float minWobbleTime = 4.0f;
+    [SerializeField] private float maxWobbleTime = 4.0f;
     [SerializeField] private float minPauseTime = 0.0f;
     [SerializeField] private float maxPauseTime = 0.0f;
     [SerializeField] private float minCooldown = 0.0f;
@@ -21,6 +21,11 @@ public class Wobble : MonoBehaviour
     private float wobbleTime;
     private float pauseTime;
     private float cooldown;
+
+    private void Reset() {
+        minRotationChange = new Vector3(-10f, -10f, -10f);
+        maxRotationChange = new Vector3(10f, 10f, 10f);
+    }
 
     private void Awake() {
         StartWobble();
