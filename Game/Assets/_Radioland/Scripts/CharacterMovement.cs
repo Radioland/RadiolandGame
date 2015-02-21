@@ -61,6 +61,7 @@ public class CharacterMovement : MonoBehaviour
     private float lastJumpTime;
     private float lastGroundedTime;
     private float lastBouncedTime;
+    private const float minimumBounceTime = 0.3f;
     private const float bounceCooldown = 0.5f;
     private const float slopeRayDistance = 0.1f;
     private Vector3 contactPoint;
@@ -142,7 +143,7 @@ public class CharacterMovement : MonoBehaviour
         if (grounded) {
             lastGroundedTime = Time.time;
 
-            if (bouncing) {
+            if (bouncing && Time.time - lastBouncedTime > minimumBounceTime) {
                 ResetAirSmoothDampTime();
                 ResetGroundSmoothDampTime();
                 bouncing = false;
@@ -236,10 +237,7 @@ public class CharacterMovement : MonoBehaviour
     private void ApplyGravity() {
         if (grounded) {
             if (falling) {
-                float landingVerticalSpeed = verticalSpeed;
-                verticalSpeed = 0.0f;
-                SendMessage("Grounded", landingVerticalSpeed, SendMessageOptions.DontRequireReceiver);
-                falling = false;
+                Land();
             }
             jumping = false;
             animator.SetBool(landingHash, false);
@@ -264,6 +262,13 @@ public class CharacterMovement : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void Land() {
+        float landingVerticalSpeed = verticalSpeed;
+        verticalSpeed = 0.0f;
+        SendMessage("Grounded", landingVerticalSpeed, SendMessageOptions.DontRequireReceiver);
+        falling = false;
     }
 
     private void ApplyJump() {
@@ -309,6 +314,7 @@ public class CharacterMovement : MonoBehaviour
     public void Bounce(float bounceSpeed, Vector3 bounceDirection, float newSmoothDampTimes=0f) {
         if (Time.time - lastBouncedTime < bounceCooldown) { return; }
         lastBouncedTime = Time.time;
+        Land();
 
         SendMessage("BounceTriggered", SendMessageOptions.DontRequireReceiver);
         Vector3 bounceVelocity = bounceSpeed * bounceDirection;
