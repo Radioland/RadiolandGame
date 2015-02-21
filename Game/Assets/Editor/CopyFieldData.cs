@@ -60,9 +60,9 @@ public class CopyFieldData : EditorWindow {
     private void CopyDataInScene() {
         Debug.Log("Copying data in " + EditorApplication.currentScene);
 
-        // Find and replace "Bus" to change the component being worked on
-        Effect[] components = Resources.FindObjectsOfTypeAll<Effect>();
-        foreach (Effect component in components) {
+        // Edit these lines to change which components are operated on.
+        ParticlesFollowCurve[] components = Resources.FindObjectsOfTypeAll<ParticlesFollowCurve>();
+        foreach (ParticlesFollowCurve component in components) {
             // Edit this line to change which field is copied into which
             //component.Transfer();
 

@@ -9,7 +9,7 @@ public class BendMesh : MonoBehaviour
     #region Internal representation.
     [SerializeField] [Tooltip("Local coordinates")] private Vector3 referenceStart;
     [SerializeField] [Tooltip("Local coordinates")] private Vector3 referenceEnd;
-    [SerializeField] private BezierSpline bendSpline;
+    [SerializeField] private ICurve bendCurve;
     [SerializeField] private bool bendChildren = true;
     [SerializeField] private bool bendOnPlay = true;
     #endregion Internal representation.
@@ -48,7 +48,7 @@ public class BendMesh : MonoBehaviour
     }
 
     public void PerformBend(bool saveMeshes) {
-        if (!bendSpline) { return; }
+        if (!bendCurve) { return; }
 
         Debug.Log("Bending Mesh on " + transform.GetPath() + ".");
 
@@ -95,8 +95,8 @@ public class BendMesh : MonoBehaviour
             float pointReferenceUp = Vector3.Dot(differenceFromReference, referenceUp);
             float pointReferenceRight = Vector3.Dot(differenceFromReference, referenceRight);
 
-            Vector3 bendPoint = bendSpline.GetPoint(percentAlongReference);
-            Vector3 bendForward = bendSpline.GetDirection(percentAlongReference);
+            Vector3 bendPoint = bendCurve.GetPoint(percentAlongReference);
+            Vector3 bendForward = bendCurve.GetDirection(percentAlongReference);
             Vector3 bendUp, bendRight;
             CurveUtils.GetUpAndRight(bendForward, out bendUp, out bendRight);
 

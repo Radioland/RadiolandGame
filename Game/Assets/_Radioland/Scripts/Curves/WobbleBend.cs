@@ -7,8 +7,8 @@ public class WobbleBend : MonoBehaviour
     #region Internal representation.
     [SerializeField] [Tooltip("Local coordinates")] private Vector3 referenceStart;
     [SerializeField] [Tooltip("Local coordinates")] private Vector3 referenceEnd;
-    [SerializeField] private BezierSpline bendSplineA;
-    [SerializeField] private BezierSpline bendSplineB;
+    [SerializeField] private ICurve bendCurveA;
+    [SerializeField] private ICurve bendCurveB;
     [SerializeField] private bool bendChildren = true;
     [SerializeField] private float bendSpeed = 0.2f;
     #endregion Internal representation.
@@ -89,13 +89,13 @@ public class WobbleBend : MonoBehaviour
             float pointReferenceUp = Vector3.Dot(differenceFromReference, referenceUp);
             float pointReferenceRight = Vector3.Dot(differenceFromReference, referenceRight);
 
-            Vector3 bendPointA = bendSplineA.GetPoint(percentAlongReference);
-            Vector3 bendForwardA = bendSplineA.GetDirection(percentAlongReference);
+            Vector3 bendPointA = bendCurveA.GetPoint(percentAlongReference);
+            Vector3 bendForwardA = bendCurveA.GetDirection(percentAlongReference);
             Vector3 bendUpA, bendRightA;
             CurveUtils.GetUpAndRight(bendForwardA, out bendUpA, out bendRightA);
 
-            Vector3 bendPointB = bendSplineB.GetPoint(percentAlongReference);
-            Vector3 bendForwardB = bendSplineB.GetDirection(percentAlongReference);
+            Vector3 bendPointB = bendCurveB.GetPoint(percentAlongReference);
+            Vector3 bendForwardB = bendCurveB.GetDirection(percentAlongReference);
             Vector3 bendUpB, bendRightB;
             CurveUtils.GetUpAndRight(bendForwardB, out bendUpB, out bendRightB);
 

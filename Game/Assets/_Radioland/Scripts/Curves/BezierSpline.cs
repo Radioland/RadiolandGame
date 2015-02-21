@@ -68,7 +68,7 @@ public class BezierSpline : ICurve
     }
     public int GetAnchorPointIndex(int index) { return (index + 1) / 3 * 3; }
     public bool IsAnchorPoint(int index) { return index == GetAnchorPointIndex(index); }
-    public int CurveCount { get { return (points.Length - 1) / 3; } }
+    public new int curveCount { get { return (points.Length - 1) / 3; } }
     #endregion Public interface for points.
 
     #region Public interface for point modes.
@@ -91,7 +91,7 @@ public class BezierSpline : ICurve
     #endregion Public interface for point modes.
 
     #region Public interface for looping.
-    public bool loop {
+    public new bool loop {
         get {
             return m_loop;
         }
@@ -112,7 +112,7 @@ public class BezierSpline : ICurve
             t = 1f;
             i = points.Length - 4;
         } else {
-            t = Mathf.Clamp01(t) * CurveCount;
+            t = Mathf.Clamp01(t) * curveCount;
             i = (int)t;
             t -= i;
             i *= 3;
@@ -128,7 +128,7 @@ public class BezierSpline : ICurve
             t = 1f;
             i = points.Length - 4;
         } else {
-            t = Mathf.Clamp01(t) * CurveCount;
+            t = Mathf.Clamp01(t) * curveCount;
             i = (int)t;
             t -= i;
             i *= 3;
@@ -202,7 +202,7 @@ public class BezierSpline : ICurve
     protected override void OnDrawGizmos() {
         base.OnDrawGizmos();
 
-        int steps = gizmoStepsPerCurve * CurveCount;
+        int steps = gizmoStepsPerCurve * curveCount;
         for (int i = 0; i < steps; i++) {
             Vector3 p0w = GetPoint(i / (float)steps);
             Vector3 p1w = GetPoint((i + 1) / (float)steps);

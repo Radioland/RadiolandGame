@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-public class ParticlesFollowSpline : MonoBehaviour
+public class ParticlesFollowCurve : MonoBehaviour
 {
     [SerializeField] private ParticleSystem system;
-    [SerializeField] private BezierSpline spline;
+    [SerializeField] private ICurve curve;
 
     [SerializeField] [Tooltip("Higher values interpolate to target position faster.")]
     [Range(0f, 1f)] private float smoothing = 0.2f;
@@ -15,10 +15,10 @@ public class ParticlesFollowSpline : MonoBehaviour
 
     private void Reset() {
         system = gameObject.GetComponentInChildren<ParticleSystem>();
-        spline = gameObject.GetComponentInChildren<BezierSpline>();
+        curve = gameObject.GetComponentInChildren<ICurve>();
 
         if (system) { Debug.Log("Found " + system.GetPath() + " for " + this.GetPath()); }
-        if (spline) { Debug.Log("Found " + spline.GetPath() + " for " + this.GetPath()); }
+        if (curve) { Debug.Log("Found " + curve.GetPath() + " for " + this.GetPath()); }
 
         stopped = false;
     }
@@ -26,7 +26,7 @@ public class ParticlesFollowSpline : MonoBehaviour
     private void Awake() {
         system.simulationSpace = ParticleSystemSimulationSpace.World;
 
-        if (spline.loop) {
+        if (curve.loop) {
             system.emissionRate = system.maxParticles / loopTime;
 
             // Work within a lifetime range of [loopTime, 2 * loopTime].
@@ -63,7 +63,7 @@ public class ParticlesFollowSpline : MonoBehaviour
             ParticleSystem.Particle particle = particles[i];
 
             float t;
-            if (spline.loop) {
+            if (curve.loop) {
                 if (particle.lifetime < particle.startLifetime / 2f) {
                     if (stopped) {
                         particle.lifetime = 0f;
@@ -75,7 +75,7 @@ public class ParticlesFollowSpline : MonoBehaviour
             } else {
                 t = 1f - (particle.lifetime / particle.startLifetime);
             }
-            particle.position = Vector3.Lerp(particle.position, spline.GetPoint(t), smoothing);
+            particle.position = Vector3.Lerp(particle.position, curve.GetPoint(t), smoothing);
 
             particles[i] = particle;
         }

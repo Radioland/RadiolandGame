@@ -10,6 +10,9 @@ public class ICurve : MonoBehaviour
     protected static readonly Color gizmoLineColor = Color.blue;
     protected static readonly Color gizmoBoxColor = new Color(0.2f, 0.3f, 0.5f);
 
+    [HideInInspector] public readonly bool loop = false;
+    [HideInInspector] public readonly int curveCount = 1;
+
     private void Awake() {
 
     }

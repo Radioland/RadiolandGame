@@ -7,7 +7,7 @@ using UnityEditor;
 
 public class CreateTube : MonoBehaviour
 {
-    [SerializeField] private BezierSpline spline;
+    [SerializeField] private ICurve curve;
     [SerializeField] private GameObject proceduralMeshPrefab;
     [SerializeField] private float radius = 0.5f;
     [SerializeField] private int lengthSegmentsPerCurve = 10;
@@ -32,9 +32,9 @@ public class CreateTube : MonoBehaviour
     private List<int> triangles;
 
     private void Reset() {
-        spline = gameObject.GetComponentInChildren<BezierSpline>();
+        curve = gameObject.GetComponentInChildren<ICurve>();
 
-        if (spline) { Debug.Log("Found " + spline.GetPath() + " for " + this.GetPath()); }
+        if (curve) { Debug.Log("Found " + curve.GetPath() + " for " + this.GetPath()); }
     }
 
     private void Awake() {
@@ -56,7 +56,7 @@ public class CreateTube : MonoBehaviour
             return null;
         }
 
-        if (!spline) {
+        if (!curve) {
             Debug.LogError("Spline is not set for " +
                             this.GetPath() + ", aborting CreateNew.");
             return null;
@@ -64,7 +64,7 @@ public class CreateTube : MonoBehaviour
 
         GameObject tube = (GameObject)Instantiate(proceduralMeshPrefab);
         tube.transform.parent = transform;
-        tube.transform.position = spline.transform.position;
+        tube.transform.position = curve.transform.position;
 
         MeshFilter tubeMeshFilter = tube.GetComponent<MeshFilter>();
         if (!tubeMeshFilter) { tubeMeshFilter = tube.AddComponent<MeshFilter>(); }
@@ -78,13 +78,13 @@ public class CreateTube : MonoBehaviour
 
         float radiansPerSegment = Mathf.PI * 2f / radiusSegments;
 
-        if (!spline.loop) {
+        if (!curve.loop) {
             Vector3 curveCenter, curveForward, curveUp, curveRight;
             float nextTheta, nextX, nextY;
 
             // Create the start cap.
-            curveCenter = spline.GetPoint(0f);
-            curveForward = spline.GetDirection(0f);
+            curveCenter = curve.GetPoint(0f);
+            curveForward = curve.GetDirection(0f);
             CurveUtils.GetUpAndRight(curveForward, out curveUp, out curveRight);
 
             int centerVertex = vertices.Count;
@@ -105,8 +105,8 @@ public class CreateTube : MonoBehaviour
             }
 
             // Create the end cap.
-            curveCenter = spline.GetPoint(1f);
-            curveForward = spline.GetDirection(1f);
+            curveCenter = curve.GetPoint(1f);
+            curveForward = curve.GetDirection(1f);
             CurveUtils.GetUpAndRight(curveForward, out curveUp, out curveRight);
 
             centerVertex = vertices.Count;
@@ -128,7 +128,7 @@ public class CreateTube : MonoBehaviour
         }
 
         // Create segments along the length of the curve.
-        int lengthSegments = lengthSegmentsPerCurve * spline.CurveCount;
+        int lengthSegments = lengthSegmentsPerCurve * curve.curveCount;
         for (int i = 0; i < lengthSegments; i++) {
             float startT = i / (float)lengthSegments;
             float endT = (i + 1) / (float)lengthSegments;
@@ -181,31 +181,31 @@ public class CreateTube : MonoBehaviour
     /// <param name="t">Time along the curve.</param>
     /// <returns></returns>
     private Vector3 GetAveragedForward(float t) {
-        int lengthSegments = lengthSegmentsPerCurve * spline.CurveCount;
+        int lengthSegments = lengthSegmentsPerCurve * curve.curveCount;
 
         float halfwayPreviousT = t - (0.5f / (float)lengthSegments);
         float halfwayNextT = t + (0.5f / (float)lengthSegments);
 
-        Vector3 halfwayPreviousForward = spline.GetDirection(halfwayPreviousT);
-        Vector3 halfwayNextForward = spline.GetDirection(halfwayNextT);
+        Vector3 halfwayPreviousForward = curve.GetDirection(halfwayPreviousT);
+        Vector3 halfwayNextForward = curve.GetDirection(halfwayNextT);
         return (halfwayPreviousForward + halfwayNextForward).normalized;
     }
 
     private void CreateTubeSegment(float startT, float endT, int currentDepth) {
         float radiansPerSegment = Mathf.PI * 2f / radiusSegments;
 
-        Vector3 startCurveCenter = spline.GetPoint(startT);
-        Vector3 endCurveCenter = spline.GetPoint(endT);
+        Vector3 startCurveCenter = curve.GetPoint(startT);
+        Vector3 endCurveCenter = curve.GetPoint(endT);
 
         // Hack to avoid "pinching" where the forward vector is zero.
         // This also smoothes some sections and works well with recursive refinement.
         Vector3 startCurveForward = Mathf.Approximately(startT, 0f) ?
-            spline.GetDirection(startT) : GetAveragedForward(startT);
+            curve.GetDirection(startT) : GetAveragedForward(startT);
         Vector3 endCurveForward = Mathf.Approximately(endT, 1f) ?
-            spline.GetDirection(endT) : GetAveragedForward(endT);
+            curve.GetDirection(endT) : GetAveragedForward(endT);
 
         // Refine recursively up to a max depth if forward vectors are too dissimilar.
-        float dotProduct = Vector3.Dot(spline.GetDirection(startT), spline.GetDirection(endT));
+        float dotProduct = Vector3.Dot(curve.GetDirection(startT), curve.GetDirection(endT));
         if (dotProduct < refineTheshold && currentDepth < maxRefinementDepth) {
             float middleT = (startT + endT) / 2.0f;
             CreateTubeSegment(startT, middleT, currentDepth + 1);
@@ -227,8 +227,8 @@ public class CreateTube : MonoBehaviour
             }
         }
 
-        // Compensate for twists in the spline.
-        // If the up vectors are close to antiparallel, the spline twists.
+        // Compensate for twists in the curve.
+        // If the up vectors are close to antiparallel, the curve twists.
         // Twist vertex pairings using a {radiusSegments / 2} offset.
         // [0:0, 1:1, 2:2, 3:3, 4:4, 5:5] twists to [0:3, 1:4, 2:5, 3:0, 4:1, 5:2]
         bool twisted = Vector3.Dot(startCurveUp, endCurveUp) < 0;
@@ -240,7 +240,7 @@ public class CreateTube : MonoBehaviour
         vertices.Add(endCurveCenter + endCurveRight * radius);
 
         for (int i = 0; i < radiusSegments - 1; i++) {
-            if (Mathf.Approximately(endT, 1f) && spline.loop) { startVertex = 0; }
+            if (Mathf.Approximately(endT, 1f) && curve.loop) { startVertex = 0; }
 
             float endTheta = radiansPerSegment * (i + 1);
 
@@ -268,14 +268,14 @@ public class CreateTube : MonoBehaviour
     }
 
     public void OnDrawGizmosSelected() {
-        if (!spline) { return; }
+        if (!curve) { return; }
 
-        int lengthSegments = lengthSegmentsPerCurve * spline.CurveCount;
+        int lengthSegments = lengthSegmentsPerCurve * curve.curveCount;
 
         for (int i = 0; i < lengthSegments; i++) {
             float t = i / (float)lengthSegments;
-            Vector3 curveCenter = spline.GetPoint(t);
-            Vector3 curveForward = spline.GetDirection(t);
+            Vector3 curveCenter = curve.GetPoint(t);
+            Vector3 curveForward = curve.GetDirection(t);
             //curveForward = GetAveragedForward(t);
             Vector3 curveUp, curveRight;
             CurveUtils.GetUpAndRight(curveForward, out curveUp, out curveRight);
