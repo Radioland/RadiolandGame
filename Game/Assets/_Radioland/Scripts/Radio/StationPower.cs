@@ -19,6 +19,7 @@ public class StationPower : MonoBehaviour
     private List<MonoBehaviour> powerBehaviors;
     [SerializeField] private UnityEvent startPowerEvents;
     [SerializeField] private UnityEvent stopPowerEvents;
+    [SerializeField] private UnityEventFloat continuousEvents;
 
     private bool powered;
     private RadioStation radioStation;
@@ -51,6 +52,8 @@ public class StationPower : MonoBehaviour
             } else {
                 StopPower();
             }
+
+            continuousEvents.Invoke(allStations.Max(station => station.signalStrength));
         } else if (radioStation) {
             if (!powered && radioStation.StrongSignal()) {
                 StartPower();
@@ -59,6 +62,8 @@ public class StationPower : MonoBehaviour
             if (powered && !radioStation.StrongSignal()) {
                 StopPower();
             }
+
+            continuousEvents.Invoke(radioStation.signalStrength);
         }
     }
 
