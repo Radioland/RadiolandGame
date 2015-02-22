@@ -3,7 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 // Reference: http://forum.unity3d.com/threads/web-radio-streaming-with-bass-dll.168046/
 
@@ -165,9 +168,11 @@ public class AudioStream : MonoBehaviour
         BASS_ChannelGetData(stream, spectrum, lengths.BASS_DATA_FFT2048);
     }
 
+    #if UNITY_EDITOR
     private void HandleOnPlayModeChanged() {
         if (EditorApplication.isPaused || !EditorApplication.isPlaying) { Pause(); }
     }
+    #endif
 
     private void Play() {
         if (!paused) { return; }
