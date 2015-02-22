@@ -59,13 +59,22 @@ public class TransformLerp : MonoBehaviour
         Quaternion referenceRotation = transform.parent ?
                                            transform.parent.rotation * targetRotation :
                                            targetRotation;
-        Matrix4x4 gizmoMatrix = Matrix4x4.TRS(targetPosition, referenceRotation, Vector3.one);
-        Gizmos.matrix = gizmoMatrix;
 
-        if (renderer) {
-            Gizmos.DrawWireCube(Vector3.zero, renderer.bounds.extents);
-        } else if (collider) {
-            Gizmos.DrawWireCube(Vector3.zero, collider.bounds.extents);
+        MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+        if (meshFilter) {
+            GL.wireframe = true;
+            if (renderer) { renderer.sharedMaterial.SetPass(0); }
+            Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
+            GL.wireframe = false;
+        } else {
+            Matrix4x4 gizmoMatrix = Matrix4x4.TRS(targetPosition, referenceRotation, Vector3.one);
+            Gizmos.matrix = gizmoMatrix;
+
+            if (renderer) {
+                Gizmos.DrawWireCube(Vector3.zero, renderer.bounds.extents);
+            } else if (collider) {
+                Gizmos.DrawWireCube(Vector3.zero, collider.bounds.extents);
+            }
         }
     }
 
