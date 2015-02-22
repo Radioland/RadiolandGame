@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TranslateEffect : Effect
+public class RotateEffect : Effect
 {
-    [SerializeField] private Vector3 finalTranslationDelta;
+    [SerializeField] private Vector3 finalRotationEulerAngles;
+
+    private Quaternion originalRotation;
+    private Quaternion finalRotation;
 
     private void Reset() {
         timing = new EffectTiming();
@@ -22,8 +25,8 @@ public class TranslateEffect : Effect
         base.Update();
 
         if (hasStarted && isPlaying) {
-            transform.position = transform.position +
-                                 finalTranslationDelta / timing.duration * Time.deltaTime;
+            transform.rotation = Quaternion.Lerp(originalRotation, finalRotation,
+                                                 percentDurationElapsed);
         }
     }
 
@@ -33,6 +36,9 @@ public class TranslateEffect : Effect
 
     public override void StartEffect() {
         base.StartEffect();
+
+        originalRotation = transform.rotation;
+        finalRotation = Quaternion.Euler(finalRotationEulerAngles);
     }
 
     public override void EndEffect() {

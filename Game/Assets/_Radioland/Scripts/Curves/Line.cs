@@ -5,6 +5,11 @@ public class Line : ICurve
     public Vector3 p0;
     public Vector3 p1;
 
+    private void Reset() {
+        p0 = Vector3.zero;
+        p1 = new Vector3(0f, 0f, 5f);
+    }
+
     private void Awake() {
 
     }

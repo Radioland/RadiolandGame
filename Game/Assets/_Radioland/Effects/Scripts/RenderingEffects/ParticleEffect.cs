@@ -5,7 +5,7 @@ public class ParticleEffect : Effect
 {
     // Variables to specify in the editor.
     [SerializeField] private ParticleSystem effectParticleSystem;
-    [SerializeField] private bool repositionParticleSystem = true;
+    [SerializeField] private bool repositionParticleSystem = false;
     [SerializeField] private GameObject positionObject;
     [SerializeField] private Vector3 offsetFromObject;
 
@@ -34,6 +34,8 @@ public class ParticleEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
+        if (!effectParticleSystem) { return; }
+
         if (repositionParticleSystem) {
             Vector3 position;
             if (positionObject) {
@@ -50,6 +52,8 @@ public class ParticleEffect : Effect
 
     public override void EndEffect() {
         base.EndEffect();
+
+        if (!effectParticleSystem) { return; }
 
         effectParticleSystem.enableEmission = false;
     }

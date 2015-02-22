@@ -7,12 +7,12 @@ public class AllChildEffects : Effect
     // Variables to specify in the editor.
     [SerializeField] private bool overrideDurations = false;
 
-    private List<Effect> childEffectsList;
+    private List<EffectManager> childEffectManagersList;
 
     protected override void Awake() {
         base.Awake();
 
-        childEffectsList = new List<Effect>();
+        childEffectManagersList = new List<EffectManager>();
     }
 
     protected override void Start() {
@@ -26,15 +26,16 @@ public class AllChildEffects : Effect
     public override void TriggerEffect() {
         base.TriggerEffect();
 
-        childEffectsList.Clear();
+        childEffectManagersList.Clear();
 
-        Effect [] childEffects = gameObject.GetComponentsInChildren<Effect>();
-        foreach (Effect childEffect in childEffects) {
+        EffectManager[] childEffectManagers = gameObject.GetComponentsInChildren<EffectManager>();
+        foreach (EffectManager childEffectManager in childEffectManagers) {
             // Avoid infinite recursion that triggers a stack overflow...
-            if (childEffect.gameObject != gameObject) {
-                childEffect.StartEffect();
-                childEffectsList.Add(childEffect);
+            if (childEffectManager.gameObject != gameObject) {
+                childEffectManager.StartEvent();
+                childEffectManagersList.Add(childEffectManager);
             }
+
         }
     }
 
@@ -46,8 +47,8 @@ public class AllChildEffects : Effect
         base.EndEffect();
 
         if (overrideDurations) {
-            foreach (Effect childEffect in childEffectsList) {
-                childEffect.EndEffect();
+            foreach (EffectManager childEffectManager in childEffectManagersList) {
+                childEffectManager.StopEvent();
             }
         }
     }
