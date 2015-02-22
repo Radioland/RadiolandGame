@@ -16,7 +16,8 @@ public class TransformLerp : MonoBehaviour
 
     private static readonly Color defaultColor = new Color(0.6f, 0.6f, 0.6f, 0.5f);
     private static readonly Color selectedColor = new Color(0.3f, 0.5f, 0.9f, 0.5f);
-    private static Material highlightMaterial;
+    private static Material highlightDefaultMaterial;
+    private static Material highlightSelectedMaterial;
 
     private void Awake() {
         SetupTransformations();
@@ -53,9 +54,8 @@ public class TransformLerp : MonoBehaviour
     }
 
     private void DrawGizmos(bool selected=false) {
-        if (!highlightMaterial) {
-            highlightMaterial = Resources.Load<Material>("Materials/transform_target");
-        }
+        if (!highlightDefaultMaterial) { highlightDefaultMaterial = Resources.Load<Material>("Materials/transform_target_default"); }
+        if (!highlightSelectedMaterial) { highlightSelectedMaterial = Resources.Load<Material>("Materials/transform_target_selected"); }
 
         if (!Application.isPlaying) {
             SetupTransformations();
@@ -67,11 +67,10 @@ public class TransformLerp : MonoBehaviour
 
         MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
         if (meshFilter && renderer) {
-            if (highlightMaterial) {
-                highlightMaterial.SetColor("_Color", selected ? selectedColor : defaultColor);
-                highlightMaterial.SetPass(0);
-                Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
-            }
+            if (selected) { highlightSelectedMaterial.SetPass(0); }
+            else          { highlightDefaultMaterial.SetPass(0);  }
+            Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
+
             renderer.sharedMaterial.SetPass(0);
             GL.wireframe = true;
             Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
