@@ -14,8 +14,9 @@ public class TransformLerp : MonoBehaviour
     private float currentTime;
     private float timeDamp;
 
-    private static readonly Color gizmoBoxColor = Color.grey;
-    private static readonly Color selectedGizmoBoxColor = Color.blue;
+    private static readonly Color defaultColor = new Color(0.6f, 0.6f, 0.6f, 0.5f);
+    private static readonly Color selectedColor = new Color(0.3f, 0.5f, 0.9f, 0.5f);
+    private static Material targetMaterial;
 
     private void Awake() {
         SetupTransformations();
@@ -51,7 +52,11 @@ public class TransformLerp : MonoBehaviour
         SetTime(Mathf.SmoothDamp(currentTime, t, ref timeDamp, duration));
     }
 
-    private void DrawGizmos() {
+    private void DrawGizmos(bool selected=false) {
+        if (!targetMaterial) {
+            targetMaterial = Resources.Load<Material>("Materials/transform_target");
+        }
+
         if (!Application.isPlaying) {
             SetupTransformations();
         }
@@ -61,30 +66,37 @@ public class TransformLerp : MonoBehaviour
                                            targetRotation;
 
         MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-        if (meshFilter) {
+        if (meshFilter && renderer) {
+            if (targetMaterial) {
+                Material originalMaterial = renderer.sharedMaterial;
+                renderer.sharedMaterial = targetMaterial;
+                renderer.sharedMaterial.SetColor("_Color", selected ? selectedColor : defaultColor);
+                renderer.sharedMaterial.SetPass(0);
+                Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
+                renderer.sharedMaterial = originalMaterial;
+            }
+            renderer.sharedMaterial.SetPass(0);
             GL.wireframe = true;
-            if (renderer) { renderer.sharedMaterial.SetPass(0); }
             Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
             GL.wireframe = false;
         } else {
             Matrix4x4 gizmoMatrix = Matrix4x4.TRS(targetPosition, referenceRotation, Vector3.one);
             Gizmos.matrix = gizmoMatrix;
 
+            Gizmos.color = selected ? selectedColor : defaultColor;
             if (renderer) {
                 Gizmos.DrawWireCube(Vector3.zero, renderer.bounds.extents);
             } else if (collider) {
-                Gizmos.DrawWireCube(Vector3.zero, collider.bounds.extents);
+                Gizmos.DrawWireCube(Vector3.zero, collider.bounds.size);
             }
         }
     }
 
     public void OnDrawGizmos() {
-        Gizmos.color = gizmoBoxColor;
         DrawGizmos();
     }
 
     public void OnDrawGizmosSelected() {
-        Gizmos.color = selectedGizmoBoxColor;
-        DrawGizmos();
+        DrawGizmos(selected:true);
     }
 }
