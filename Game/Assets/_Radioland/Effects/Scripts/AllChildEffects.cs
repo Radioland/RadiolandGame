@@ -25,6 +25,10 @@ public class AllChildEffects : Effect
 
     public override void TriggerEffect() {
         base.TriggerEffect();
+    }
+
+    public override void StartEffect() {
+        base.StartEffect();
 
         childEffectManagersList.Clear();
 
@@ -37,10 +41,6 @@ public class AllChildEffects : Effect
             }
 
         }
-    }
-
-    public override void StartEffect() {
-        base.StartEffect();
     }
 
     public override void EndEffect() {
