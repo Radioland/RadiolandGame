@@ -16,7 +16,7 @@ public class TransformLerp : MonoBehaviour
 
     private static readonly Color defaultColor = new Color(0.6f, 0.6f, 0.6f, 0.5f);
     private static readonly Color selectedColor = new Color(0.3f, 0.5f, 0.9f, 0.5f);
-    private static Material targetMaterial;
+    private static Material highlightMaterial;
 
     private void Awake() {
         SetupTransformations();
@@ -53,8 +53,8 @@ public class TransformLerp : MonoBehaviour
     }
 
     private void DrawGizmos(bool selected=false) {
-        if (!targetMaterial) {
-            targetMaterial = Resources.Load<Material>("Materials/transform_target");
+        if (!highlightMaterial) {
+            highlightMaterial = Resources.Load<Material>("Materials/transform_target");
         }
 
         if (!Application.isPlaying) {
@@ -67,13 +67,10 @@ public class TransformLerp : MonoBehaviour
 
         MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
         if (meshFilter && renderer) {
-            if (targetMaterial) {
-                Material originalMaterial = renderer.sharedMaterial;
-                renderer.sharedMaterial = targetMaterial;
-                renderer.sharedMaterial.SetColor("_Color", selected ? selectedColor : defaultColor);
-                renderer.sharedMaterial.SetPass(0);
+            if (highlightMaterial) {
+                highlightMaterial.SetColor("_Color", selected ? selectedColor : defaultColor);
+                highlightMaterial.SetPass(0);
                 Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
-                renderer.sharedMaterial = originalMaterial;
             }
             renderer.sharedMaterial.SetPass(0);
             GL.wireframe = true;
