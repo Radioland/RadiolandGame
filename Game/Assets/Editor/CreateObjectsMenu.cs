@@ -88,18 +88,32 @@ using System.Collections;
                      placeAbove:true, orientToSurface:true);
     }
 
-    [MenuItem("GameObject/Create Radioland/Environment/Transport", false, 1)]
-    [MenuItem("Radioland/Environment/Transport", false, 1)]
-    private static void CreateTransport() {
-        CreateObject("Transport", "Assets/_Radioland/Environment/Prefabs/Transport.prefab",
-                     placeAbove:true);
+    [MenuItem("GameObject/Create Radioland/Environment/Transport (Natural)", false, 1)]
+    [MenuItem("Radioland/Environment/Transport (Natural)", false, 1)]
+    private static void CreateNaturalTransport() {
+        CreateObject("Transport (Natural)", "Assets/_Radioland/Environment/Prefabs/Transport.prefab",
+                     placeAbove:true, orientToSurface:false);
     }
 
-    [MenuItem("GameObject/Create Radioland/Environment/Elevator", false, 1)]
-    [MenuItem("Radioland/Environment/Elevator", false, 1)]
-    private static void CreateElevator() {
-        CreateObject("Elevator", "Assets/_Radioland/Environment/Prefabs/Elevator.prefab",
-                     placeAbove:true);
+    [MenuItem("GameObject/Create Radioland/Environment/Transport (Mechanical)", false, 1)]
+    [MenuItem("Radioland/Environment/Transport (Mechanical)", false, 1)]
+    private static void CreateMechanicalTransport() {
+        CreateObject("Transport (Mechanical)", "Assets/_Radioland/Environment/Prefabs/Transport - Mechanical.prefab",
+                     placeAbove:true, orientToSurface:false);
+    }
+
+    [MenuItem("GameObject/Create Radioland/Environment/Elevator (Natural)", false, 1)]
+    [MenuItem("Radioland/Environment/Elevator (Natural)", false, 1)]
+    private static void CreateNaturalElevator() {
+        CreateObject("Elevator (Natural)", "Assets/_Radioland/Environment/Prefabs/Elevator.prefab",
+                     placeAbove:true, orientToSurface:false);
+    }
+
+    [MenuItem("GameObject/Create Radioland/Environment/Elevator (Mechanical)", false, 1)]
+    [MenuItem("Radioland/Environment/Elevator (Mechanical)", false, 1)]
+    private static void CreateMechanicalElevator() {
+        CreateObject("Elevator (Mechanical)", "Assets/_Radioland/Environment/Prefabs/Elevator - Mechanical.prefab",
+                     placeAbove:true, orientToSurface:false);
     }
 
     [MenuItem("GameObject/Create Radioland/Props/Visualizer Grass", false, 1)]
