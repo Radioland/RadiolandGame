@@ -30,12 +30,16 @@ public class AnimatorBoolEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
-        animator.SetBool(boolToSet, true);
+        if (animator) {
+            animator.SetBool(boolToSet, true);
+        }
     }
 
     public override void EndEffect() {
         base.EndEffect();
 
-        animator.SetBool(boolToSet, false);
+        if (animator) {
+            animator.SetBool(boolToSet, false);
+        }
     }
 }
