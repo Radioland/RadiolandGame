@@ -5,10 +5,12 @@ public class EffectsEffect : Effect
 {
     // Variables to specify in the editor.
     [SerializeField] private EffectManager effects;
+    [SerializeField] private string effectsObjectName = "";
     [SerializeField] private bool overrideDurations = false;
 
     protected override void Awake() {
         base.Awake();
+
     }
 
     protected override void Start() {
@@ -25,6 +27,13 @@ public class EffectsEffect : Effect
 
     public override void StartEffect() {
         base.StartEffect();
+
+        if (!effects && effectsObjectName.Length > 0) {
+            GameObject effectsObject = GameObject.Find(effectsObjectName);
+            if (effectsObject) {
+                effects = effectsObject.GetComponent<EffectManager>();
+            }
+        }
 
         if (effects) {
             effects.StartEvent();
