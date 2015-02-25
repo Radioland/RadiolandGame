@@ -116,6 +116,13 @@ using System.Collections;
                      placeAbove:true, orientToSurface:false);
     }
 
+    [MenuItem("GameObject/Create Radioland/Environment/Double Door", false, 1)]
+    [MenuItem("Radioland/Environment/Double Door", false, 1)]
+    private static void CreateDoubleDoor() {
+        CreateObject("Double Door", "Assets/_Radioland/Environment/Prefabs/door-double.prefab",
+                     placeAbove:true, orientToSurface:true);
+    }
+
     [MenuItem("GameObject/Create Radioland/Props/Visualizer Grass", false, 1)]
     [MenuItem("Radioland/Props/Visualizer Grass", false, 1)]
     private static void CreateVisualizerGrass() {

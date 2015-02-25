@@ -5,21 +5,41 @@ using System.Collections.Generic;
 
 public class Dialogue : MonoBehaviour
 {
-    [SerializeField] private GameObject dialogueObject;
+    private enum DialogueMode
+    {
+        Automatic,
+        Manual
+    }
+
+    [SerializeField] [Tooltip("Typically a Canvas")] private GameObject dialogueRootObject;
+    [SerializeField] private DialogueMode mode = DialogueMode.Automatic;
+    [SerializeField] private bool startVisible = false;
+    [Header("Automatic Setup")]
     [SerializeField] private Text uiText;
-    [SerializeField] private List<TextAsset> messages;
+    [SerializeField] private List<TextAsset> messageFiles;
+    [Header("Manual Setup")]
+    [SerializeField] private List<GameObject> messageObjects;
+    [Header("Dialogue Effects")]
     [SerializeField] private EffectManager allMessagesEffects;
     [SerializeField] private List<EffectManager> specificMessageEffects;
 
     private bool visible;
-    private int currentMessage;
+    private int currentMessage = 0;
     private const float nextMessageCooldown = 0.5f;
     private float lastNextMessageTime;
+    private int messageCount;
 
     private void Awake() {
-        ClearMessage();
+        if (startVisible) {
+            visible = true;
+            dialogueRootObject.SetActive(true);
+        } else {
+            ClearMessage();
+        }
 
         lastNextMessageTime = -1000f;
+
+        messageCount = mode == DialogueMode.Automatic ? messageFiles.Count : messageObjects.Count;
     }
 
     private void Start() {
@@ -31,11 +51,13 @@ public class Dialogue : MonoBehaviour
     }
 
     public void NextMessage() {
-        if (messages.Count == 0) { return; }
+        if (messageCount == 0) { return; }
 
         lastNextMessageTime = Time.time;
 
         if (visible) {
+            if (mode == DialogueMode.Manual) { messageObjects[currentMessage].SetActive(false); }
+
             if (allMessagesEffects) { allMessagesEffects.StopEvent(); }
             if (specificMessageEffects.Count > currentMessage &&
                 specificMessageEffects[currentMessage]) {
@@ -45,11 +67,15 @@ public class Dialogue : MonoBehaviour
             currentMessage++;
         } else {
             visible = true;
-            dialogueObject.SetActive(true);
+            dialogueRootObject.SetActive(true);
         }
 
-        if (currentMessage < messages.Count) {
-            uiText.text = messages[currentMessage].text;
+        if (currentMessage < messageCount) {
+            if (messageObjects.Count > 0) {
+                messageObjects[currentMessage].SetActive(true);
+            } else {
+                uiText.text = messageFiles[currentMessage].text;
+            }
 
             if (allMessagesEffects) { allMessagesEffects.StartEvent(); }
             if (specificMessageEffects.Count > currentMessage &&
@@ -62,10 +88,17 @@ public class Dialogue : MonoBehaviour
     }
 
     public void ClearMessage() {
+        if (mode == DialogueMode.Manual) {
+            foreach (GameObject messageObject in messageObjects) {
+                messageObject.SetActive(false);
+            }
+        }
+
         currentMessage = 0;
-        uiText.text = "";
+
+        if (mode == DialogueMode.Automatic) { uiText.text = ""; }
         visible = false;
-        dialogueObject.SetActive(false);
+        dialogueRootObject.SetActive(false);
     }
 
     public void OnTriggerStay(Collider other) {
