@@ -60,15 +60,6 @@ float3 RGBtoHSV(in float3 RGB)
 		
 		void rampcolor (Input IN, SurfaceOutput o, inout fixed4 color) {
 			float y = 0;
-			if (IN.uv_MainTex.y < 0.25) {
-				y = 0.5 / 4.0;
-			} else if (IN.uv_MainTex.y < 0.5) {
-				y = 1.5 / 4.0;
-			} else if (IN.uv_MainTex.y < 0.75) {
-				y = 2.5 / 4.0;
-			} else {
-				y = 3.5 / 4.0;
-			}
 			y = IN.uv_MainTex.y;
 			
 			color = saturate(color);
