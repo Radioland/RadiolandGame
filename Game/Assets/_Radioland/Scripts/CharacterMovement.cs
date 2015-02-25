@@ -64,6 +64,8 @@ public class CharacterMovement : MonoBehaviour
     private const float minimumBounceTime = 0.3f;
     private const float bounceCooldown = 0.5f;
     private QuadraticCurve bounceTrajectory;
+    private GameObject bounceTrajectoryParent;
+    private GameObject bounceTrajectoryObject;
     private const float slopeRayDistance = 0.1f;
     private Vector3 contactPoint;
     private float slopeAngle;
@@ -111,6 +113,8 @@ public class CharacterMovement : MonoBehaviour
         jumpingHash = Animator.StringToHash("Jumping");
         landingHash = Animator.StringToHash("Landing");
 
+        bounceTrajectoryParent = new GameObject("Bounce Trajectory Parent");
+
         originalGravity = gravity;
         originalJumpHeight = jumpHeight;
         originalGroundSmoothDampTime = groundSmoothDampTime;
@@ -124,7 +128,7 @@ public class CharacterMovement : MonoBehaviour
 
     }
 
-    private void ResetState() {
+    public void ResetState() {
         moving = false;
         running = false;
         inJumpWindup = false;
@@ -151,20 +155,11 @@ public class CharacterMovement : MonoBehaviour
         if (grounded) {
             lastGroundedTime = Time.time;
 
-            if (bouncing && Time.time - lastBouncedTime > minimumBounceTime) {
-                ResetAirSmoothDampTime();
-                ResetGroundSmoothDampTime();
-                bouncing = false;
-            }
-
             ApplySliding();
         }
 
-        if (bouncing && bounceTrajectory) {
-            Vector3 target = bounceTrajectory.GetPoint(Time.time - lastBouncedTime);
-            Vector3 difference = target - transform.position;
-            Vector3 movement = difference * 0.5f;
-            collisionFlags = controller.Move(movement);
+        if (bouncing) {
+            ApplyBouncing();
         }
 
         // Get input values from controller/keyboard.
@@ -218,6 +213,24 @@ public class CharacterMovement : MonoBehaviour
             animator.SetFloat(speedHash, Mathf.Abs(controlSpeed));
             animator.SetFloat(strafeHash, strafeInput);
             animator.SetBool(jumpingHash, jumping);
+        }
+    }
+
+    private void ApplyBouncing() {
+        if (grounded && Time.time - lastBouncedTime > minimumBounceTime) {
+            ResetAirSmoothDampTime();
+            ResetGroundSmoothDampTime();
+            bouncing = false;
+            jumping = false;
+            bounceTrajectory = null;
+            Land();
+        } else if (bounceTrajectory) {
+            Vector3 target = bounceTrajectory.GetPoint(Time.time - lastBouncedTime);
+            Vector3 difference = target - transform.position;
+            Vector3 movement = difference * 0.5f;
+            collisionFlags = controller.Move(movement);
+
+            verticalSpeed = movement.y;
         }
     }
 
@@ -284,6 +297,8 @@ public class CharacterMovement : MonoBehaviour
     }
 
     private void Land() {
+        if (bouncing && Time.time - lastBouncedTime < minimumBounceTime) { return; }
+
         float landingVerticalSpeed = verticalSpeed;
         verticalSpeed = 0.0f;
         SendMessage("Grounded", landingVerticalSpeed, SendMessageOptions.DontRequireReceiver);
@@ -355,7 +370,13 @@ public class CharacterMovement : MonoBehaviour
         lastBouncedTime = Time.time;
         Land();
 
-        bounceTrajectory = trajectory;
+        if (bounceTrajectoryObject) { Destroy(bounceTrajectoryObject); }
+        bounceTrajectoryObject = new GameObject("Bounce Trajectory");
+        bounceTrajectoryObject.transform.parent = bounceTrajectoryParent.transform;
+        QuadraticCurve trajectoryCopy = bounceTrajectoryObject.AddComponent<QuadraticCurve>();
+        trajectoryCopy.SetAsCopy(trajectory);
+
+        bounceTrajectory = trajectoryCopy;
 
         SendMessage("BounceTriggered", SendMessageOptions.DontRequireReceiver);
         jumping = true;

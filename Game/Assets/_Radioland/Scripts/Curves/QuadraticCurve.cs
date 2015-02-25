@@ -24,6 +24,16 @@ public class QuadraticCurve : ICurve
 
     }
 
+    public void SetAsCopy(QuadraticCurve original) {
+        transform.position = original.transform.position;
+        transform.rotation = original.transform.rotation;
+
+        speed = original.speed;
+        acceleration = original.acceleration;
+        stopOnCollision = original.stopOnCollision;
+        layerMask = original.layerMask;
+    }
+
     public override Vector3 GetPoint(float t) {
         Vector3 direction = transform.up;
         Vector3 position = (transform.position +
