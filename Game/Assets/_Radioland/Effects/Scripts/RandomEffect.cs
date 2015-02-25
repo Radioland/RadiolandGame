@@ -35,6 +35,8 @@ public class RandomEffect : Effect
     public override void EndEffect() {
         base.EndEffect();
 
-        currentEffect.EndEffect();
+        if (currentEffect) {
+            currentEffect.EndEffect();
+        }
     }
 }
