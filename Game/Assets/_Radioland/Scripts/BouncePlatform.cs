@@ -11,6 +11,7 @@ public class BouncePlatform : MonoBehaviour
 {
     public BounceMode bounceMode = BounceMode.Static;
     public float staticElasticity = 0.5f;
+    public QuadraticCurve trajectory;
     [SerializeField] private float triggeredSpeed = 30f;
     [SerializeField] private float triggeredDuration = 0.5f;
     [SerializeField] private float triggeredNewSmoothDampTimes = 10.0f;
@@ -42,8 +43,12 @@ public class BouncePlatform : MonoBehaviour
         if (((1<<other.gameObject.layer) & bounceTriggerLayers) != 0) {
             CharacterMovement characterMovement = other.transform.root.GetComponent<CharacterMovement>();
             if (characterMovement) {
-                characterMovement.Bounce(triggeredSpeed, transform.up,
-                                         newSmoothDampTimes:triggeredNewSmoothDampTimes);
+                if (trajectory) {
+                    characterMovement.Bounce(trajectory);
+                } else {
+                    characterMovement.Bounce(triggeredSpeed, transform.up,
+                                             newSmoothDampTimes:triggeredNewSmoothDampTimes);
+                }
             }
         }
     }

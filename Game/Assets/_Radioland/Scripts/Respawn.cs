@@ -72,6 +72,7 @@ public class Respawn : MonoBehaviour
         if (refillEnergy) {
             powerupManager.energy = 1.0f;
         }
+        characterMovement.ResetState();
         characterMovement.Stop();
         powerupManager.StopAnyPowerups();
     }

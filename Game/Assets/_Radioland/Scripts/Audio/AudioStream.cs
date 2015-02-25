@@ -164,6 +164,9 @@ public class AudioStream : MonoBehaviour
 
         if (Time.timeScale <= 0.001f && !paused) { Pause(); }
         if (Time.timeScale > 0.001f && paused) { Play(); }
+        #if UNITY_EDITOR
+            if (EditorApplication.isPaused || !EditorApplication.isPlaying) { Pause(); }
+        #endif
 
         BASS_ChannelGetData(stream, spectrum, lengths.BASS_DATA_FFT2048);
     }
