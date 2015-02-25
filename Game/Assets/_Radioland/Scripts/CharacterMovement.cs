@@ -389,6 +389,7 @@ public class CharacterMovement : MonoBehaviour
     // Velocity controls.
     public void AddVelocity(Vector3 extraVelocity) { velocity += extraVelocity; }
     public void SetVelocity(Vector3 newVelocity) { velocity = newVelocity; }
+    public Vector3 GetVelocity() { return velocity; }
     public void Stop() {
         velocity = Vector3.zero;
         verticalSpeed = 0;
