@@ -50,7 +50,7 @@ public class CharacterMovement : MonoBehaviour
     public bool controllable { get; private set; }
     #endregion State (read-only visible to other scripts).
 
-    #region Collision, jumping, sliding, and input.
+    #region Collision, jumping, sliding, bouncing, and input.
     private CharacterController controller;
     private CollisionFlags collisionFlags;
     private RaycastHit hit;
@@ -63,13 +63,14 @@ public class CharacterMovement : MonoBehaviour
     private float lastBouncedTime;
     private const float minimumBounceTime = 0.3f;
     private const float bounceCooldown = 0.5f;
+    private QuadraticCurve bounceTrajectory;
     private const float slopeRayDistance = 0.1f;
     private Vector3 contactPoint;
     private float slopeAngle;
     private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * gravity); } }
     private float leftX;
     private float leftY;
-    #endregion Collision, jumping, sliding, and input.
+    #endregion Collision, jumping, sliding, bouncing, and input.
 
     #region Animation
     private Animator animator;
@@ -89,8 +90,6 @@ public class CharacterMovement : MonoBehaviour
 
     private void Awake() {
         if (!cameraControl) { Debug.LogWarning("No camera control set on CharacterMovement!"); }
-
-        ResetState();
 
         controller = gameObject.GetComponent<CharacterController>();
         verticalSpeed = 0f;
@@ -117,6 +116,8 @@ public class CharacterMovement : MonoBehaviour
         originalGroundSmoothDampTime = groundSmoothDampTime;
         originalAirSmoothDampTime = airSmoothDampTime;
         originalMass = mass;
+
+        ResetState();
     }
 
     private void Start() {
@@ -129,10 +130,17 @@ public class CharacterMovement : MonoBehaviour
         inJumpWindup = false;
         jumping = false;
         bouncing = false;
+        bounceTrajectory = null;
         sliding = false;
         falling = false;
         controlSpeed = 0f;
         controllable = true;
+
+        ResetAirSmoothDampTime();
+        ResetGroundSmoothDampTime();
+        ResetGravity();
+        ResetJumpHeight();
+        ResetMass();
     }
 
     private void OnControllerColliderHit(ControllerColliderHit controllerHit) {
@@ -150,6 +158,13 @@ public class CharacterMovement : MonoBehaviour
             }
 
             ApplySliding();
+        }
+
+        if (bouncing && bounceTrajectory) {
+            Vector3 target = bounceTrajectory.GetPoint(Time.time - lastBouncedTime);
+            Vector3 difference = target - transform.position;
+            Vector3 movement = difference * 0.5f;
+            collisionFlags = controller.Move(movement);
         }
 
         // Get input values from controller/keyboard.
@@ -246,7 +261,11 @@ public class CharacterMovement : MonoBehaviour
                 falling = true;
             }
 
-            verticalSpeed -= gravity * Time.deltaTime;
+            if (bouncing && bounceTrajectory) {
+                // Gravity is already accounted for.
+            } else {
+                verticalSpeed -= gravity * Time.deltaTime;
+            }
 
             if (jumping) {
                 // Check if predicted to be landing within landingTime.
@@ -329,6 +348,19 @@ public class CharacterMovement : MonoBehaviour
             SetAirSmoothDampTime(newSmoothDampTimes);
             SetGroundSmoothDampTime(newSmoothDampTimes);
         }
+    }
+
+    public void Bounce(QuadraticCurve trajectory) {
+        if (Time.time - lastBouncedTime < bounceCooldown) { return; }
+        lastBouncedTime = Time.time;
+        Land();
+
+        bounceTrajectory = trajectory;
+
+        SendMessage("BounceTriggered", SendMessageOptions.DontRequireReceiver);
+        jumping = true;
+        bouncing = true;
+        lastJumpTime = Time.time;
     }
 
     // Velocity controls.

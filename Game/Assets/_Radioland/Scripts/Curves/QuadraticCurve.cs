@@ -54,7 +54,7 @@ public class QuadraticCurve : ICurve
             Matrix4x4 transformMatrix;
             Vector3 center;
 
-            RaycastHit[] hits = Physics.RaycastAll(GetPoint(t), direction, distance, layerMask);
+            RaycastHit[] hits = Physics.RaycastAll(GetPoint(t), direction, distance, layerMask).OrderBy(h=>h.distance).ToArray();
             bool hitObject = false;
             foreach (RaycastHit hit in hits.Where(hit => hit.collider.gameObject != gameObject)) {
                 hitObject = true;
@@ -73,6 +73,8 @@ public class QuadraticCurve : ICurve
                 Gizmos.matrix = transformMatrix;
                 Gizmos.color = gizmoBoxColor;
                 Gizmos.DrawWireCube(Vector3.zero, new Vector3(gizmoBoxWidth, gizmoBoxWidth, distance));
+
+                if (stopOnCollision) { break; }
             }
 
             if (stopOnCollision && hitObject) { break; }
