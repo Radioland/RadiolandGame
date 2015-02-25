@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0d60fd99798230d448d21a31bd7cd42b
+guid: 02c3231f273c7d040b2021ae7425cf45
 ModelImporter:
   serializedVersion: 16
   fileIDToRecycleName:
@@ -7,10 +7,10 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: elevator
+    4300000: crystal_lamp
     9500000: //RootNode
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:
