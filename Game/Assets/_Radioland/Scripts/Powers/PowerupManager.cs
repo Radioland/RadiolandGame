@@ -51,13 +51,17 @@ public class PowerupManager : MonoBehaviour
 //                    powerupReadyGlow.enabled = true;
 //                    powerupReadyGlow.material.SetColor(glowColorName, powerup.color);
 //                }
-                usePowerupParticles.startColor = powerup.color;
+//                usePowerupParticles.startColor = powerup.color;
 //                powerupReady = true;
             }
         }
 //        if (!powerupReady) {
 //            powerupReadyGlow.enabled = false;
 //        }
+    }
+
+    public void SetUsePowerupParticleColor(Color color) {
+        usePowerupParticles.startColor = color;
     }
 
     public bool CanUsePowerup(Powerup testPowerup) {

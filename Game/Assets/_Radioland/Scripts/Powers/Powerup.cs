@@ -89,6 +89,7 @@ public class Powerup : MonoBehaviour
         lastStartedTime = Time.time;
         primed = true;
         //powerupManager.energy -= energyCost;
+        powerupManager.SetUsePowerupParticleColor(color);
     }
 
     public virtual void EndPowerup() {
