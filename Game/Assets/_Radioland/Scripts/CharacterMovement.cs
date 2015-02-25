@@ -206,7 +206,9 @@ public class CharacterMovement : MonoBehaviour
             velocity = Vector3.SmoothDamp(velocity, motion, ref velocityDamp, airSmoothDampTime);
         }
 
-        collisionFlags = controller.Move((velocity + Vector3.up * verticalSpeed) * Time.deltaTime);
+        if (!(bouncing && bounceTrajectory)) {
+            collisionFlags = controller.Move((velocity + Vector3.up * verticalSpeed) * Time.deltaTime);
+        }
 
         // Update animations.
         if (animator) {
