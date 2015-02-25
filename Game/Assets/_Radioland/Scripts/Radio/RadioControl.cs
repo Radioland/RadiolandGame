@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class RadioControl : MonoBehaviour
 {
     public float frequencyFadeLimit = 0.2f;
+    [Range(1.0f, 5.0f)] public float frequencyHighScale = 1.5f;
     public float powerupMinSignalStrength = 0.25f;
     public float backgroundStrength { get { return (1.0f - maxSignal / stationCutoff); } }
 
@@ -129,13 +130,6 @@ public class RadioControl : MonoBehaviour
             radioUI.SetKnobRotation(rotationDegrees);
         }
 
-        // Fade glow image based on energy percentage.
-        if (powerupManager) {
-            foreach (RadioUI radioUI in radioUIs) {
-                radioUI.SetEnergy(powerupManager.energy);
-            }
-        }
-
         // Trigger powerups.
         /*
         if (Input.GetButtonDown("UsePower")) {
@@ -154,6 +148,13 @@ public class RadioControl : MonoBehaviour
         maxSignal = 0.0f;
         foreach (RadioStation station in stations) {
             maxSignal = Mathf.Max(maxSignal, station.signalStrength);
+        }
+
+        // Fade glow image based on max signal.
+        if (powerupManager) {
+            foreach (RadioUI radioUI in radioUIs) {
+                radioUI.SetGlow(maxSignal);
+            }
         }
 
         // Adjust the volume of the static to fill in between stations.

@@ -12,7 +12,9 @@ public class RadioStation : MonoBehaviour
             // Lerp signalStrength from 0 to 1 within frequencyFadeLimit.
             // When outside of frequencyFadeLimit from the current frequency, clamp to 0.
             float frequencyDifference = Mathf.Abs(radioControl.currentFrequency - frequency);
-            float strength = 1.0f - frequencyDifference / radioControl.frequencyFadeLimit;
+            float strength = radioControl.frequencyHighScale -
+                             (radioControl.frequencyHighScale *
+                              frequencyDifference / radioControl.frequencyFadeLimit);
             strength = Mathf.Clamp(strength, 0.0f, 1.0f);
             return strength;
         }

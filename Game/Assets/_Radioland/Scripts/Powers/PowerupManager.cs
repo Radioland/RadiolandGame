@@ -4,7 +4,7 @@ using System.Collections;
 public class PowerupManager : MonoBehaviour
 {
     [SerializeField] private Renderer powerupReadyGlow;
-    [SerializeField] private string glowColorName = "_TintColor";
+//    [SerializeField] private string glowColorName = "_TintColor";
     [SerializeField] private ParticleSystem usePowerupParticles;
     [SerializeField] private EffectManager usePowerupEffects;
 
@@ -44,24 +44,24 @@ public class PowerupManager : MonoBehaviour
         }
 
         // Show powerupReadyGlow if a powerup is ready.
-        bool powerupReady = false;
+//        bool powerupReady = false;
         foreach (Powerup powerup in powerups) {
             if (powerup.HasStrongSignal()) {
-                if (!powerupReadyGlow.enabled) {
-                    powerupReadyGlow.enabled = true;
-                    powerupReadyGlow.material.SetColor(glowColorName, powerup.color);
-                }
+//                if (!powerupReadyGlow.enabled) {
+//                    powerupReadyGlow.enabled = true;
+//                    powerupReadyGlow.material.SetColor(glowColorName, powerup.color);
+//                }
                 usePowerupParticles.startColor = powerup.color;
-                powerupReady = true;
+//                powerupReady = true;
             }
         }
-        if (!powerupReady) {
-            powerupReadyGlow.enabled = false;
-        }
+//        if (!powerupReady) {
+//            powerupReadyGlow.enabled = false;
+//        }
     }
 
     public bool CanUsePowerup(Powerup testPowerup) {
-        return (testPowerup.energyCost <= energy);
+        return (testPowerup.energyCost <= energy && activePowerup == null);
     }
 
     public void SetActivePowerup(Powerup newActivePowerup) {

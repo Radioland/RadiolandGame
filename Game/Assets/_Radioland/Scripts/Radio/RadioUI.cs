@@ -32,7 +32,7 @@ public class RadioUI : MonoBehaviour
         lastActiveTime = -1000.0f;
 
         if (energyThresholdObjects.Count != energyThresholdLevels.Count) {
-            Debug.LogWarning("Length mismatch between energy threshold objects and levels on " +
+            Debug.LogWarning("Length mismatch between glow threshold objects and levels on " +
                              this.GetPath() + ".");
         }
     }
@@ -77,12 +77,12 @@ public class RadioUI : MonoBehaviour
         }
     }
 
-    public void SetEnergy(float energy) {
-        SetGlowAlpha(energy);
+    public void SetGlow(float glow) {
+        SetGlowAlpha(glow);
 
         int objectCount = Mathf.Min(energyThresholdObjects.Count, energyThresholdLevels.Count);
         for (int i = 0; i < objectCount; i++) {
-            if (energy < energyThresholdLevels[i]) {
+            if (glow < energyThresholdLevels[i]) {
                 energyThresholdObjects[i].SetActive(false);
             } else {
                 energyThresholdObjects[i].SetActive(true);
