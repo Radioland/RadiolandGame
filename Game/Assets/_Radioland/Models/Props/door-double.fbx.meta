@@ -17,6 +17,8 @@ ModelImporter:
     3300002: door_r
     4300000: door_r
     4300002: door_l
+    6400000: door_l
+    6400002: door_r
     9500000: //RootNode
   materials:
     importMaterials: 0
@@ -39,7 +41,7 @@ ModelImporter:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
-    addColliders: 0
+    addColliders: 1
     importBlendShapes: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
