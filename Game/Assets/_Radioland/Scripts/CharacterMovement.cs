@@ -280,7 +280,7 @@ public class CharacterMovement : MonoBehaviour
                 verticalSpeed -= gravity * Time.deltaTime;
             }
 
-            if (jumping) {
+            if (jumping && !bouncing || Time.time - lastBouncedTime < minimumBounceTime) {
                 // Check if predicted to be landing within landingTime.
                 // d = v * t + 1/2 a * t^2
                 float distance = -(verticalSpeed * landingTime +
