@@ -12,14 +12,16 @@ public class CurveWalker : MonoBehaviour
 {
     [SerializeField] private ICurve curve;
     [SerializeField] private float duration = 2f;
+    [SerializeField] private Interpolate.EaseType easeType = Interpolate.EaseType.EaseInOutQuad;
     [SerializeField] private bool lookForward = false;
     [SerializeField] private CurveWalkerMode mode = CurveWalkerMode.PingPong;
 
     private float progress;
     private bool goingForward = true;
+    private Interpolate.Function easeFunction;
 
     private void Awake() {
-
+        easeFunction = Interpolate.Ease(easeType);
     }
 
     private void Start() {
@@ -47,10 +49,12 @@ public class CurveWalker : MonoBehaviour
             }
         }
 
-        Vector3 position = curve.GetPoint(progress);
+        float easedProgress = easeFunction(0f, 1f, progress, 1f);
+
+        Vector3 position = curve.GetPoint(easedProgress);
         transform.position = position;
         if (lookForward) {
-            transform.LookAt(position + curve.GetDirection(progress));
+            transform.LookAt(position + curve.GetDirection(easedProgress));
         }
     }
 }
