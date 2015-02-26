@@ -129,6 +129,8 @@ public class CharacterMovement : MonoBehaviour
     }
 
     public void ResetState() {
+        transform.parent = null;
+
         moving = false;
         running = false;
         inJumpWindup = false;
@@ -192,6 +194,8 @@ public class CharacterMovement : MonoBehaviour
 
         // Don't rotate within a dead zone.
         if (controlSpeed > 0.05f) { transform.Rotate(new Vector3(0, charAngle, 0)); }
+        // Kill x and z rotation.
+        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
 
         float walkSpeed = maxWalkSpeed * runSpeedCurve.Evaluate(Time.time - lastRunInputStartTime);
         Vector3 motion = (transform.forward * controlSpeed + transform.right * strafeInput) * walkSpeed;

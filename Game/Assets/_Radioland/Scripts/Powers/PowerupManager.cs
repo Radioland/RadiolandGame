@@ -65,7 +65,7 @@ public class PowerupManager : MonoBehaviour
     }
 
     public bool CanUsePowerup(Powerup testPowerup) {
-        return (testPowerup.energyCost <= energy && activePowerup == null);
+        return (testPowerup.energyCost <= energy && activePowerup == null && Time.timeScale > 0.01f);
     }
 
     public void SetActivePowerup(Powerup newActivePowerup) {
