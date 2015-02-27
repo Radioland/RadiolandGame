@@ -29,25 +29,19 @@ public class FollowPlatforms : MonoBehaviour
 
     }
 
-    private void Detatch() {
-        latestPlatform = null;
-        transform.parent = null;
-    }
-
     private void Update() {
         Platform platform = GetPlatformUnder();
         if (platform) {
             latestPlatform = platform;
             lastPlatformUnderTime = Time.time;
-            transform.parent = platform.transform;
         }
 
         if (Time.time - lastPlatformUnderTime > lingerTime) {
-            Detatch();
+            latestPlatform = null;
         }
 
         if (latestPlatform) {
-//            Push(latestPlatform);
+            Push(latestPlatform);
         }
     }
 
@@ -57,7 +51,7 @@ public class FollowPlatforms : MonoBehaviour
 
         if (latestPlatform) {
             characterMovement.AddVelocity(latestPlatform.lastVelocity);
-            Detatch();
+            latestPlatform = null;
         }
     }
 
