@@ -38,7 +38,9 @@ public class StationPower : MonoBehaviour
             }
         }
 
-        StopPower();
+        if (enabled) {
+            StopPower();
+        }
     }
 
     private void Start() {
@@ -46,6 +48,8 @@ public class StationPower : MonoBehaviour
     }
 
     private void Update() {
+        if (!enabled) { return; }
+
         if (stationChoice == StationChoice.Any) {
             if (allStations.Any(station => station.StrongSignal())) {
                 StartPower();

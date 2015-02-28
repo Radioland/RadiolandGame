@@ -162,6 +162,8 @@ public class AudioStream : MonoBehaviour
     private void Update() {
         if (!streamInitialized) { return; }
 
+        if (AudioListener.volume < 0.001f) { volume = 0f; }
+
         if (Time.timeScale <= 0.001f && !paused) { Pause(); }
         if (Time.timeScale > 0.001f && paused) { Play(); }
         #if UNITY_EDITOR
