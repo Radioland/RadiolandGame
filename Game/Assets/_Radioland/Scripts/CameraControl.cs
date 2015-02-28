@@ -62,11 +62,6 @@ public class CameraControl : MonoBehaviour
         targetPosition = new Vector3(0, 100000, 0);
         smoothMouse = Vector2.zero;
 
-        #if !UNITY_EDITOR
-        Screen.showCursor = false;
-        Screen.lockCursor = true;
-        #endif
-
         distanceUp = defaultDistanceUp;
         lookDir = followTransform.forward;
         curLookDir = followTransform.forward;
@@ -81,7 +76,10 @@ public class CameraControl : MonoBehaviour
     }
 
     private void Update() {
-
+        #if !UNITY_EDITOR
+        Screen.showCursor = false;
+        Screen.lockCursor = true;
+        #endif
     }
 
     private void LateUpdate() {
