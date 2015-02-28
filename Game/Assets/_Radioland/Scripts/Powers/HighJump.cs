@@ -36,6 +36,9 @@ public class HighJump : JumpPowerup
         base.EndPowerup();
 
         characterMovement.ResetJumpHeight();
-        animator.SetBool(highJumpHash, false);
+
+        if (animator && animator.gameObject.activeInHierarchy) {
+            animator.SetBool(highJumpHash, false);
+        }
     }
 }

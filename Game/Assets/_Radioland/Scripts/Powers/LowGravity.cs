@@ -59,6 +59,8 @@ public class LowGravity : JumpPowerup
         characterMovement.ResetAirSmoothDampTime();
         characterMovement.ResetGroundSmoothDampTime();
 
-        animator.SetBool(longJumpHash, false);
+        if (animator && animator.gameObject.activeInHierarchy) {
+            animator.SetBool(longJumpHash, false);
+        }
     }
 }

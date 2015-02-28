@@ -30,7 +30,7 @@ public class AnimatorBoolEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
-        if (animator) {
+        if (animator && animator.gameObject.activeInHierarchy) {
             animator.SetBool(boolToSet, true);
         }
     }
@@ -38,7 +38,7 @@ public class AnimatorBoolEffect : Effect
     public override void EndEffect() {
         base.EndEffect();
 
-        if (animator) {
+        if (animator && animator.gameObject.activeInHierarchy) {
             animator.SetBool(boolToSet, false);
         }
     }
