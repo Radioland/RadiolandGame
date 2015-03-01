@@ -30,20 +30,18 @@ public class Dialogue : MonoBehaviour
     private int messageCount;
 
     private void Awake() {
-        if (startVisible) {
-            visible = true;
-            dialogueRootObject.SetActive(true);
-        } else {
-            ClearMessage();
-        }
-
         lastNextMessageTime = -1000f;
 
         messageCount = mode == DialogueMode.Automatic ? messageFiles.Count : messageObjects.Count;
     }
 
     private void Start() {
-
+        if (startVisible) {
+            visible = true;
+            dialogueRootObject.SetActive(true);
+        } else {
+            ClearMessage();
+        }
     }
 
     private void Update() {
@@ -92,6 +90,12 @@ public class Dialogue : MonoBehaviour
             foreach (GameObject messageObject in messageObjects) {
                 messageObject.SetActive(false);
             }
+        }
+
+        if (allMessagesEffects) { allMessagesEffects.StopEvent(); }
+        if (specificMessageEffects.Count > currentMessage &&
+            specificMessageEffects[currentMessage]) {
+            specificMessageEffects[currentMessage].StopEvent();
         }
 
         currentMessage = 0;
