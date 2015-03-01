@@ -199,5 +199,6 @@ public class AudioStream : MonoBehaviour
     public void OnDestroy() {
         BASS_StreamFree(stream);
         BASS_Free();
+        bassInitialized = false;
     }
 }
