@@ -41,12 +41,17 @@ public class RadioStation : MonoBehaviour
 
         if (powerup) { powerup.radioStation = this; }
 
-        if (stream && !stream.streamInitialized && audioSource && !audioSource.enabled) {
-            audioSource.enabled = true;
-        }
     }
 
     private void Update() {
+        if ((!stream || (stream && !stream.streamInitialized)) && (audioSource)) {
+            audioSource.enabled = true;
+            stream.enabled = false;
+        } else {
+            stream.enabled = true;
+            audioSource.enabled = false;
+        }
+
         audioSource.volume = signalStrength * maxVolume;
         if (stream) {
             stream.volume = signalStrength * maxVolume;
