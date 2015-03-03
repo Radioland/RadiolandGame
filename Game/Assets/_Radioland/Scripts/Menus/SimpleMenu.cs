@@ -20,6 +20,9 @@ public class SimpleMenu : MonoBehaviour
     }
 
     public void LoadLevel(int level) {
+        Time.timeScale = 1.0f;
+        AudioListener.pause = false;
+
         GameObject loadingScreenObject = (GameObject) Instantiate(loadingScreen);
         Loading loading = loadingScreenObject.GetComponent<Loading>();
         if (loading) {

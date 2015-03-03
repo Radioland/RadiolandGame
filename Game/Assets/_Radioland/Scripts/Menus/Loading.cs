@@ -21,6 +21,8 @@ public class Loading : MonoBehaviour
     }
 
     public void LoadLevel(int level) {
+        Time.timeScale = 1.0f;
+        AudioListener.pause = false;
         StartCoroutine(DisplayLoadingScreen(level));
     }
 
