@@ -31,7 +31,9 @@ public class SpectrumSource : MonoBehaviour
 
         GameObject player = GameObject.FindWithTag("Player");
         allStations = player.GetComponentsInChildren<RadioStation>();
+    }
 
+    private void Start() {
         // Find the radioStation matching stationChoice.
         foreach (RadioStation station in allStations) {
             if ((station.id == 1 && stationChoice == StationChoice.Station_1) ||
@@ -42,10 +44,6 @@ public class SpectrumSource : MonoBehaviour
                 radioStation = station;
             }
         }
-    }
-
-    private void Start() {
-
     }
 
     private void Update() {
