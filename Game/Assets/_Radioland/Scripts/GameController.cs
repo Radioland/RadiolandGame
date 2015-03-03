@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System.Collections;
 
 public class GameController : MonoBehaviour
@@ -9,6 +11,7 @@ public class GameController : MonoBehaviour
     public bool masterMute = false;
 
     [SerializeField] private GameObject pauseBackground;
+    [SerializeField] private Button resumeButton;
     private bool m_paused = false;
     public bool paused { get { return m_paused; } }
 
@@ -46,7 +49,7 @@ public class GameController : MonoBehaviour
     }
 
     private void HandlePause() {
-        if (Input.GetButtonDown("Pause")) {
+        if (Input.GetButtonDown("Pause") && !paused) {
             TogglePause();
         }
     }
@@ -58,6 +61,11 @@ public class GameController : MonoBehaviour
         AudioListener.pause = paused;
         if (pauseBackground) {
             pauseBackground.SetActive(paused);
+
+        }
+        if (resumeButton && paused) {
+            EventSystem eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
+            eventSystem.SetSelectedGameObject(resumeButton.gameObject, new BaseEventData(eventSystem));
         }
 
         CharacterMovement characterMovement = player.GetComponent<CharacterMovement>();

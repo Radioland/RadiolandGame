@@ -27,6 +27,9 @@ public class LoadLevelEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
+        Time.timeScale = 1.0f;
+        AudioListener.pause = false;
+
         if (loadNext) { levelToLoad = Application.loadedLevel + 1; }
         if (Application.levelCount > levelToLoad || levelToLoad < 0) {
             GameObject loadingScreenObject = (GameObject) Instantiate(loadingScreen);
