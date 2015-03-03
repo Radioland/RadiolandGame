@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GDCStartMenu : MonoBehaviour
+public class SimpleMenu : MonoBehaviour
 {
     private void Awake() {
 
