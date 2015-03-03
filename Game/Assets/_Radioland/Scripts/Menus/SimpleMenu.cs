@@ -3,9 +3,12 @@ using System.Collections;
 
 public class SimpleMenu : MonoBehaviour
 {
+    [SerializeField] private GameObject loadingScreen;
+
     private void Awake() {
 
     }
+
     private void Start() {
 
     }
@@ -17,7 +20,13 @@ public class SimpleMenu : MonoBehaviour
     }
 
     public void LoadLevel(int level) {
-        Application.LoadLevel(level);
+        GameObject loadingScreenObject = (GameObject) Instantiate(loadingScreen);
+        Loading loading = loadingScreenObject.GetComponent<Loading>();
+        if (loading) {
+            loading.LoadLevel(level);
+        } else {
+            Application.LoadLevel(level);
+        }
     }
 
     public void Exit() {
