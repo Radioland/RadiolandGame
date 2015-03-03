@@ -47,17 +47,21 @@ public class GameController : MonoBehaviour
 
     private void HandlePause() {
         if (Input.GetButtonDown("Pause")) {
-            m_paused = !paused;
-
-            Time.timeScale = paused ? 0.0f : 1.0f;
-            AudioListener.pause = paused;
-            if (pauseBackground) {
-                pauseBackground.SetActive(paused);
-            }
-
-            CharacterMovement characterMovement = player.GetComponent<CharacterMovement>();
-            characterMovement.SetControllable(!paused);
+            TogglePause();
         }
+    }
+
+    public void TogglePause() {
+        m_paused = !paused;
+
+        Time.timeScale = paused ? 0.0f : 1.0f;
+        AudioListener.pause = paused;
+        if (pauseBackground) {
+            pauseBackground.SetActive(paused);
+        }
+
+        CharacterMovement characterMovement = player.GetComponent<CharacterMovement>();
+        characterMovement.SetControllable(!paused);
     }
 
     private void HandleCheats() {
