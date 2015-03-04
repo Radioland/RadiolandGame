@@ -3,7 +3,8 @@ using System.Collections;
 
 public class Dance : MonoBehaviour
 {
-    public bool dancing;
+    [HideInInspector] public bool dancing;
+    [SerializeField] private float idleDanceStartTime = 4.0f;
     [SerializeField] private float minDanceTime = 0.5f;
     [SerializeField] private float minInputStopTime = 0.5f;
     [SerializeField] private float inputPersistTime = 0.1f;
@@ -17,7 +18,8 @@ public class Dance : MonoBehaviour
     private float lastDanceTime;
     private float lastInputTime;
     private float lastInputStartedTime;
-    private bool stillReceivingInput;
+    private bool stillNoInput;
+    private bool ableToDance;
 
     private void Awake() {
         dancing = false;
@@ -32,10 +34,12 @@ public class Dance : MonoBehaviour
         danceBoolHash = Animator.StringToHash("Dancing");
         danceStateHash = Animator.StringToHash("Base Layer.Dance");
 
+        ableToDance = false;
         stopping = false;
         lastDanceTime = -1000.0f;
         lastInputTime = -1000.0f;
         lastInputStartedTime = -1000.0f;
+        stillNoInput = true;
     }
 
     private void Start() {
@@ -43,16 +47,12 @@ public class Dance : MonoBehaviour
     }
 
     private void Update() {
-        if (characterMovement.grounded && Input.GetButtonDown("Dance")) {
-            dancing = true;
-            stopping = false;
-            lastDanceTime = Time.time;
+        if (ableToDance && stillNoInput && Time.time - lastInputStartedTime > idleDanceStartTime) {
+            StartDancing();
+        }
 
-            animator.SetBool(danceBoolHash, true);
-
-            if (danceEffects) {
-                danceEffects.StartEvent();
-            }
+        if (!ableToDance) {
+            stopping = true;
         }
 
         bool inDanceState = animator.GetCurrentAnimatorStateInfo(0).nameHash == danceStateHash;
@@ -73,24 +73,28 @@ public class Dance : MonoBehaviour
         }
     }
 
+    public void SetAbleToDance(bool newAbleToDance) {
+        ableToDance = newAbleToDance;
+    }
+
     // Called via SendMessage in CharacterMovement.
     private void InputReceived() {
         lastInputTime = Time.time;
 
-        if (dancing && stillReceivingInput) {
+        if (dancing && !stillNoInput) {
             if (Time.time - lastInputStartedTime > minInputStopTime) {
                 stopping = true;
             }
         } else {
             lastInputStartedTime = Time.time;
         }
-        stillReceivingInput = true;
+        stillNoInput = false;
     }
 
     // Called via SendMessage in CharacterMovement.
     private void NoMovementInput() {
         if (Time.time - lastInputTime > inputPersistTime) {
-            stillReceivingInput = false;
+            stillNoInput = true;
         }
     }
 
@@ -99,6 +103,18 @@ public class Dance : MonoBehaviour
         // Jump immediately cancels dancing.
         if (dancing) {
             StopDancing();
+        }
+    }
+
+    private void StartDancing() {
+        dancing = true;
+        stopping = false;
+        lastDanceTime = Time.time;
+
+        animator.SetBool(danceBoolHash, true);
+
+        if (danceEffects) {
+            danceEffects.StartEvent();
         }
     }
 
