@@ -55,11 +55,11 @@ public class Dance : MonoBehaviour
             stopping = true;
         }
 
-        bool inDanceState = animator.GetCurrentAnimatorStateInfo(0).nameHash == danceStateHash;
+        bool inDanceState = animator.GetCurrentAnimatorStateInfo(0).fullPathHash == danceStateHash;
 
         // Wait at least minDanceTime before stopping the animation and restoring control.
         if (Time.time - lastDanceTime > minDanceTime && stopping) {
-            if (inDanceState) {
+            if (inDanceState && animator.isActiveAndEnabled) {
                 animator.SetBool(danceBoolHash, false);
             }
 
@@ -111,7 +111,9 @@ public class Dance : MonoBehaviour
         stopping = false;
         lastDanceTime = Time.time;
 
-        animator.SetBool(danceBoolHash, true);
+        if (animator.isActiveAndEnabled) {
+            animator.SetBool(danceBoolHash, true);
+        }
 
         if (danceEffects) {
             danceEffects.StartEvent();
@@ -119,7 +121,9 @@ public class Dance : MonoBehaviour
     }
 
     private void StopDancing() {
-        animator.SetBool(danceBoolHash, false);
+        if (animator.isActiveAndEnabled) {
+            animator.SetBool(danceBoolHash, false);
+        }
         characterMovement.SetControllable(true);
         stopping = false;
         dancing = false;

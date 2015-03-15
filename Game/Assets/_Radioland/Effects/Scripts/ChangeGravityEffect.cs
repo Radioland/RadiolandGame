@@ -32,7 +32,8 @@ public class ChangeGravityEffect : Effect
         base.StartEffect();
 
         if (objectToChange) {
-            objectToChange.rigidbody.useGravity = useGravity;
+            Rigidbody objectRigidbody = objectToChange.GetComponent<Rigidbody>();
+            objectRigidbody.useGravity = useGravity;
         }
     }
 

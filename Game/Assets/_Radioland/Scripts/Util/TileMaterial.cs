@@ -22,9 +22,11 @@ public class TileMaterial : MonoBehaviour
         float materialScaleX = xScaleMultipler * (proportionalScale ? GetScale(materialXAxis) : 1f);
         float materialScaleY = yScaleMultipler * (proportionalScale ? GetScale(materialYAxis) : 1f);
 
-        foreach (string propertyName in materialPropertyNames.Where(propertyName => renderer.material.HasProperty(propertyName))) {
-            renderer.material.SetTextureScale(propertyName, new Vector2(materialScaleX, materialScaleY));
-            renderer.material.SetTextureOffset(propertyName, new Vector2(xOffset, yOffset));
+        Renderer rendererToChange = gameObject.GetComponent<Renderer>();
+
+        foreach (string propertyName in materialPropertyNames.Where(propertyName => rendererToChange.material.HasProperty(propertyName))) {
+            rendererToChange.material.SetTextureScale(propertyName, new Vector2(materialScaleX, materialScaleY));
+            rendererToChange.material.SetTextureOffset(propertyName, new Vector2(xOffset, yOffset));
         }
     }
 

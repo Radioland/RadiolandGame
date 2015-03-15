@@ -12,9 +12,13 @@ public class CameraBackground : MonoBehaviour
     private float currentTime;
     private float timeDamp;
 
+    private Camera cameraToChange;
+
     private void Awake() {
         currentTime = 0f;
         timeDamp = 0f;
+
+        cameraToChange = gameObject.GetComponent<Camera>();
     }
 
     private void Start() {
@@ -31,10 +35,10 @@ public class CameraBackground : MonoBehaviour
         float saturation = (int) Mathf.Lerp(minSaturation, maxSaturation, t) / 255.0f;
         float brightness = (int) Mathf.Lerp(minBrightness, maxBrightness, t) / 255.0f;
 
-        HSBColor cameraColorHSB = new HSBColor(camera.backgroundColor);
+        HSBColor cameraColorHSB = new HSBColor(cameraToChange.backgroundColor);
         cameraColorHSB.b = brightness;
         cameraColorHSB.s = saturation;
-        camera.backgroundColor = cameraColorHSB.ToColor();
+        cameraToChange.backgroundColor = cameraColorHSB.ToColor();
     }
 
     public void SetIntensitySmooth(float t) {

@@ -35,6 +35,7 @@ public class AudioOneShotEffect : Effect
         if (playAtPoint) {
             AudioSource.PlayClipAtPoint(audioClip, transform.position, volumeScale);
         } else {
+            AudioSource audio = gameObject.GetComponent<AudioSource>();
             audio.PlayOneShot(audioClip, volumeScale);
         }
     }
