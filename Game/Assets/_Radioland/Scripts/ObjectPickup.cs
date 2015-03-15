@@ -18,7 +18,6 @@ public class ObjectPickup : MonoBehaviour {
         pickingUp = false;
 
         characterMovement = gameObject.GetComponent<CharacterMovement>();
-        //objectiveGUI = GameObject.Find("ObjectiveUI");
     }
 
     private void Start() {
@@ -32,14 +31,11 @@ public class ObjectPickup : MonoBehaviour {
             }
 
             animator.SetTrigger(pickupTriggerHash);
-
-            //Destroy(c.gameObject);
-            //objectiveGUI.GetComponent<ObjectiveGUI>().IncrementTargets();
         }
     }
 
     private void Update() {
-        bool inPickupState = animator.GetCurrentAnimatorStateInfo(0).nameHash == pickupStateHash;
+        bool inPickupState = animator.GetCurrentAnimatorStateInfo(0).fullPathHash == pickupStateHash;
 
         if (!pickingUp && inPickupState) {
             pickingUp = true;

@@ -87,11 +87,12 @@ public class VisualizeAudio : MonoBehaviour
         if (!spectrumObjectPrefab) { return; }
         // if (spectrumObjects.Count != 0) { return; }
 
-        // Draw a cube around the space taken up by the cubes.
+        // Draw a box around the space taken up by the spectrum objects.
 
-        float depth = spectrumObjectPrefab.renderer.bounds.size.z;
-        float width = spectrumObjectPrefab.renderer.bounds.size.x;
-        float height = (spectrumObjectPrefab.renderer.bounds.size.y *
+        Renderer spectrumObjectPrefabRenderer = spectrumObjectPrefab.GetComponent<Renderer>();
+        float depth = spectrumObjectPrefabRenderer.bounds.size.z;
+        float width = spectrumObjectPrefabRenderer.bounds.size.x;
+        float height = (spectrumObjectPrefabRenderer.bounds.size.y *
                         spectrumObjectPrefab.transform.localScale.y * maxScale);
 
         Vector3 start = transform.position - (transform.forward * depth / 2.0f);

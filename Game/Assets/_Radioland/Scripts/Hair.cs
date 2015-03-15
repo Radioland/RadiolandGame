@@ -33,7 +33,7 @@ public class Hair : MonoBehaviour
         if (!hairJoint) {
             hairJoint = gameObject.AddComponent<FixedJoint>();
         }
-        hairJoint.connectedBody = baseObject.rigidbody;
+        hairJoint.connectedBody = baseObject.GetComponent<Rigidbody>();
     }
 
     public void DetatchFromBase() {

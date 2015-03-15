@@ -66,12 +66,13 @@ public class TransformLerp : MonoBehaviour
                                            targetRotation;
 
         MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-        if (meshFilter && renderer) {
+        Renderer objectRenderer = gameObject.GetComponent<Renderer>();
+        if (meshFilter && objectRenderer) {
             if (selected) { highlightSelectedMaterial.SetPass(0); }
             else          { highlightDefaultMaterial.SetPass(0);  }
             Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
 
-            renderer.sharedMaterial.SetPass(0);
+            objectRenderer.sharedMaterial.SetPass(0);
             GL.wireframe = true;
             Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
             GL.wireframe = false;
@@ -80,10 +81,10 @@ public class TransformLerp : MonoBehaviour
             Gizmos.matrix = gizmoMatrix;
 
             Gizmos.color = selected ? selectedColor : defaultColor;
-            if (renderer) {
-                Gizmos.DrawWireCube(Vector3.zero, renderer.bounds.extents);
-            } else if (collider) {
-                Gizmos.DrawWireCube(Vector3.zero, collider.bounds.size);
+            if (objectRenderer) {
+                Gizmos.DrawWireCube(Vector3.zero, objectRenderer.bounds.extents);
+            } else if (GetComponent<Collider>()) {
+                Gizmos.DrawWireCube(Vector3.zero, GetComponent<Collider>().bounds.size);
             }
         }
     }

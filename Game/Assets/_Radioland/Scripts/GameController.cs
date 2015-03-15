@@ -7,7 +7,7 @@ public class GameController : MonoBehaviour
 {
     public GameObject player;
     [Tooltip("Kill the player when they fall below this value.")]
-    [SerializeField] private float fallbackKillY = -100.0f;
+    [SerializeField] private float fallbackKillY = -1000.0f;
     public bool masterMute = false;
 
     [SerializeField] private GameObject pauseBackground;
@@ -19,12 +19,17 @@ public class GameController : MonoBehaviour
     private GameObject latestCheckpoint;
     private Respawn respawnScript;
 
+    private float pauseCooldown = 0.5f;
+    private float lastPausedTime;
+
     private void Awake() {
         player = GameObject.FindWithTag("Player");
 
         fallbackRespawnPosition = player.transform.position;
 
         respawnScript = gameObject.GetComponentInChildren<Respawn>();
+
+        lastPausedTime = -1000f;
     }
 
     private void Start() {
@@ -55,13 +60,15 @@ public class GameController : MonoBehaviour
     }
 
     public void TogglePause() {
+        if (Time.unscaledTime - lastPausedTime < pauseCooldown) { return; }
+        lastPausedTime = Time.unscaledTime;
+
         m_paused = !paused;
 
         Time.timeScale = paused ? 0.0f : 1.0f;
         AudioListener.pause = paused;
         if (pauseBackground) {
             pauseBackground.SetActive(paused);
-
         }
         if (resumeButton && paused) {
             EventSystem eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();

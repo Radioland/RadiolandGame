@@ -21,14 +21,14 @@ using System.Collections;
         }
 
         theObject.transform.localPosition = Vector3.zero;
-        if (placeAbove && selectedObject && selectedObject.collider) {
-            float height = selectedObject.collider.bounds.size.y;
+        if (placeAbove && selectedObject && selectedObject.GetComponent<Collider>()) {
+            float height = selectedObject.GetComponent<Collider>().bounds.size.y;
 
             RaycastHit[] hits;
             hits = Physics.RaycastAll(selectedObject.transform.position + Vector3.up * height,
                                       -Vector3.up, height * 1.2f);
             foreach (RaycastHit hit in hits) {
-                if (hit.collider == selectedObject.collider) {
+                if (hit.collider == selectedObject.GetComponent<Collider>()) {
                     Vector3 localHit = selectedObject.transform.InverseTransformPoint(hit.point);
                     theObject.transform.localPosition = localHit;
 

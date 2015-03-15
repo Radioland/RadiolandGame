@@ -32,7 +32,8 @@ public class RandomAudioEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
-        audio.PlayOneShot(audioClips[Random.Range(0, audioClips.Count)], volumeScale * secondaryScale);
+        AudioSource audioSource = gameObject.GetComponent<AudioSource>();
+        audioSource.PlayOneShot(audioClips[Random.Range(0, audioClips.Count)], volumeScale * secondaryScale);
     }
 
     public override void EndEffect() {
