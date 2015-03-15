@@ -77,8 +77,8 @@ public class CameraControl : MonoBehaviour
 
     private void Update() {
         #if !UNITY_EDITOR
-        Screen.showCursor = false;
-        Screen.lockCursor = true;
+        Cursor.lockState = UnityEngine.CursorLockMode.Locked;
+        Cursor.visible = false;
         #endif
     }
 
