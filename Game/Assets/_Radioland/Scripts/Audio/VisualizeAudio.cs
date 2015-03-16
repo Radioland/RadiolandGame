@@ -13,35 +13,47 @@ public class VisualizeAudio : MonoBehaviour
     [Header("Manual Objects Setup")]
     [SerializeField] private List<GameObject> spectrumObjects;
     [Header("Configuration")]
+    [SerializeField] private bool scaleX = false;
+    [SerializeField] private bool scaleY = true;
+    [SerializeField] private bool scaleZ = false;
     [SerializeField] private float minScale = 0.2f;
     [SerializeField] private float maxScale = 4.0f;
+    [SerializeField] private float lerpSpeed = 0.5f;
     [SerializeField] private int upperFrequency = 1024;
 
     private SpectrumSource spectrumSource;
     private int spectrumSamples;
     private float[] spectrum;
 
-    private Vector3 originalScale;
+    private Vector3[] originalScales;
 
     private static Color gizmoBoxColor = Color.blue;
 
     private void Awake() {
-        originalScale = spectrumObjectPrefab.transform.localScale;
-
         spectrumSource = gameObject.GetComponent<SpectrumSource>();
         spectrumSamples = spectrumSource.spectrumSamples;
         spectrum = new float[spectrumSamples];
 
         if (spectrumObjects.Count == 0) {
+            // Automatic setup.
+            originalScales = new Vector3[spectumObjectCount];
             spectrumObjects = new List<GameObject>();
             for (int i = 0; i < spectumObjectCount; i++) {
-                GameObject spectrumObject = (GameObject)Instantiate(spectrumObjectPrefab);
+                originalScales[i] = spectrumObjectPrefab.transform.localScale;
+                GameObject spectrumObject = (GameObject) Instantiate(spectrumObjectPrefab);
 
                 spectrumObject.transform.parent = transform;
                 spectrumObject.transform.position = transform.position + i * transform.forward * spectrumObjectOffset;
                 spectrumObject.transform.localRotation = Quaternion.identity;
 
                 spectrumObjects.Add(spectrumObject);
+            }
+        } else {
+            // Manual setup.
+            spectumObjectCount = spectrumObjects.Count;
+            originalScales = new Vector3[spectumObjectCount];
+            for (int i = 0; i < spectumObjectCount; i++) {
+                originalScales[i] = spectrumObjects[i].transform.localScale;
             }
         }
     }
@@ -77,9 +89,13 @@ public class VisualizeAudio : MonoBehaviour
             if (spectrumSource.radioStation) { relativeScaleFactor /= spectrumSource.radioStation.maxVolume; }
 
             float scaleFactor = Mathf.Lerp(minScale, maxScale, relativeScaleFactor);
-            spectrumObjects[i].transform.localScale = new Vector3(originalScale.x,
-                                                                  originalScale.y * scaleFactor,
-                                                                  originalScale.z);
+            Vector3 originalScale = originalScales[i];
+            Vector3 newScale = originalScale;
+            if (scaleX) { newScale.x = originalScale.x * scaleFactor; }
+            if (scaleY) { newScale.y = originalScale.y * scaleFactor; }
+            if (scaleZ) { newScale.z = originalScale.z * scaleFactor; }
+            spectrumObjects[i].transform.localScale = Vector3.Lerp(spectrumObjects[i].transform.localScale,
+                                                                   newScale, lerpSpeed);
         }
     }
 

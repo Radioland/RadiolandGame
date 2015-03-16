@@ -130,6 +130,13 @@ using System.Collections;
                      placeAbove:true, orientToSurface:true);
     }
 
+    [MenuItem("GameObject/Create Radioland/Props/Visualizer Cloud", false, 1)]
+    [MenuItem("Radioland/Props/Visualizer Cloud", false, 1)]
+    private static void CreateVisualizerCloud() {
+        CreateObject("Visualizer Cloud", "Assets/_Radioland/Environment/Prefabs/Components/props/Visualizer Cloud.prefab",
+                     placeAbove:true, orientToSurface:false);
+    }
+
     [MenuItem("GameObject/Create Radioland/General/Checkpoint", false, 1)]
     [MenuItem("Radioland/General/Checkpoint", false, 1)]
     private static void CreateCheckpoint() {
