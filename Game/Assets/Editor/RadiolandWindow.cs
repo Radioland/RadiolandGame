@@ -3,13 +3,17 @@ using UnityEditor;
 
 public class RadiolandWindow : EditorWindow
 {
-    private Texture2D headerImage = Resources.Load("BirbBanner", typeof(Texture2D)) as Texture2D;
+    private Texture2D headerImage;
     private const float headerHeight = 100f;
 
     private const float defaultCurveGizmoSphereRadius = 0.8f;
     private const float defaultCurveGizmoBoxWidth= 0.9f;
     private float curveGizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", defaultCurveGizmoSphereRadius);
     private float curveGizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", 0.9f);
+
+    public void OnEnable() {
+        headerImage = Resources.Load("BirbBanner", typeof(Texture2D)) as Texture2D;
+    }
 
     [MenuItem ("Window/Radioland")]
     private static void Init() {
