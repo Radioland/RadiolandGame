@@ -5,6 +5,7 @@
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0.0
 		_VColorFactor ("Vertex Color Factor", Range(0,2)) = 2.0
+		_VRamp ("Vertex Color Ramp", 2D) = "white" {}
 
 	}
 	SubShader {
@@ -30,11 +31,13 @@
 		half _Metallic;
 		fixed4 _Color;
 		half _VColorFactor;
+		sampler2D _VRamp;
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			// Albedo comes from a texture tinted by color
 			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-			o.Albedo = c.rgb * IN.color.rgb * _VColorFactor;
+			fixed4 r = tex2D (_VRamp, IN.color.rg);
+			o.Albedo = c.rgb * r * _VColorFactor;
 
 			// Metallic and smoothness come from slider variables
 			o.Metallic = _Metallic;
