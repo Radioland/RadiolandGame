@@ -19,6 +19,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float minRadius = 4f;
     [SerializeField] private float maxRadius = 14f;
     private float radius;
+    [SerializeField] private float maxTargetAhead = 3f;
 
     [SerializeField] private float defaultAngleUp = 25f;
     [SerializeField] private float minAngleUp = -50f;
@@ -54,10 +55,12 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float maxSpeed = 1.5f;
     [SerializeField] private float camSmoothDampTime = 0.1f;
     [SerializeField] private float lookLerpDampTime = 0.2f;
+    [SerializeField] private float aimAheadDampTime = 1f;
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
     private Transform lookLerpTransform;
     private Vector3 lookLerpObjectSmooth = Vector3.zero;
+    private float aimAheadSmooth = 0;
 
     // Camera reset.
     private float lastResetTime;
@@ -98,6 +101,13 @@ public class CameraControl : MonoBehaviour
 
         cameraTransform.localRotation = Quaternion.Lerp(cameraTransform.localRotation,
                                                         Quaternion.identity, Time.deltaTime);
+
+        // Aim ahead of followTransform based on current speed.
+        Vector3 localFollowPosition = followTransform.localPosition;
+        float targetAimAhead = Mathf.Lerp(0f, maxTargetAhead, Mathf.Pow(characterMovement.GetPercentWalkSpeed(), 2f));
+        float aimAhead = Mathf.SmoothDamp(localFollowPosition.z, targetAimAhead, ref aimAheadSmooth, aimAheadDampTime);
+        localFollowPosition.z = aimAhead;
+        followTransform.localPosition = localFollowPosition;
 
         // Get input values from controller/keyboard.
         // TODO: replace with better controller/mouse input management.
@@ -155,7 +165,8 @@ public class CameraControl : MonoBehaviour
         targetCameraPosition = followTransform.position + targetOffset;
         Debug.DrawLine(followTransform.position, followTransform.position + targetOffset, Color.white);
 
-        CompensateForWalls(followTransform.position, ref targetCameraPosition);
+        CompensateForWalls(followTransform.position - followTransform.localPosition,
+                           ref targetCameraPosition);
 
         // Smoothly translate to the target position.
         targetCameraPosition = Vector3.SmoothDamp(cameraTransform.position, targetCameraPosition,

@@ -54,6 +54,7 @@ public class CharacterMovement : MonoBehaviour
     private CharacterController controller;
     private CollisionFlags collisionFlags;
     private RaycastHit hit;
+    private float walkSpeed;
     private float verticalSpeed;
     private const float walkRunCutoff = 0.3f;
     private float lastRunInputStartTime;
@@ -94,14 +95,6 @@ public class CharacterMovement : MonoBehaviour
         if (!cameraControl) { Debug.LogWarning("No camera control set on CharacterMovement!"); }
 
         controller = gameObject.GetComponent<CharacterController>();
-        verticalSpeed = 0f;
-        lastRunInputStartTime = -1000f;
-        lastJumpInputTime = -1000f;
-        lastJumpTime = -1000f;
-        lastGroundedTime = -1000f;
-        slopeAngle = 0f;
-        leftX = 0f;
-        leftY = 0f;
 
         // Fetch animator properties.
         animator = gameObject.GetComponentInChildren<Animator>();
@@ -130,6 +123,16 @@ public class CharacterMovement : MonoBehaviour
 
     public void ResetState() {
         transform.parent = null;
+
+        walkSpeed = 0f;
+        verticalSpeed = 0f;
+        lastRunInputStartTime = -1000f;
+        lastJumpInputTime = -1000f;
+        lastJumpTime = -1000f;
+        lastGroundedTime = -1000f;
+        slopeAngle = 0f;
+        leftX = 0f;
+        leftY = 0f;
 
         moving = false;
         running = false;
@@ -197,7 +200,7 @@ public class CharacterMovement : MonoBehaviour
         // Kill x and z rotation.
         transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
 
-        float walkSpeed = maxWalkSpeed * runSpeedCurve.Evaluate(Time.time - lastRunInputStartTime);
+        walkSpeed = maxWalkSpeed * runSpeedCurve.Evaluate(Time.time - lastRunInputStartTime);
         Vector3 motion = (transform.forward * controlSpeed + transform.right * strafeInput) * walkSpeed;
         motion = Vector3.ClampMagnitude(motion, maxWalkSpeed);
 
@@ -397,6 +400,10 @@ public class CharacterMovement : MonoBehaviour
     public void Stop() {
         velocity = Vector3.zero;
         verticalSpeed = 0;
+    }
+    public float GetPercentWalkSpeed() {
+        if (!moving) { return 0f; }
+        return walkSpeed / maxWalkSpeed;
     }
 
     #region Set and reset properties.
