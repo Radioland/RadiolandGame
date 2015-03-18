@@ -179,7 +179,7 @@ public class CharacterMovement : MonoBehaviour
             Mathf.Abs(Input.GetAxisRaw("Vertical")) >= 0.01 ||
             Mathf.Abs(Input.GetAxisRaw("Strafe")) >= 0.01) {
 
-            if (controllable && !running && controlSpeed < walkRunCutoff) {
+            if (controllable && !running && controlSpeed > walkRunCutoff) {
                 lastRunInputStartTime = Time.time;
             }
             running = controllable && controlSpeed > walkRunCutoff;
