@@ -37,13 +37,12 @@ public class StationPower : MonoBehaviour
                 radioStation = station;
             }
         }
-
-        if (enabled) {
-            StopPower(stopEvenIfAlreadyStopped:true);
-        }
     }
 
     private void Start() {
+        if (enabled) {
+            StopPower(stopEvenIfAlreadyStopped:true);
+        }
 
     }
 
