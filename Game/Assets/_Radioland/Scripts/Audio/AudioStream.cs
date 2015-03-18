@@ -22,7 +22,7 @@ public class AudioStream : MonoBehaviour
     private bool paused;
     [HideInInspector] public bool streamInitialized;
 
-    private static int maxRetryAttempts = 1;
+    private static int maxRetryAttempts = 2;
 
     public enum flags
     {
@@ -50,7 +50,8 @@ public class AudioStream : MonoBehaviour
     public float volume {
         get { return m_volume; }
         set {
-            m_volume = value;
+            m_volume = AudioListener.volume < 0.001f ? 0f : value;
+
             if (!streamInitialized) { return; }
             BASS_ChannelSetAttribute(stream, attribs.BASS_ATTRIB_VOL, m_volume);
         }
