@@ -13,15 +13,14 @@ public class BouncePlatform : MonoBehaviour
     public float staticElasticity = 0.5f;
     public QuadraticCurve trajectory;
     [SerializeField] private float triggeredSpeed = 30f;
-    [SerializeField] private float triggeredDuration = 0.5f;
     [SerializeField] private float triggeredNewSmoothDampTimes = 10.0f;
 
     [SerializeField] private LayerMask bounceTriggerLayers;
 
-    private float lastBounceTime;
+    private bool bouncing;
 
     private void Awake() {
-        lastBounceTime = -1000f;
+        bouncing = false;
     }
 
     private void Start() {
@@ -32,13 +31,8 @@ public class BouncePlatform : MonoBehaviour
 
     }
 
-    public void TriggerBounce() {
-        lastBounceTime = Time.time;
-    }
-
     public void OnTriggerStay(Collider other) {
-        if (bounceMode != BounceMode.Triggered ||
-            Time.time - lastBounceTime > triggeredDuration) { return; }
+        if (bounceMode != BounceMode.Triggered || !bouncing) { return; }
 
         if (((1<<other.gameObject.layer) & bounceTriggerLayers) != 0) {
             CharacterMovement characterMovement = other.transform.root.GetComponent<CharacterMovement>();
@@ -51,5 +45,13 @@ public class BouncePlatform : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void StartBouncing() {
+        bouncing = true;
+    }
+
+    public void StopBouncing() {
+        bouncing = false;
     }
 }

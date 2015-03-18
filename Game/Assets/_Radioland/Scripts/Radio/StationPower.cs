@@ -57,9 +57,7 @@ public class StationPower : MonoBehaviour
                 StopPower();
             }
 
-            if (powered) {
-                continuousEvents.Invoke(allStations.Max(station => station.signalStrength));
-            }
+            continuousEvents.Invoke(allStations.Max(station => station.signalStrength));
         } else if (radioStation) {
             if (!powered && radioStation.StrongSignal()) {
                 StartPower();
@@ -69,9 +67,7 @@ public class StationPower : MonoBehaviour
                 StopPower();
             }
 
-            if (powered) {
-                continuousEvents.Invoke(radioStation.signalStrength);
-            }
+            continuousEvents.Invoke(radioStation.signalStrength);
         }
     }
 
