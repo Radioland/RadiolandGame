@@ -14,12 +14,16 @@ public class CameraControl : MonoBehaviour
     private Camera cameraComponent;
 
     // Distances from the player.
-    [Header("Positioning")]
-    [SerializeField] [Range(2.0f, 40.0f)] private float targetRadius = 6.0f;
-    [SerializeField] private float defaultDistanceUp = 2.0f;
-    [SerializeField] private float minDistanceUp = 1.0f;
-    [SerializeField] private float maxDistanceUp = 10.0f;
-    private float distanceUp;
+    [Header("Positioning and zooming")]
+    [SerializeField] [Range(2.0f, 30.0f)] private float defaultRadius = 10.0f;
+    [SerializeField] private float minRadius = 4f;
+    [SerializeField] private float maxRadius = 14f;
+    private float radius;
+
+    [SerializeField] private float defaultAngleUp = 25f;
+    [SerializeField] private float minAngleUp = -50f;
+    [SerializeField] private float maxAngleUp= 80.0f;
+    private float angleUp;
 
     // Obstacle/occulsion avoidance.
     [Header("Obstacle avoidance")]
@@ -31,19 +35,19 @@ public class CameraControl : MonoBehaviour
 
     // Camera speeds (controller and mouse free look as well as default orbit).
     [Header("Speeds")]
-    [SerializeField] private float rotateSpeed = 3.0f;
-    [SerializeField] private float zoomSpeed = 0.2f;
+    [SerializeField] private float rotateAroundSpeed = 2f;
+    [SerializeField] private float rotateUpSpeed = 2.5f;
 
     // Mouse look.
     [Header("Mouse look")]
-    [SerializeField] private Vector2 mouseSensitivity = new Vector2(0.7f, 0.4f);
+    [SerializeField] private Vector2 mouseSensitivity = new Vector2(0.35f, 0.3f);
     [SerializeField] private Vector2 mouseSmoothing = new Vector2(2.0f, 2.0f);
     private Vector2 smoothMouse;
 
-    private Vector3 targetPosition;
-    private Vector3 characterOffset;
-    private Vector3 lookDir;
-    private Vector3 curLookDir;
+    private Vector3 targetCameraPosition;
+    private Vector3 lookDirXZ;
+    private Vector3 curLookDirXZ;
+    private static float deadZone = 0.1f;
 
     // Smoothing and damping.
     [Header("Smoothing")]
@@ -52,7 +56,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float lookLerpDampTime = 0.2f;
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
-    private GameObject lookLerpObject;
+    private Transform lookLerpTransform;
     private Vector3 lookLerpObjectSmooth = Vector3.zero;
 
     // Camera reset.
@@ -62,23 +66,20 @@ public class CameraControl : MonoBehaviour
     private void Awake() {
         if (!followTransform) { followTransform = transform; }
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
-        if (!characterMovement) {
-            Debug.LogWarning("No character movement set on CameraControl!");
-        }
+        if (!characterMovement) { Debug.LogWarning("No character movement set on CameraControl!"); }
 
         cameraComponent = cameraTransform.GetComponent<Camera>();
-        targetPosition = new Vector3(0, 100000, 0);
+        targetCameraPosition = new Vector3(0, 100000, 0);
         smoothMouse = Vector2.zero;
 
-        distanceUp = defaultDistanceUp;
-        lookDir = followTransform.forward;
-        curLookDir = followTransform.forward;
-
-        characterOffset = followTransform.position + new Vector3(0f, distanceUp, 0f);
+        angleUp = defaultAngleUp;
+        lookDirXZ = followTransform.forward;
+        curLookDirXZ = followTransform.forward;
 
         lastResetTime = -1000.0f;
 
-        lookLerpObject = new GameObject("Camera Look Lerp Object");
+        GameObject lookLerpObject = new GameObject("Camera Look Lerp Object");
+        lookLerpTransform = lookLerpObject.transform;
     }
 
     private void Start() {
@@ -108,57 +109,70 @@ public class CameraControl : MonoBehaviour
         ApplyMouseLook(ref rightX, ref rightY);
 
         // Free look using rightX and rightY.
-        cameraTransform.RotateAround(characterOffset, followTransform.up,
-                                     rotateSpeed * (Mathf.Abs(rightX) > 0.1f ? rightX : 0f));
-        distanceUp += zoomSpeed * (Mathf.Abs(rightY) > 0.1f ? rightY : 0f);
-        distanceUp = Mathf.Clamp(distanceUp, minDistanceUp, maxDistanceUp);
+        cameraTransform.RotateAround(followTransform.position, followTransform.up,
+                                     rotateAroundSpeed * (Mathf.Abs(rightX) > deadZone ? rightX : 0f));
+        angleUp += rotateUpSpeed * (Mathf.Abs(rightY) > deadZone ? rightY : 0f);
+        angleUp = Mathf.Clamp(angleUp, minAngleUp, maxAngleUp);
+
+        if (angleUp < 0) {
+            float angleUpNormalized = Mathf.InverseLerp(minAngleUp, 0, angleUp);
+            radius = Mathf.Lerp(minRadius, defaultRadius, angleUpNormalized);
+        } else {
+            float angleUpNormalized = Mathf.InverseLerp(0, maxAngleUp, angleUp);
+            radius = Mathf.Lerp(defaultRadius, maxRadius, angleUpNormalized);
+        }
 
         // Only update camera look direction if moving or rotating.
-        if (characterMovement.controlSpeed > 0.1f || Mathf.Abs(rightX) > 0.1f || Mathf.Abs(rightY) > 0.1f) {
-            lookDir = Vector3.Lerp(followTransform.right * (leftX < 0 ? 1f : -1f),
-                                   followTransform.forward * (leftY < 0 ? -1f : 1f),
-                                   Mathf.Abs(Vector3.Dot(cameraTransform.forward, followTransform.forward)));
-            Debug.DrawRay(cameraTransform.position, lookDir, Color.white);
+        if (characterMovement.controlSpeed > deadZone ||
+            Mathf.Abs(rightX) > deadZone || Mathf.Abs(rightY) > deadZone) {
+            lookDirXZ = Vector3.Lerp(followTransform.right * (leftX < 0 ? 1f : -1f),
+                                     followTransform.forward * (leftY < 0 ? -1f : 1f),
+                                     Mathf.Abs(Vector3.Dot(cameraTransform.forward, followTransform.forward)));
 
             // Calculate direction from camera to player, kill Y, and normalize to give a valid direction with unit magnitude.
-            curLookDir = Vector3.Normalize(followTransform.position - cameraTransform.position);
-            curLookDir.y = 0;
-            Debug.DrawRay(cameraTransform.position, curLookDir, Color.green);
+            curLookDirXZ = Vector3.Normalize(followTransform.position - cameraTransform.position);
+            curLookDirXZ.y = 0;
 
-            // Damping makes it so we don't update targetPosition while pivoting; camera shouldn't rotate around player.
+            // Damping makes it so we don't update targetCameraPosition while pivoting; camera shouldn't rotate around player.
             // Note: unlike in the tutorial, we don't use pivot. lookDirDampTime of 1 works well here.
-            curLookDir = Vector3.SmoothDamp(curLookDir, lookDir, ref velocityLookDir, 1);
+            curLookDirXZ = Vector3.SmoothDamp(curLookDirXZ, lookDirXZ, ref velocityLookDir, 1);
         }
+        Debug.DrawRay(cameraTransform.position, lookDirXZ, Color.white);
+        Debug.DrawRay(cameraTransform.position, curLookDirXZ, Color.red);
 
         // Reset look direction if the reset button is pressed.
         if (Input.GetButtonDown("ResetCamera")) { lastResetTime = Time.time; }
         if (Time.time - lastResetTime < resetDuration) {
-            curLookDir = followTransform.forward;
-            distanceUp = defaultDistanceUp;
+            curLookDirXZ = followTransform.forward;
+            angleUp = defaultAngleUp;
         }
 
-        characterOffset = followTransform.position + (distanceUp * followTransform.up);
-        targetPosition = characterOffset + followTransform.up * distanceUp -
-                         Vector3.Normalize(curLookDir) * targetRadius;
+        float xzAngle = Mathf.Atan2(curLookDirXZ.z, curLookDirXZ.x) + Mathf.PI;
+        float angleUpRadians = angleUp * Mathf.Deg2Rad;
+        Vector3 targetOffset = new Vector3(Mathf.Cos(xzAngle) * Mathf.Cos(angleUpRadians),
+                                           Mathf.Sin(angleUpRadians),
+                                           Mathf.Sin(xzAngle) * Mathf.Cos(angleUpRadians)) * radius;
+        targetCameraPosition = followTransform.position + targetOffset;
+        Debug.DrawLine(followTransform.position, followTransform.position + targetOffset, Color.white);
 
-        CompensateForWalls(characterOffset, ref targetPosition);
+        CompensateForWalls(followTransform.position, ref targetCameraPosition);
 
         // Smoothly translate to the target position.
-        targetPosition = Vector3.SmoothDamp(cameraTransform.position, targetPosition,
+        targetCameraPosition = Vector3.SmoothDamp(cameraTransform.position, targetCameraPosition,
                                             ref velocityCamSmooth, camSmoothDampTime);
-        Vector3 velocity = targetPosition - cameraTransform.position;
+        Vector3 velocity = targetCameraPosition - cameraTransform.position;
         velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
         cameraTransform.position = cameraTransform.position + velocity;
 
-        // Smoothly look to the target position.
-        lookLerpObject.transform.position = Vector3.SmoothDamp(lookLerpObject.transform.position,
-                                                               followTransform.position,
-                                                               ref lookLerpObjectSmooth,
-                                                               lookLerpDampTime);
-        Vector3 position = lookLerpObject.transform.position;
-        position.y = followTransform.position.y;
-        lookLerpObject.transform.position = position;
-        cameraTransform.LookAt(lookLerpObject.transform);
+        // Smoothly look to the target position (in xz - look directly at y).
+        Vector3 lookPosition = Vector3.SmoothDamp(lookLerpTransform.position, followTransform.position,
+                                                  ref lookLerpObjectSmooth, lookLerpDampTime);
+        lookPosition.y = followTransform.position.y; // Look directly at y.
+        lookLerpTransform.position = lookPosition;
+        cameraTransform.LookAt(lookLerpTransform);
+
+        Debug.DrawLine(cameraTransform.position, lookLerpTransform.position, Color.blue);
+        Debug.DrawLine(cameraTransform.position, followTransform.position, Color.cyan);
     }
 
     private void ApplyMouseLook(ref float rightX, ref float rightY) {
@@ -183,7 +197,7 @@ public class CameraControl : MonoBehaviour
         RaycastHit wallHit = new RaycastHit();
         Vector3 direction = Vector3.Normalize(toTarget - fromObject);
         if (Physics.Raycast(fromObject, direction, out wallHit,
-                            targetRadius, cameraBlockLayers)) {
+                            defaultRadius, cameraBlockLayers)) {
             Debug.DrawRay(wallHit.point, wallHit.normal, Color.red);
             toTarget = wallHit.point;
         }
