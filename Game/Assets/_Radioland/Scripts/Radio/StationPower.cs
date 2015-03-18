@@ -39,7 +39,7 @@ public class StationPower : MonoBehaviour
         }
 
         if (enabled) {
-            StopPower();
+            StopPower(stopEvenIfAlreadyStopped:true);
         }
     }
 
@@ -57,7 +57,9 @@ public class StationPower : MonoBehaviour
                 StopPower();
             }
 
-            continuousEvents.Invoke(allStations.Max(station => station.signalStrength));
+            if (powered) {
+                continuousEvents.Invoke(allStations.Max(station => station.signalStrength));
+            }
         } else if (radioStation) {
             if (!powered && radioStation.StrongSignal()) {
                 StartPower();
@@ -67,11 +69,15 @@ public class StationPower : MonoBehaviour
                 StopPower();
             }
 
-            continuousEvents.Invoke(radioStation.signalStrength);
+            if (powered) {
+                continuousEvents.Invoke(radioStation.signalStrength);
+            }
         }
     }
 
-    private void StartPower() {
+    private void StartPower(bool startEvenIfAlreadyStarted=false) {
+        if (powered && !startEvenIfAlreadyStarted) { return; }
+
         powered = true;
         foreach (MonoBehaviour powerBehavior in powerBehaviors) {
             powerBehavior.enabled = true;
@@ -79,11 +85,14 @@ public class StationPower : MonoBehaviour
         startPowerEvents.Invoke();
     }
 
-    private void StopPower() {
+    private void StopPower(bool stopEvenIfAlreadyStopped=false) {
+        if (!powered && !stopEvenIfAlreadyStopped) { return; }
+
         powered = false;
         foreach (MonoBehaviour powerBehavior in powerBehaviors) {
             powerBehavior.enabled = false;
         }
         stopPowerEvents.Invoke();
+        continuousEvents.Invoke(0);
     }
 }
