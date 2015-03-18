@@ -49,7 +49,7 @@ public class CameraControl : MonoBehaviour
     [Header("Smoothing")]
     [SerializeField] private float maxSpeed = 1.5f;
     [SerializeField] private float camSmoothDampTime = 0.1f;
-    [SerializeField] private float lookLerpDampTime = 0.1f;
+    [SerializeField] private float lookLerpDampTime = 0.2f;
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
     private GameObject lookLerpObject;
