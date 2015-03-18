@@ -49,9 +49,11 @@ public class CameraControl : MonoBehaviour
     [Header("Smoothing")]
     [SerializeField] private float maxSpeed = 1.5f;
     [SerializeField] private float camSmoothDampTime = 0.1f;
-    [SerializeField] private float lookDirDampTime = 1.0f;
+    [SerializeField] private float lookLerpDampTime = 0.1f;
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
+    private GameObject lookLerpObject;
+    private Vector3 lookLerpObjectSmooth = Vector3.zero;
 
     // Camera reset.
     private float lastResetTime;
@@ -75,6 +77,8 @@ public class CameraControl : MonoBehaviour
         characterOffset = followTransform.position + new Vector3(0f, distanceUp, 0f);
 
         lastResetTime = -1000.0f;
+
+        lookLerpObject = new GameObject("Camera Look Lerp Object");
     }
 
     private void Start() {
@@ -123,13 +127,11 @@ public class CameraControl : MonoBehaviour
 
             // Damping makes it so we don't update targetPosition while pivoting; camera shouldn't rotate around player.
             // Note: unlike in the tutorial, we don't use pivot. lookDirDampTime of 1 works well here.
-            curLookDir = Vector3.SmoothDamp(curLookDir, lookDir, ref velocityLookDir, lookDirDampTime);
+            curLookDir = Vector3.SmoothDamp(curLookDir, lookDir, ref velocityLookDir, 1);
         }
 
         // Reset look direction if the reset button is pressed.
-        if (Input.GetButtonDown("ResetCamera")) {
-            lastResetTime = Time.time;
-        }
+        if (Input.GetButtonDown("ResetCamera")) { lastResetTime = Time.time; }
         if (Time.time - lastResetTime < resetDuration) {
             curLookDir = followTransform.forward;
             distanceUp = defaultDistanceUp;
@@ -148,7 +150,15 @@ public class CameraControl : MonoBehaviour
         velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
         cameraTransform.position = cameraTransform.position + velocity;
 
-        cameraTransform.LookAt(followTransform);
+        // Smoothly look to the target position.
+        lookLerpObject.transform.position = Vector3.SmoothDamp(lookLerpObject.transform.position,
+                                                               followTransform.position,
+                                                               ref lookLerpObjectSmooth,
+                                                               lookLerpDampTime);
+        Vector3 position = lookLerpObject.transform.position;
+        position.y = followTransform.position.y;
+        lookLerpObject.transform.position = position;
+        cameraTransform.LookAt(lookLerpObject.transform);
     }
 
     private void ApplyMouseLook(ref float rightX, ref float rightY) {
