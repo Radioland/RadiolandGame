@@ -70,14 +70,14 @@ using System.Collections;
     [MenuItem("GameObject/Create Radioland/Props/Leaves", false, 1)]
     [MenuItem("Radioland/Props/Leaves", false, 1)]
     private static void CreateLeaves() {
-        CreateObject("Leaves", "Assets/_Radioland/Environment/Prefabs/Components/props/leaves.prefab",
+        CreateObject("Leaves", "Assets/_Radioland/Environment/Prefabs/Props/leaves.prefab",
                      placeAbove:true, orientToSurface:true);
     }
 
     [MenuItem("GameObject/Create Radioland/Environment/Wire Creator", false, 1)]
     [MenuItem("Radioland/Environment/Wire Creator", false, 1)]
     private static void CreateWireCreator() {
-        CreateObject("Wire Creator", "Assets/_Radioland/Environment/Prefabs/Components/wires/Wire Creator.prefab",
+        CreateObject("Wire Creator", "Assets/_Radioland/Environment/Prefabs/Wires/Wire Creator.prefab",
                      placeAbove:true, orientToSurface:false);
     }
 
@@ -126,14 +126,14 @@ using System.Collections;
     [MenuItem("GameObject/Create Radioland/Props/Visualizer Grass", false, 1)]
     [MenuItem("Radioland/Props/Visualizer Grass", false, 1)]
     private static void CreateVisualizerGrass() {
-        CreateObject("Visualizer Grass", "Assets/_Radioland/Environment/Prefabs/Components/props/Visualizer Grass.prefab",
+        CreateObject("Visualizer Grass", "Assets/_Radioland/Environment/Prefabs/Props/Visualizer Grass.prefab",
                      placeAbove:true, orientToSurface:true);
     }
 
     [MenuItem("GameObject/Create Radioland/Props/Visualizer Cloud", false, 1)]
     [MenuItem("Radioland/Props/Visualizer Cloud", false, 1)]
     private static void CreateVisualizerCloud() {
-        CreateObject("Visualizer Cloud", "Assets/_Radioland/Environment/Prefabs/Components/props/Visualizer Cloud.prefab",
+        CreateObject("Visualizer Cloud", "Assets/_Radioland/Environment/Prefabs/Props/Visualizer Cloud.prefab",
                      placeAbove:true, orientToSurface:false);
     }
 
