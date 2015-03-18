@@ -14,6 +14,7 @@ public class CameraControl : MonoBehaviour
     private Camera cameraComponent;
 
     // Distances from the player.
+    [Header("Positioning")]
     [SerializeField] [Range(2.0f, 40.0f)] private float targetRadius = 6.0f;
     [SerializeField] private float defaultDistanceUp = 2.0f;
     [SerializeField] private float minDistanceUp = 1.0f;
@@ -21,6 +22,7 @@ public class CameraControl : MonoBehaviour
     private float distanceUp;
 
     // Obstacle/occulsion avoidance.
+    [Header("Obstacle avoidance")]
     [SerializeField] [Tooltip("Extra space between obstacle and camera")]
     private float compensationOffset = 0.2f;
     [SerializeField] private LayerMask cameraBlockLayers;
@@ -28,10 +30,12 @@ public class CameraControl : MonoBehaviour
     private Vector3[] viewFrustum;
 
     // Camera speeds (controller and mouse free look as well as default orbit).
+    [Header("Speeds")]
     [SerializeField] private float rotateSpeed = 3.0f;
     [SerializeField] private float zoomSpeed = 0.2f;
 
     // Mouse look.
+    [Header("Mouse look")]
     [SerializeField] private Vector2 mouseSensitivity = new Vector2(0.7f, 0.4f);
     [SerializeField] private Vector2 mouseSmoothing = new Vector2(2.0f, 2.0f);
     private Vector2 smoothMouse;
@@ -42,6 +46,8 @@ public class CameraControl : MonoBehaviour
     private Vector3 curLookDir;
 
     // Smoothing and damping.
+    [Header("Smoothing")]
+    [SerializeField] private float maxSpeed = 1.5f;
     [SerializeField] private float camSmoothDampTime = 0.1f;
     [SerializeField] private float lookDirDampTime = 1.0f;
     private Vector3 velocityLookDir = Vector3.zero;
@@ -136,8 +142,12 @@ public class CameraControl : MonoBehaviour
         CompensateForWalls(characterOffset, ref targetPosition);
 
         // Smoothly translate to the target position.
-        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, targetPosition,
-                                                      ref velocityCamSmooth, camSmoothDampTime);
+        targetPosition = Vector3.SmoothDamp(cameraTransform.position, targetPosition,
+                                            ref velocityCamSmooth, camSmoothDampTime);
+        Vector3 velocity = targetPosition - cameraTransform.position;
+        velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
+        cameraTransform.position = cameraTransform.position + velocity;
+
         cameraTransform.LookAt(followTransform);
     }
 
