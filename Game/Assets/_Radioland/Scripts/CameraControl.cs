@@ -9,6 +9,7 @@ public class CameraControl : MonoBehaviour
 {
     public Transform cameraTransform;
 
+    [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform followTransform;
     [SerializeField] private CharacterMovement characterMovement;
     private Camera cameraComponent;
@@ -19,11 +20,23 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float minRadius = 4f;
     [SerializeField] private float maxRadius = 14f;
     private float radius;
-
+    private float manualTargetRadius;
+    [SerializeField] private float maxTargetAhead = 3f;
     [SerializeField] private float defaultAngleUp = 25f;
     [SerializeField] private float minAngleUp = -50f;
     [SerializeField] private float maxAngleUp= 80.0f;
     private float angleUp;
+
+    [Header("Auto zoom")]
+    [SerializeField] private bool useAutoZoom = true;
+    [SerializeField] private float minAutoZoomIn = 0.7f;
+    [SerializeField] private float maxAutoZoomOut = 1.3f;
+    private float autoTargetRadiusFactor;
+    private float autoTargetRadiusFactorGoal;
+    private const float autoZoomUpdateRate = 0.5f; // Seconds between updates.
+    private float zoomCheckDistance = 8f;
+    private int[] phiValues = { -20, 10, 30 };
+    private int numRays = 8;
 
     // Obstacle/occulsion avoidance.
     [Header("Obstacle avoidance")]
@@ -53,11 +66,15 @@ public class CameraControl : MonoBehaviour
     [Header("Smoothing")]
     [SerializeField] private float maxSpeed = 1.5f;
     [SerializeField] private float camSmoothDampTime = 0.1f;
-    [SerializeField] private float lookLerpDampTime = 0.2f;
+    [SerializeField] private float lookLerpDampTime = 0.6f;
+    [SerializeField] private float aimAheadDampTime = 0.2f;
+    [SerializeField] private float autoZoomDampTime = 0.5f;
     private Vector3 velocityLookDir = Vector3.zero;
     private Vector3 velocityCamSmooth = Vector3.zero;
     private Transform lookLerpTransform;
     private Vector3 lookLerpObjectSmooth = Vector3.zero;
+    private float aimAheadSmooth = 0;
+    private float autoZoomSmooth = 0;
 
     // Camera reset.
     private float lastResetTime;
@@ -72,6 +89,10 @@ public class CameraControl : MonoBehaviour
         targetCameraPosition = new Vector3(0, 100000, 0);
         smoothMouse = Vector2.zero;
 
+        radius = defaultRadius;
+        manualTargetRadius = defaultRadius;
+        autoTargetRadiusFactor = 1f;
+        autoTargetRadiusFactorGoal = 1f;
         angleUp = defaultAngleUp;
         lookDirXZ = followTransform.forward;
         curLookDirXZ = followTransform.forward;
@@ -80,6 +101,8 @@ public class CameraControl : MonoBehaviour
 
         GameObject lookLerpObject = new GameObject("Camera Look Lerp Object");
         lookLerpTransform = lookLerpObject.transform;
+
+        InvokeRepeating("AutoZoomObserve", 0f, autoZoomUpdateRate);
     }
 
     private void Start() {
@@ -99,6 +122,13 @@ public class CameraControl : MonoBehaviour
         cameraTransform.localRotation = Quaternion.Lerp(cameraTransform.localRotation,
                                                         Quaternion.identity, Time.deltaTime);
 
+        // Aim ahead of followTransform based on current speed.
+        Vector3 localFollowPosition = followTransform.localPosition;
+        float targetAimAhead = Mathf.Lerp(0f, maxTargetAhead, Mathf.Pow(characterMovement.GetPercentWalkSpeed(), 2f));
+        float aimAhead = Mathf.SmoothDamp(localFollowPosition.z, targetAimAhead, ref aimAheadSmooth, aimAheadDampTime);
+        localFollowPosition.z = aimAhead;
+        followTransform.localPosition = localFollowPosition;
+
         // Get input values from controller/keyboard.
         // TODO: replace with better controller/mouse input management.
         float leftX = Input.GetAxis("Horizontal");
@@ -116,11 +146,13 @@ public class CameraControl : MonoBehaviour
 
         if (angleUp < 0) {
             float angleUpNormalized = Mathf.InverseLerp(minAngleUp, 0, angleUp);
-            radius = Mathf.Lerp(minRadius, defaultRadius, angleUpNormalized);
+            manualTargetRadius = Mathf.Lerp(minRadius, defaultRadius, angleUpNormalized);
         } else {
             float angleUpNormalized = Mathf.InverseLerp(0, maxAngleUp, angleUp);
-            radius = Mathf.Lerp(defaultRadius, maxRadius, angleUpNormalized);
+            manualTargetRadius = Mathf.Lerp(defaultRadius, maxRadius, angleUpNormalized);
         }
+        radius = manualTargetRadius * autoTargetRadiusFactor;
+        radius = Mathf.Clamp(radius, minRadius, maxRadius);
 
         // Only update camera look direction if moving or rotating.
         if (characterMovement.controlSpeed > deadZone ||
@@ -155,7 +187,8 @@ public class CameraControl : MonoBehaviour
         targetCameraPosition = followTransform.position + targetOffset;
         Debug.DrawLine(followTransform.position, followTransform.position + targetOffset, Color.white);
 
-        CompensateForWalls(followTransform.position, ref targetCameraPosition);
+        CompensateForWalls(playerTransform.position, ref targetCameraPosition);
+        UpdateAutoZoom();
 
         // Smoothly translate to the target position.
         targetCameraPosition = Vector3.SmoothDamp(cameraTransform.position, targetCameraPosition,
@@ -190,6 +223,49 @@ public class CameraControl : MonoBehaviour
 
         rightX += smoothMouse.x;
         rightY -= smoothMouse.y;
+    }
+
+    private void AutoZoomObserve() {
+        Vector3 fromPosition = playerTransform.position;
+
+        int numHits = 0;
+        // Adjust zoom dynamically based on how densely packed the area around the player is.
+        foreach (int phiValue in phiValues) {
+            float phi = phiValue * Mathf.Deg2Rad;
+            for (int i = 0; i < numRays; i++) {
+                float theta = Mathf.PI * 2f / numRays * i;
+                Vector3 direction = new Vector3(Mathf.Cos(theta) * Mathf.Cos(phi),
+                                                Mathf.Sin(phi),
+                                                Mathf.Sin(theta) * Mathf.Cos(phi)).normalized;
+
+                RaycastHit hit = new RaycastHit();
+                if (Physics.Raycast(fromPosition, direction, out hit, zoomCheckDistance, cameraBlockLayers)) {
+                    numHits++;
+                    Debug.DrawLine(fromPosition, hit.point, Color.red, autoZoomUpdateRate);
+                } else {
+                    Debug.DrawLine(fromPosition, fromPosition + direction * zoomCheckDistance, Color.green, autoZoomUpdateRate);
+                }
+            }
+        }
+
+        float target = numHits * 1f / (numRays * phiValues.Length);
+        if (target < 0.5) {
+            // Few hits, zoom out.
+            target = Mathf.Lerp(1f, maxAutoZoomOut, (0.5f - target) / 0.5f);
+        } else {
+            // Many hits, zoom in.
+            target = Mathf.Lerp(minAutoZoomIn, 1f, (target - 0.5f) / 0.5f);
+        }
+        autoTargetRadiusFactorGoal = target;
+    }
+
+    private void UpdateAutoZoom() {
+        if (useAutoZoom) {
+            autoTargetRadiusFactor = Mathf.SmoothDamp(autoTargetRadiusFactor, autoTargetRadiusFactorGoal,
+                ref autoZoomSmooth, autoZoomDampTime);
+        } else {
+            autoTargetRadiusFactor = 1f;
+        }
     }
 
     private void CompensateForWalls(Vector3 fromObject, ref Vector3 toTarget) {
