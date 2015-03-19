@@ -117,33 +117,65 @@ public class CameraControl : MonoBehaviour
     }
 
     private void LateUpdate() {
-        viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
-
-        cameraTransform.localRotation = Quaternion.Lerp(cameraTransform.localRotation,
-                                                        Quaternion.identity, Time.deltaTime);
-
-        // Aim ahead of followTransform based on current speed.
-        Vector3 localFollowPosition = followTransform.localPosition;
-        float targetAimAhead = Mathf.Lerp(0f, maxTargetAhead, Mathf.Pow(characterMovement.GetPercentWalkSpeed(), 2f));
-        float aimAhead = Mathf.SmoothDamp(localFollowPosition.z, targetAimAhead, ref aimAheadSmooth, aimAheadDampTime);
-        localFollowPosition.z = aimAhead;
-        followTransform.localPosition = localFollowPosition;
-
         // Get input values from controller/keyboard.
         // TODO: replace with better controller/mouse input management.
-        float leftX = Input.GetAxis("Horizontal");
-        float leftY = Input.GetAxis("Vertical");
         float rightX = Input.GetAxis("RightStickX");
         float rightY = Input.GetAxis("RightStickY");
 
         ApplyMouseLook(ref rightX, ref rightY);
 
+        bool movingOrRotating = (characterMovement.controlSpeed > deadZone ||
+                                 Mathf.Abs(rightX) > deadZone || Mathf.Abs(rightY) > deadZone);
+
+        UpdateLookDirectionY(rightX, rightY);
+        if (movingOrRotating) { UpdateLookDirectionXZ(); }
+        HandleReset(); // Fixes look rotations while in effect.
+
+        UpdateRadius();
+
+        SetTargetPosition();
+
+        if (movingOrRotating) {
+            SmoothMoveFollowTransform();
+        }
+        SmoothMoveCameraToTarget();
+        SmoothLookAtTarget();
+
+        CompensateForWalls(playerTransform.position, ref targetCameraPosition);
+        UpdateAutoZoom();
+
+        cameraTransform.LookAt(lookLerpTransform);
+    }
+
+    private void UpdateLookDirectionY(float rightX, float rightY) {
         // Free look using rightX and rightY.
         cameraTransform.RotateAround(followTransform.position, followTransform.up,
                                      rotateAroundSpeed * (Mathf.Abs(rightX) > deadZone ? rightX : 0f));
         angleUp += rotateUpSpeed * (Mathf.Abs(rightY) > deadZone ? rightY : 0f);
         angleUp = Mathf.Clamp(angleUp, minAngleUp, maxAngleUp);
+    }
 
+    private void UpdateLookDirectionXZ() {
+        float leftX = Input.GetAxis("Horizontal");
+        float leftY = Input.GetAxis("Vertical");
+
+        lookDirXZ = Vector3.Lerp(followTransform.right * (leftX < 0 ? 1f : -1f),
+                                 followTransform.forward * (leftY < 0 ? -1f : 1f),
+                                 Mathf.Abs(Vector3.Dot(cameraTransform.forward, followTransform.forward)));
+
+        // Calculate direction from camera to player, kill Y, and normalize to give a valid direction with unit magnitude.
+        curLookDirXZ = Vector3.Normalize(followTransform.position - cameraTransform.position);
+        curLookDirXZ.y = 0;
+
+        // Damping makes it so we don't update targetCameraPosition while pivoting; camera shouldn't rotate around player.
+        // Note: unlike in the tutorial, we don't use pivot. lookDirDampTime of 1 works well here.
+        curLookDirXZ = Vector3.SmoothDamp(curLookDirXZ, lookDirXZ, ref velocityLookDir, 1);
+
+        Debug.DrawRay(cameraTransform.position, lookDirXZ, Color.white);
+        Debug.DrawRay(cameraTransform.position, curLookDirXZ, Color.red);
+    }
+
+    private void UpdateRadius() {
         if (angleUp < 0) {
             float angleUpNormalized = Mathf.InverseLerp(minAngleUp, 0, angleUp);
             manualTargetRadius = Mathf.Lerp(minRadius, defaultRadius, angleUpNormalized);
@@ -151,34 +183,10 @@ public class CameraControl : MonoBehaviour
             float angleUpNormalized = Mathf.InverseLerp(0, maxAngleUp, angleUp);
             manualTargetRadius = Mathf.Lerp(defaultRadius, maxRadius, angleUpNormalized);
         }
-        radius = manualTargetRadius * autoTargetRadiusFactor;
-        radius = Mathf.Clamp(radius, minRadius, maxRadius);
+        radius = Mathf.Clamp(manualTargetRadius * autoTargetRadiusFactor, minRadius, maxRadius);
+    }
 
-        // Only update camera look direction if moving or rotating.
-        if (characterMovement.controlSpeed > deadZone ||
-            Mathf.Abs(rightX) > deadZone || Mathf.Abs(rightY) > deadZone) {
-            lookDirXZ = Vector3.Lerp(followTransform.right * (leftX < 0 ? 1f : -1f),
-                                     followTransform.forward * (leftY < 0 ? -1f : 1f),
-                                     Mathf.Abs(Vector3.Dot(cameraTransform.forward, followTransform.forward)));
-
-            // Calculate direction from camera to player, kill Y, and normalize to give a valid direction with unit magnitude.
-            curLookDirXZ = Vector3.Normalize(followTransform.position - cameraTransform.position);
-            curLookDirXZ.y = 0;
-
-            // Damping makes it so we don't update targetCameraPosition while pivoting; camera shouldn't rotate around player.
-            // Note: unlike in the tutorial, we don't use pivot. lookDirDampTime of 1 works well here.
-            curLookDirXZ = Vector3.SmoothDamp(curLookDirXZ, lookDirXZ, ref velocityLookDir, 1);
-        }
-        Debug.DrawRay(cameraTransform.position, lookDirXZ, Color.white);
-        Debug.DrawRay(cameraTransform.position, curLookDirXZ, Color.red);
-
-        // Reset look direction if the reset button is pressed.
-        if (Input.GetButtonDown("ResetCamera")) { lastResetTime = Time.time; }
-        if (Time.time - lastResetTime < resetDuration) {
-            curLookDirXZ = followTransform.forward;
-            angleUp = defaultAngleUp;
-        }
-
+    private void SetTargetPosition() {
         float xzAngle = Mathf.Atan2(curLookDirXZ.z, curLookDirXZ.x) + Mathf.PI;
         float angleUpRadians = angleUp * Mathf.Deg2Rad;
         Vector3 targetOffset = new Vector3(Mathf.Cos(xzAngle) * Mathf.Cos(angleUpRadians),
@@ -186,26 +194,34 @@ public class CameraControl : MonoBehaviour
                                            Mathf.Sin(xzAngle) * Mathf.Cos(angleUpRadians)) * radius;
         targetCameraPosition = followTransform.position + targetOffset;
         Debug.DrawLine(followTransform.position, followTransform.position + targetOffset, Color.white);
+    }
 
-        CompensateForWalls(playerTransform.position, ref targetCameraPosition);
-        UpdateAutoZoom();
+    private void SmoothMoveFollowTransform() {
+        // Aim ahead of followTransform based on current speed.
+        Vector3 localFollowPosition = followTransform.localPosition;
+        float targetAimAhead = 1f;
+        targetAimAhead = Mathf.Lerp(0f, maxTargetAhead, Mathf.Pow(characterMovement.GetPercentWalkSpeed(), 2f));
+        float aimAhead = Mathf.SmoothDamp(localFollowPosition.z, targetAimAhead, ref aimAheadSmooth, aimAheadDampTime);
+        localFollowPosition.z = aimAhead;
+        followTransform.localPosition = localFollowPosition;
 
+        Debug.DrawLine(cameraTransform.position, followTransform.position, Color.cyan);
+    }
+
+    private void SmoothMoveCameraToTarget() {
         // Smoothly translate to the target position.
-        targetCameraPosition = Vector3.SmoothDamp(cameraTransform.position, targetCameraPosition,
-                                            ref velocityCamSmooth, camSmoothDampTime);
-        Vector3 velocity = targetCameraPosition - cameraTransform.position;
-        velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
-        cameraTransform.position = cameraTransform.position + velocity;
+        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, targetCameraPosition,
+                                                  ref velocityCamSmooth, camSmoothDampTime, maxSpeed / Time.deltaTime);
+    }
 
+    private void SmoothLookAtTarget() {
         // Smoothly look to the target position (in xz - look directly at y).
         Vector3 lookPosition = Vector3.SmoothDamp(lookLerpTransform.position, followTransform.position,
                                                   ref lookLerpObjectSmooth, lookLerpDampTime);
         lookPosition.y = followTransform.position.y; // Look directly at y.
         lookLerpTransform.position = lookPosition;
-        cameraTransform.LookAt(lookLerpTransform);
 
         Debug.DrawLine(cameraTransform.position, lookLerpTransform.position, Color.blue);
-        Debug.DrawLine(cameraTransform.position, followTransform.position, Color.cyan);
     }
 
     private void ApplyMouseLook(ref float rightX, ref float rightY) {
@@ -313,6 +329,14 @@ public class CameraControl : MonoBehaviour
         }
 
         cameraTransform.position = camPosCache;
-        viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
+    }
+
+    private void HandleReset() {
+        // Reset look direction if the reset button is pressed.
+        if (Input.GetButtonDown("ResetCamera")) { lastResetTime = Time.time; }
+        if (Time.time - lastResetTime < resetDuration) {
+            curLookDirXZ = followTransform.forward;
+            angleUp = defaultAngleUp;
+        }
     }
 }
