@@ -31,8 +31,8 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private bool useAutoZoom = true;
     [SerializeField] private float minAutoZoomIn = 0.7f;
     [SerializeField] private float maxAutoZoomOut = 1.3f;
-    private float autoTargetRadiusFactor;
-    private float autoTargetRadiusFactorGoal;
+    private float autoRadiusFactor;
+    private float autoRadiusFactorTarget;
     private const float autoZoomUpdateRate = 0.5f; // Seconds between updates.
     private float zoomCheckDistance = 8f;
     private int[] phiValues = { -20, 10, 30 };
@@ -56,6 +56,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private Vector2 mouseSensitivity = new Vector2(0.35f, 0.3f);
     [SerializeField] private Vector2 mouseSmoothing = new Vector2(2.0f, 2.0f);
     private Vector2 smoothMouse;
+    private bool mouseLookEnabled;
 
     private Vector3 targetCameraPosition;
     private Vector3 lookDirXZ;
@@ -88,11 +89,12 @@ public class CameraControl : MonoBehaviour
         cameraComponent = cameraTransform.GetComponent<Camera>();
         targetCameraPosition = new Vector3(0, 100000, 0);
         smoothMouse = Vector2.zero;
+        mouseLookEnabled = true;
 
         radius = defaultRadius;
         manualTargetRadius = defaultRadius;
-        autoTargetRadiusFactor = 1f;
-        autoTargetRadiusFactorGoal = 1f;
+        autoRadiusFactor = 1f;
+        autoRadiusFactorTarget = 1f;
         angleUp = defaultAngleUp;
         lookDirXZ = followTransform.forward;
         curLookDirXZ = followTransform.forward;
@@ -113,6 +115,8 @@ public class CameraControl : MonoBehaviour
         #if !UNITY_EDITOR
         Cursor.lockState = UnityEngine.CursorLockMode.Locked;
         Cursor.visible = false;
+        #else
+        if (Input.GetKeyDown(KeyCode.Escape)) { mouseLookEnabled = !mouseLookEnabled; }
         #endif
     }
 
@@ -122,7 +126,7 @@ public class CameraControl : MonoBehaviour
         float rightX = Input.GetAxis("RightStickX");
         float rightY = Input.GetAxis("RightStickY");
 
-        ApplyMouseLook(ref rightX, ref rightY);
+        if (mouseLookEnabled) { ApplyMouseLook(ref rightX, ref rightY); }
 
         bool movingOrRotating = (characterMovement.controlSpeed > deadZone ||
                                  Mathf.Abs(rightX) > deadZone || Mathf.Abs(rightY) > deadZone);
@@ -137,9 +141,11 @@ public class CameraControl : MonoBehaviour
 
         if (movingOrRotating) {
             SmoothMoveFollowTransform();
+        } else {
+            aimAheadSmooth = 0;
         }
-        SmoothMoveCameraToTarget();
         SmoothLookAtTarget();
+        SmoothMoveCameraToTarget();
 
         CompensateForWalls(playerTransform.position, ref targetCameraPosition);
         UpdateAutoZoom();
@@ -183,7 +189,7 @@ public class CameraControl : MonoBehaviour
             float angleUpNormalized = Mathf.InverseLerp(0, maxAngleUp, angleUp);
             manualTargetRadius = Mathf.Lerp(defaultRadius, maxRadius, angleUpNormalized);
         }
-        radius = Mathf.Clamp(manualTargetRadius * autoTargetRadiusFactor, minRadius, maxRadius);
+        radius = Mathf.Clamp(manualTargetRadius * autoRadiusFactor, minRadius, maxRadius);
     }
 
     private void SetTargetPosition() {
@@ -272,15 +278,15 @@ public class CameraControl : MonoBehaviour
             // Many hits, zoom in.
             target = Mathf.Lerp(minAutoZoomIn, 1f, (target - 0.5f) / 0.5f);
         }
-        autoTargetRadiusFactorGoal = target;
+        autoRadiusFactorTarget = target;
     }
 
     private void UpdateAutoZoom() {
         if (useAutoZoom) {
-            autoTargetRadiusFactor = Mathf.SmoothDamp(autoTargetRadiusFactor, autoTargetRadiusFactorGoal,
+            autoRadiusFactor = Mathf.SmoothDamp(autoRadiusFactor, autoRadiusFactorTarget,
                 ref autoZoomSmooth, autoZoomDampTime);
         } else {
-            autoTargetRadiusFactor = 1f;
+            autoRadiusFactor = 1f;
         }
     }
 
