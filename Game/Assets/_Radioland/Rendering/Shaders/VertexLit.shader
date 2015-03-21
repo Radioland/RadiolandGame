@@ -4,6 +4,7 @@
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0.0
+		_GlossyMetalTex ("Smoothness (R) / Metallic (G)", 2D) = "white" {}
 		_VColorFactor ("Vertex Color Factor", Range(0,2)) = 2.0
 		_VRamp ("Vertex Color Ramp", 2D) = "white" {}
 
@@ -26,12 +27,14 @@
 			//float3 vertNormal;
 		};
 
+		fixed4 _Color;
 		sampler2D _MainTex;
 		half _Glossiness;
 		half _Metallic;
-		fixed4 _Color;
+		sampler2D _GlossyMetalTex;
 		half _VColorFactor;
 		sampler2D _VRamp;
+
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			// Albedo comes from a texture tinted by color
@@ -39,9 +42,10 @@
 			fixed4 r = tex2D (_VRamp, IN.color.rg);
 			o.Albedo = c.rgb * r * _VColorFactor;
 
-			// Metallic and smoothness come from slider variables
-			o.Metallic = _Metallic;
-			o.Smoothness = _Glossiness;
+			// Metallic and smoothness come from slider variables & map
+			fixed4 SM = tex2D (_GlossyMetalTex, IN.uv_MainTex);
+			o.Smoothness = SM.r * _Glossiness;
+			o.Metallic = SM.g * _Metallic;
 			o.Alpha = c.a * IN.color.a;
 		}
 		ENDCG
