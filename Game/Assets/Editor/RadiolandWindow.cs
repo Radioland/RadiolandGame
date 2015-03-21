@@ -8,8 +8,12 @@ public class RadiolandWindow : EditorWindow
 
     private const float defaultCurveGizmoSphereRadius = 0.8f;
     private const float defaultCurveGizmoBoxWidth= 0.9f;
-    private float curveGizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", defaultCurveGizmoSphereRadius);
-    private float curveGizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", 0.9f);
+    private float curveGizmoSphereRadius = EditorPrefs.GetFloat("curveGizmoSphereRadius", defaultCurveGizmoSphereRadius);
+    private float curveGizmoBoxWidth = EditorPrefs.GetFloat("curveGizmoBoxWidth", 0.9f);
+
+    private bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
+    private bool highlightAllRecursive = EditorPrefs.GetBool("highlightAllRecursive", false);
+    private bool highlightEncapsulateChildren = EditorPrefs.GetBool("highlightEncapsulateChildren", true);
 
     public void OnEnable() {
         headerImage = Resources.Load("BirbBanner", typeof(Texture2D)) as Texture2D;
@@ -21,8 +25,8 @@ public class RadiolandWindow : EditorWindow
         RadiolandWindow window = (RadiolandWindow)EditorWindow.GetWindow(typeof(RadiolandWindow));
         window.title = "Radioland";
 
-        window.curveGizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", window.curveGizmoSphereRadius);
-        window.curveGizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", window.curveGizmoBoxWidth);
+        window.curveGizmoSphereRadius = EditorPrefs.GetFloat("curveGizmoSphereRadius", window.curveGizmoSphereRadius);
+        window.curveGizmoBoxWidth = EditorPrefs.GetFloat("curveGizmoBoxWidth", window.curveGizmoBoxWidth);
     }
 
     private void OnGUI() {
@@ -43,7 +47,7 @@ public class RadiolandWindow : EditorWindow
         if (Mathf.Approximately(curveGizmoSphereRadius, defaultCurveGizmoSphereRadius)) { GUI.enabled = false; }
         if (GUILayout.Button("Reset", GUILayout.ExpandWidth(false))) { curveGizmoSphereRadius = defaultCurveGizmoSphereRadius; }
         GUI.enabled = true;
-        PlayerPrefs.SetFloat("curveGizmoSphereRadius", curveGizmoSphereRadius);
+        EditorPrefs.SetFloat("curveGizmoSphereRadius", curveGizmoSphereRadius);
         EditorGUILayout.EndHorizontal();
 
         // Curves: Gizmo Box Width.
@@ -52,7 +56,27 @@ public class RadiolandWindow : EditorWindow
         if (Mathf.Approximately(curveGizmoBoxWidth, defaultCurveGizmoBoxWidth)) { GUI.enabled = false; }
         if (GUILayout.Button("Reset", GUILayout.ExpandWidth(false))) { curveGizmoBoxWidth = defaultCurveGizmoBoxWidth; }
         GUI.enabled = true;
-        PlayerPrefs.SetFloat("curveGizmoBoxWidth", curveGizmoBoxWidth);
+        EditorPrefs.SetFloat("curveGizmoBoxWidth", curveGizmoBoxWidth);
         EditorGUILayout.EndHorizontal();
+
+        GUILayout.Label("Hierarchy Highlight Settings", EditorStyles.boldLabel);
+
+        float labelWidthBackup = EditorGUIUtility.labelWidth;
+        EditorGUIUtility.labelWidth = 190;
+
+        // Highlight: Enable.
+        highlightEnabled = EditorGUILayout.Toggle("Enable Highlight (Slows Editor)", highlightEnabled);
+        EditorPrefs.SetBool("highlightEnabled", highlightEnabled);
+
+        if (highlightEnabled) {
+            // Highlight: All Recursive.
+            highlightAllRecursive = EditorGUILayout.Toggle("Highlight All Recursive", highlightAllRecursive);
+            EditorPrefs.SetBool("highlightAllRecursive", highlightAllRecursive);
+
+            // Highlight: Encapsulate Children.
+            highlightEncapsulateChildren = EditorGUILayout.Toggle("Highlight Encapsulate Children", highlightEncapsulateChildren);
+            EditorPrefs.SetBool("highlightEncapsulateChildren", highlightEncapsulateChildren);
+            EditorGUIUtility.labelWidth = labelWidthBackup;
+        }
     }
 }

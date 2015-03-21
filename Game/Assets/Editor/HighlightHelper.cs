@@ -9,14 +9,21 @@ public class HighlightHelper
 {
     static HighlightHelper() {
         EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGui;
+        EditorApplication.update += OnEditorUpdate;
 
         SceneView.onSceneGUIDelegate += OnSceneGuiDelegate;
     }
 
-    private static readonly Color HoverColor = new Color(1, 1, 1, 0.75f);
-    private static readonly Color DragColor = new Color(1f, 0, 0, 0.75f);
+    private static readonly Color hoverColor = new Color(1, 1, 1, 0.75f);
+    private static readonly Color dragColor = new Color(1f, 0, 0, 0.75f);
+    private static readonly Color faceColor = new Color(0.5f, 0.5f, 0.5f, 0.1f);
+    private static readonly Color outlineColor = new Color(0f, 0f, 0.5f, 0.3f);
+    private const float hoverPadding = 1.1f;
 
     private static void OnSceneGuiDelegate(SceneView sceneView) {
+        bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
+        if (!highlightEnabled) { return; }
+
         switch (Event.current.type) {
             case EventType.DragUpdated:
             case EventType.DragPerform:
@@ -30,7 +37,7 @@ public class HighlightHelper
 
             Color handleColor = Handles.color;
 
-            Handles.color = DragColor;
+            Handles.color = dragColor;
             foreach (Object objectReference in DragAndDrop.objectReferences) {
                 GameObject gameObject = objectReference as GameObject;
 
@@ -41,7 +48,7 @@ public class HighlightHelper
                 }
             }
 
-            Handles.color = HoverColor;
+            Handles.color = hoverColor;
             if (hoveredInstance != 0 && !drawnInstanceIDs.Contains(hoveredInstance)) {
                 GameObject sceneGameObject = EditorUtility.InstanceIDToObject(hoveredInstance) as GameObject;
 
@@ -54,29 +61,109 @@ public class HighlightHelper
         }
     }
 
-    private static void DrawObjectBounds(GameObject sceneGameObject)
-    {
-        Bounds bounds = new Bounds(sceneGameObject.transform.position, Vector3.one);
-        foreach (Renderer renderer in sceneGameObject.GetComponents<Renderer>()) {
-            Bounds rendererBounds = renderer.bounds;
-            rendererBounds.center = sceneGameObject.transform.position;
-            bounds.Encapsulate(renderer.bounds);
+    private static void DrawObjectBounds(GameObject sceneGameObject) {
+        bool highlightAllRecursive = EditorPrefs.GetBool("highlightAllRecursive", false);
+        bool highlightEncapsulateChildren = EditorPrefs.GetBool("highlightEncapsulateChildren", true);
+
+        Transform[] objectTransforms = highlightAllRecursive ?
+                sceneGameObject.GetComponentsInChildren<Transform>() :
+                new[]{sceneGameObject.transform};
+
+        foreach (Transform objectTransform in objectTransforms) {
+            Bounds bounds = objectTransform == sceneGameObject ?
+                new Bounds(objectTransform.position, Vector3.one) :
+                new Bounds(objectTransform.position, Vector3.zero);
+
+            Renderer[] renderers = highlightEncapsulateChildren ?
+                objectTransform.GetComponentsInChildren<Renderer>() :
+                objectTransform.GetComponents<Renderer>();
+
+            foreach (Renderer renderer in renderers) {
+                if (!(renderer is ParticleSystemRenderer)) {
+                    Bounds rendererBounds = renderer.bounds;
+                    rendererBounds.center = objectTransform.position;
+                    bounds.Encapsulate(renderer.bounds);
+                }
+            }
+
+            float width = bounds.size.x / 2;
+            float height = bounds.size.y / 2;
+            float depth = bounds.size.z / 2;
+
+            // Front
+            Vector3[] verts = {
+                bounds.center + new Vector3(width, height, depth),
+                bounds.center + new Vector3(width, -height, depth),
+                bounds.center + new Vector3(-width, -height, depth),
+                bounds.center + new Vector3(-width, height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Back
+            verts = new[]{
+                bounds.center + new Vector3(width, height, -depth),
+                bounds.center + new Vector3(width, -height, -depth),
+                bounds.center + new Vector3(-width, -height, -depth),
+                bounds.center + new Vector3(-width, height, -depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Right
+            verts = new[]{
+                bounds.center + new Vector3(width, height, -depth),
+                bounds.center + new Vector3(width, -height, -depth),
+                bounds.center + new Vector3(width, -height, depth),
+                bounds.center + new Vector3(width, height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Left
+            verts = new[]{
+                bounds.center + new Vector3(-width, height, -depth),
+                bounds.center + new Vector3(-width, -height, -depth),
+                bounds.center + new Vector3(-width, -height, depth),
+                bounds.center + new Vector3(-width, height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Top
+            verts = new[]{
+                bounds.center + new Vector3(-width, height, depth),
+                bounds.center + new Vector3(-width, height, -depth),
+                bounds.center + new Vector3(width, height, -depth),
+                bounds.center + new Vector3(width, height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Bottom
+            verts = new[]{
+                bounds.center + new Vector3(-width, -height, depth),
+                bounds.center + new Vector3(-width, -height, -depth),
+                bounds.center + new Vector3(width, -height, -depth),
+                bounds.center + new Vector3(width, -height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
         }
-
-        float onePixelOffset = HandleUtility.GetHandleSize(bounds.center) * 1 / 64f;
-
-        float circleSize = bounds.size.magnitude * 0.5f;
-
-        Handles.CircleCap(0, bounds.center,
-            sceneGameObject.transform.rotation, circleSize - onePixelOffset);
-        Handles.CircleCap(0, bounds.center,
-            sceneGameObject.transform.rotation, circleSize + onePixelOffset);
-        Handles.CircleCap(0, bounds.center, sceneGameObject.transform.rotation, circleSize);
     }
 
     private static int hoveredInstance = 0;
+    private static double lastRepaintHierarchyWindow = -1000f;
+    private const float repaintCooldown = 1 / 6f;
+
+    private static void OnEditorUpdate() {
+        bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
+        if (!highlightEnabled) { return; }
+
+        if (EditorApplication.timeSinceStartup - lastRepaintHierarchyWindow > repaintCooldown) {
+            EditorApplication.RepaintHierarchyWindow();
+            lastRepaintHierarchyWindow = EditorApplication.timeSinceStartup;
+        }
+    }
 
     private static void HierarchyWindowItemOnGui(int instanceId, Rect selectionRect) {
+        bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
+        if (!highlightEnabled) { return; }
+
         Event current = Event.current;
 
         switch (current.type) {
@@ -106,7 +193,5 @@ public class HighlightHelper
                 }
                 break;
         }
-
-        EditorApplication.RepaintHierarchyWindow();
     }
 }
