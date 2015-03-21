@@ -154,6 +154,9 @@ public class HighlightHelper
         bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
         if (!highlightEnabled) { return; }
 
+        if (!EditorWindow.mouseOverWindow ||
+            !EditorWindow.mouseOverWindow.ToString().Contains("SceneHierarchyWindow")) { return; }
+
         if (EditorApplication.timeSinceStartup - lastRepaintHierarchyWindow > repaintCooldown) {
             EditorApplication.RepaintHierarchyWindow();
             lastRepaintHierarchyWindow = EditorApplication.timeSinceStartup;
