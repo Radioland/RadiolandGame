@@ -9,6 +9,7 @@ public class HighlightHelper
 {
     static HighlightHelper() {
         EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGui;
+        EditorApplication.update += OnEditorUpdate;
 
         SceneView.onSceneGUIDelegate += OnSceneGuiDelegate;
     }
@@ -146,6 +147,18 @@ public class HighlightHelper
     }
 
     private static int hoveredInstance = 0;
+    private static double lastRepaintHierarchyWindow = -1000f;
+    private const float repaintCooldown = 1 / 6f;
+
+    private static void OnEditorUpdate() {
+        bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
+        if (!highlightEnabled) { return; }
+
+        if (EditorApplication.timeSinceStartup - lastRepaintHierarchyWindow > repaintCooldown) {
+            EditorApplication.RepaintHierarchyWindow();
+            lastRepaintHierarchyWindow = EditorApplication.timeSinceStartup;
+        }
+    }
 
     private static void HierarchyWindowItemOnGui(int instanceId, Rect selectionRect) {
         bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
@@ -180,7 +193,5 @@ public class HighlightHelper
                 }
                 break;
         }
-
-        EditorApplication.RepaintHierarchyWindow(); // Triggers this function again but slows Unity.
     }
 }

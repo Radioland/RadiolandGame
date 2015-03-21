@@ -68,13 +68,15 @@ public class RadiolandWindow : EditorWindow
         highlightEnabled = EditorGUILayout.Toggle("Enable Highlight (Slows Editor)", highlightEnabled);
         EditorPrefs.SetBool("highlightEnabled", highlightEnabled);
 
-        // Highlight: All Recursive.
-        highlightAllRecursive = EditorGUILayout.Toggle("Highlight All Recursive", highlightAllRecursive);
-        EditorPrefs.SetBool("highlightAllRecursive", highlightAllRecursive);
+        if (highlightEnabled) {
+            // Highlight: All Recursive.
+            highlightAllRecursive = EditorGUILayout.Toggle("Highlight All Recursive", highlightAllRecursive);
+            EditorPrefs.SetBool("highlightAllRecursive", highlightAllRecursive);
 
-        // Highlight: Encapsulate Children.
-        highlightEncapsulateChildren = EditorGUILayout.Toggle("Highlight Encapsulate Children", highlightEncapsulateChildren);
-        EditorPrefs.SetBool("highlightEncapsulateChildren", highlightEncapsulateChildren);
-        EditorGUIUtility.labelWidth = labelWidthBackup;
+            // Highlight: Encapsulate Children.
+            highlightEncapsulateChildren = EditorGUILayout.Toggle("Highlight Encapsulate Children", highlightEncapsulateChildren);
+            EditorPrefs.SetBool("highlightEncapsulateChildren", highlightEncapsulateChildren);
+            EditorGUIUtility.labelWidth = labelWidthBackup;
+        }
     }
 }
