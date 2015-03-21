@@ -15,6 +15,7 @@ public class HighlightHelper
 
     private static readonly Color HoverColor = new Color(1, 1, 1, 0.75f);
     private static readonly Color DragColor = new Color(1f, 0, 0, 0.75f);
+    private const float hoverPadding = 1.1f;
 
     private static void OnSceneGuiDelegate(SceneView sceneView) {
         switch (Event.current.type) {
@@ -54,24 +55,39 @@ public class HighlightHelper
         }
     }
 
-    private static void DrawObjectBounds(GameObject sceneGameObject)
-    {
-        Bounds bounds = new Bounds(sceneGameObject.transform.position, Vector3.one);
-        foreach (Renderer renderer in sceneGameObject.GetComponents<Renderer>()) {
-            Bounds rendererBounds = renderer.bounds;
-            rendererBounds.center = sceneGameObject.transform.position;
-            bounds.Encapsulate(renderer.bounds);
+    private static void DrawObjectBounds(GameObject sceneGameObject) {
+        bool highlightAllRecursive = PlayerPrefs.GetInt("highlightAllRecursive", 0) == 1;
+        bool highlightEncapsulateChildren = PlayerPrefs.GetInt("highlightEncapsulateChildren", 0) == 1;
+
+        Transform[] objectTransforms = highlightAllRecursive ?
+                sceneGameObject.GetComponentsInChildren<Transform>() :
+                new[]{sceneGameObject.transform};
+
+        foreach (Transform objectTransform in objectTransforms) {
+            Bounds bounds = objectTransform == sceneGameObject ?
+                new Bounds(objectTransform.position, Vector3.one) :
+                new Bounds(objectTransform.position, Vector3.zero);
+
+            Renderer[] renderers = highlightEncapsulateChildren ?
+                objectTransform.GetComponentsInChildren<Renderer>() :
+                objectTransform.GetComponents<Renderer>();
+
+            foreach (Renderer renderer in renderers) {
+                if (!(renderer is ParticleSystemRenderer)) {
+                    Bounds rendererBounds = renderer.bounds;
+                    rendererBounds.center = objectTransform.position;
+                    bounds.Encapsulate(renderer.bounds);
+                }
+            }
+
+            float size = bounds.size.magnitude / 4f * hoverPadding;
+            Handles.RectangleCap(0, bounds.center - new Vector3(size, 0, 0), Quaternion.Euler(0, 90, 0), size);
+            Handles.RectangleCap(0, bounds.center + new Vector3(size, 0, 0), Quaternion.Euler(0, 90, 0), size);
+            Handles.RectangleCap(0, bounds.center - new Vector3(0, size, 0), Quaternion.Euler(90, 0, 0), size);
+            Handles.RectangleCap(0, bounds.center + new Vector3(0, size, 0), Quaternion.Euler(90, 0, 0), size);
+            Handles.RectangleCap(0, bounds.center - new Vector3(0, 0, size), Quaternion.Euler(0, 0, 90), size);
+            Handles.RectangleCap(0, bounds.center + new Vector3(0, 0, size), Quaternion.Euler(0, 0, 90), size);
         }
-
-        float onePixelOffset = HandleUtility.GetHandleSize(bounds.center) * 1 / 64f;
-
-        float circleSize = bounds.size.magnitude * 0.5f;
-
-        Handles.CircleCap(0, bounds.center,
-            sceneGameObject.transform.rotation, circleSize - onePixelOffset);
-        Handles.CircleCap(0, bounds.center,
-            sceneGameObject.transform.rotation, circleSize + onePixelOffset);
-        Handles.CircleCap(0, bounds.center, sceneGameObject.transform.rotation, circleSize);
     }
 
     private static int hoveredInstance = 0;

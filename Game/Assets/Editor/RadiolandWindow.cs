@@ -10,6 +10,8 @@ public class RadiolandWindow : EditorWindow
     private const float defaultCurveGizmoBoxWidth= 0.9f;
     private float curveGizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", defaultCurveGizmoSphereRadius);
     private float curveGizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", 0.9f);
+    private bool highlightAllRecursive = PlayerPrefs.GetInt("highlightAllRecursive", 0) == 1;
+    private bool highlightEncapsulateChildren = PlayerPrefs.GetInt("highlightEncapsulateChildren", 0) == 1;
 
     public void OnEnable() {
         headerImage = Resources.Load("BirbBanner", typeof(Texture2D)) as Texture2D;
@@ -54,5 +56,18 @@ public class RadiolandWindow : EditorWindow
         GUI.enabled = true;
         PlayerPrefs.SetFloat("curveGizmoBoxWidth", curveGizmoBoxWidth);
         EditorGUILayout.EndHorizontal();
+
+        GUILayout.Label("Hierarchy Highlight Settings", EditorStyles.boldLabel);
+
+        // Highlight: All Recursive.
+        float labelWidthBackup = EditorGUIUtility.labelWidth;
+        EditorGUIUtility.labelWidth = 180;
+        highlightAllRecursive = EditorGUILayout.Toggle("Highlight All Recursive", highlightAllRecursive, GUILayout.ExpandWidth(false));
+        PlayerPrefs.SetInt("highlightAllRecursive", highlightAllRecursive ? 1 : 0);
+
+        // Highlight: Encapsulate Children.
+        highlightEncapsulateChildren = EditorGUILayout.Toggle("Highlight Encapsulate Children", highlightEncapsulateChildren);
+        PlayerPrefs.SetInt("highlightEncapsulateChildren", highlightEncapsulateChildren ? 1 : 0);
+        EditorGUIUtility.labelWidth = labelWidthBackup;
     }
 }
