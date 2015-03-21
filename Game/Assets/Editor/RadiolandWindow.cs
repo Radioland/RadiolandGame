@@ -11,7 +11,7 @@ public class RadiolandWindow : EditorWindow
     private float curveGizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", defaultCurveGizmoSphereRadius);
     private float curveGizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", 0.9f);
     private bool highlightAllRecursive = PlayerPrefs.GetInt("highlightAllRecursive", 0) == 1;
-    private bool highlightEncapsulateChildren = PlayerPrefs.GetInt("highlightEncapsulateChildren", 0) == 1;
+    private bool highlightEncapsulateChildren = PlayerPrefs.GetInt("highlightEncapsulateChildren", 1) == 1;
 
     public void OnEnable() {
         headerImage = Resources.Load("BirbBanner", typeof(Texture2D)) as Texture2D;

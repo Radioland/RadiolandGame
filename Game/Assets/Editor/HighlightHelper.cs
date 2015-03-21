@@ -13,8 +13,10 @@ public class HighlightHelper
         SceneView.onSceneGUIDelegate += OnSceneGuiDelegate;
     }
 
-    private static readonly Color HoverColor = new Color(1, 1, 1, 0.75f);
-    private static readonly Color DragColor = new Color(1f, 0, 0, 0.75f);
+    private static readonly Color hoverColor = new Color(1, 1, 1, 0.75f);
+    private static readonly Color dragColor = new Color(1f, 0, 0, 0.75f);
+    private static readonly Color faceColor = new Color(0.5f, 0.5f, 0.5f, 0.2f);
+    private static readonly Color outlineColor = new Color(0f, 0f, 0.5f, 0.3f);
     private const float hoverPadding = 1.1f;
 
     private static void OnSceneGuiDelegate(SceneView sceneView) {
@@ -31,7 +33,7 @@ public class HighlightHelper
 
             Color handleColor = Handles.color;
 
-            Handles.color = DragColor;
+            Handles.color = dragColor;
             foreach (Object objectReference in DragAndDrop.objectReferences) {
                 GameObject gameObject = objectReference as GameObject;
 
@@ -42,7 +44,7 @@ public class HighlightHelper
                 }
             }
 
-            Handles.color = HoverColor;
+            Handles.color = hoverColor;
             if (hoveredInstance != 0 && !drawnInstanceIDs.Contains(hoveredInstance)) {
                 GameObject sceneGameObject = EditorUtility.InstanceIDToObject(hoveredInstance) as GameObject;
 
@@ -57,7 +59,7 @@ public class HighlightHelper
 
     private static void DrawObjectBounds(GameObject sceneGameObject) {
         bool highlightAllRecursive = PlayerPrefs.GetInt("highlightAllRecursive", 0) == 1;
-        bool highlightEncapsulateChildren = PlayerPrefs.GetInt("highlightEncapsulateChildren", 0) == 1;
+        bool highlightEncapsulateChildren = PlayerPrefs.GetInt("highlightEncapsulateChildren", 1) == 1;
 
         Transform[] objectTransforms = highlightAllRecursive ?
                 sceneGameObject.GetComponentsInChildren<Transform>() :
@@ -80,13 +82,63 @@ public class HighlightHelper
                 }
             }
 
-            float size = bounds.size.magnitude / 4f * hoverPadding;
-            Handles.RectangleCap(0, bounds.center - new Vector3(size, 0, 0), Quaternion.Euler(0, 90, 0), size);
-            Handles.RectangleCap(0, bounds.center + new Vector3(size, 0, 0), Quaternion.Euler(0, 90, 0), size);
-            Handles.RectangleCap(0, bounds.center - new Vector3(0, size, 0), Quaternion.Euler(90, 0, 0), size);
-            Handles.RectangleCap(0, bounds.center + new Vector3(0, size, 0), Quaternion.Euler(90, 0, 0), size);
-            Handles.RectangleCap(0, bounds.center - new Vector3(0, 0, size), Quaternion.Euler(0, 0, 90), size);
-            Handles.RectangleCap(0, bounds.center + new Vector3(0, 0, size), Quaternion.Euler(0, 0, 90), size);
+            float width = bounds.size.x / 2;
+            float height = bounds.size.y / 2;
+            float depth = bounds.size.z / 2;
+
+            // Front
+            Vector3[] verts = {
+                bounds.center + new Vector3(width, height, depth),
+                bounds.center + new Vector3(width, -height, depth),
+                bounds.center + new Vector3(-width, -height, depth),
+                bounds.center + new Vector3(-width, height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Back
+            verts = new[]{
+                bounds.center + new Vector3(width, height, -depth),
+                bounds.center + new Vector3(width, -height, -depth),
+                bounds.center + new Vector3(-width, -height, -depth),
+                bounds.center + new Vector3(-width, height, -depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Right
+            verts = new[]{
+                bounds.center + new Vector3(width, height, -depth),
+                bounds.center + new Vector3(width, -height, -depth),
+                bounds.center + new Vector3(width, -height, depth),
+                bounds.center + new Vector3(width, height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Left
+            verts = new[]{
+                bounds.center + new Vector3(-width, height, -depth),
+                bounds.center + new Vector3(-width, -height, -depth),
+                bounds.center + new Vector3(-width, -height, depth),
+                bounds.center + new Vector3(-width, height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Top
+            verts = new[]{
+                bounds.center + new Vector3(-width, height, depth),
+                bounds.center + new Vector3(-width, height, -depth),
+                bounds.center + new Vector3(width, height, -depth),
+                bounds.center + new Vector3(width, height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
+
+            // Bottom
+            verts = new[]{
+                bounds.center + new Vector3(-width, -height, depth),
+                bounds.center + new Vector3(-width, -height, -depth),
+                bounds.center + new Vector3(width, -height, -depth),
+                bounds.center + new Vector3(width, -height, depth)
+            };
+            Handles.DrawSolidRectangleWithOutline(verts, faceColor, outlineColor);
         }
     }
 
