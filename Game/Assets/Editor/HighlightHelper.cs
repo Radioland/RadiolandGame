@@ -15,7 +15,7 @@ public class HighlightHelper
 
     private static readonly Color hoverColor = new Color(1, 1, 1, 0.75f);
     private static readonly Color dragColor = new Color(1f, 0, 0, 0.75f);
-    private static readonly Color faceColor = new Color(0.5f, 0.5f, 0.5f, 0.2f);
+    private static readonly Color faceColor = new Color(0.5f, 0.5f, 0.5f, 0.1f);
     private static readonly Color outlineColor = new Color(0f, 0f, 0.5f, 0.3f);
     private const float hoverPadding = 1.1f;
 
@@ -58,8 +58,8 @@ public class HighlightHelper
     }
 
     private static void DrawObjectBounds(GameObject sceneGameObject) {
-        bool highlightAllRecursive = PlayerPrefs.GetInt("highlightAllRecursive", 0) == 1;
-        bool highlightEncapsulateChildren = PlayerPrefs.GetInt("highlightEncapsulateChildren", 1) == 1;
+        bool highlightAllRecursive = EditorPrefs.GetBool("highlightAllRecursive", false);
+        bool highlightEncapsulateChildren = EditorPrefs.GetBool("highlightEncapsulateChildren", true);
 
         Transform[] objectTransforms = highlightAllRecursive ?
                 sceneGameObject.GetComponentsInChildren<Transform>() :

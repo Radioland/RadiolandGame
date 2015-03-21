@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [ExecuteInEditMode]
 public class ICurve : MonoBehaviour
 {
@@ -38,12 +42,14 @@ public class ICurve : MonoBehaviour
     }
 
     protected virtual void OnDrawGizmos() {
-        gizmoSphereRadius = PlayerPrefs.GetFloat("curveGizmoSphereRadius", gizmoSphereRadius);
-        gizmoBoxWidth = PlayerPrefs.GetFloat("curveGizmoBoxWidth", gizmoBoxWidth);
+        #if UNITY_EDITOR
+        gizmoSphereRadius = EditorPrefs.GetFloat("curveGizmoSphereRadius", gizmoSphereRadius);
+        gizmoBoxWidth = EditorPrefs.GetFloat("curveGizmoBoxWidth", gizmoBoxWidth);
 
         Gizmos.color = Color.green;
         Gizmos.DrawSphere(GetPoint(0), gizmoSphereRadius);
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(GetPoint(1), gizmoSphereRadius);
+        #endif
     }
 }
