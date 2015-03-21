@@ -10,6 +10,8 @@ public class RadiolandWindow : EditorWindow
     private const float defaultCurveGizmoBoxWidth= 0.9f;
     private float curveGizmoSphereRadius = EditorPrefs.GetFloat("curveGizmoSphereRadius", defaultCurveGizmoSphereRadius);
     private float curveGizmoBoxWidth = EditorPrefs.GetFloat("curveGizmoBoxWidth", 0.9f);
+
+    private bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
     private bool highlightAllRecursive = EditorPrefs.GetBool("highlightAllRecursive", false);
     private bool highlightEncapsulateChildren = EditorPrefs.GetBool("highlightEncapsulateChildren", true);
 
@@ -59,10 +61,15 @@ public class RadiolandWindow : EditorWindow
 
         GUILayout.Label("Hierarchy Highlight Settings", EditorStyles.boldLabel);
 
-        // Highlight: All Recursive.
         float labelWidthBackup = EditorGUIUtility.labelWidth;
-        EditorGUIUtility.labelWidth = 180;
-        highlightAllRecursive = EditorGUILayout.Toggle("Highlight All Recursive", highlightAllRecursive, GUILayout.ExpandWidth(false));
+        EditorGUIUtility.labelWidth = 190;
+
+        // Highlight: Enable.
+        highlightEnabled = EditorGUILayout.Toggle("Enable Highlight (Slows Editor)", highlightEnabled);
+        EditorPrefs.SetBool("highlightEnabled", highlightEnabled);
+
+        // Highlight: All Recursive.
+        highlightAllRecursive = EditorGUILayout.Toggle("Highlight All Recursive", highlightAllRecursive);
         EditorPrefs.SetBool("highlightAllRecursive", highlightAllRecursive);
 
         // Highlight: Encapsulate Children.

@@ -20,6 +20,9 @@ public class HighlightHelper
     private const float hoverPadding = 1.1f;
 
     private static void OnSceneGuiDelegate(SceneView sceneView) {
+        bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
+        if (!highlightEnabled) { return; }
+
         switch (Event.current.type) {
             case EventType.DragUpdated:
             case EventType.DragPerform:
@@ -145,6 +148,9 @@ public class HighlightHelper
     private static int hoveredInstance = 0;
 
     private static void HierarchyWindowItemOnGui(int instanceId, Rect selectionRect) {
+        bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
+        if (!highlightEnabled) { return; }
+
         Event current = Event.current;
 
         switch (current.type) {
@@ -175,6 +181,6 @@ public class HighlightHelper
                 break;
         }
 
-        EditorApplication.RepaintHierarchyWindow();
+        EditorApplication.RepaintHierarchyWindow(); // Triggers this function again but slows Unity.
     }
 }
