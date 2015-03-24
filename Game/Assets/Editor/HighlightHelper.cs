@@ -147,20 +147,28 @@ public class HighlightHelper
     }
 
     private static int hoveredInstance = 0;
-    private static double lastRepaintHierarchyWindow = -1000f;
+    private static double lastRepaint = -1000f;
     private const float repaintCooldown = 1 / 6f;
 
     private static void OnEditorUpdate() {
         bool highlightEnabled = EditorPrefs.GetBool("highlightEnabled", false);
         if (!highlightEnabled) { return; }
 
-        if (!EditorWindow.mouseOverWindow ||
-            !EditorWindow.mouseOverWindow.ToString().Contains("SceneHierarchyWindow")) { return; }
-
-        if (EditorApplication.timeSinceStartup - lastRepaintHierarchyWindow > repaintCooldown) {
-            EditorApplication.RepaintHierarchyWindow();
-            lastRepaintHierarchyWindow = EditorApplication.timeSinceStartup;
+        EditorWindow mouseOverWindow = EditorWindow.mouseOverWindow;
+        if (!mouseOverWindow || !mouseOverWindow.ToString().Contains("SceneHierarchyWindow")) {
+            RepaintIfShowing(); return;
         }
+
+        if (EditorApplication.timeSinceStartup - lastRepaint > repaintCooldown) { Repaint(); }
+    }
+
+    private static void Repaint() {
+        EditorApplication.RepaintHierarchyWindow();
+        lastRepaint = EditorApplication.timeSinceStartup;
+    }
+
+    private static void RepaintIfShowing() {
+        if (hoveredInstance != 0) { Repaint(); }
     }
 
     private static void HierarchyWindowItemOnGui(int instanceId, Rect selectionRect) {
