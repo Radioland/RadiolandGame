@@ -57,24 +57,22 @@ public class TransformLerp : MonoBehaviour
         if (!highlightDefaultMaterial) { highlightDefaultMaterial = Resources.Load<Material>("Materials/transform_target_default"); }
         if (!highlightSelectedMaterial) { highlightSelectedMaterial = Resources.Load<Material>("Materials/transform_target_selected"); }
 
-        if (!Application.isPlaying) {
-            SetupTransformations();
-        }
+        if (!Application.isPlaying) { SetupTransformations(); }
 
         Quaternion referenceRotation = transform.parent ?
                                            transform.parent.rotation * targetRotation :
                                            targetRotation;
 
-        MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-        Renderer objectRenderer = gameObject.GetComponent<Renderer>();
+        MeshFilter meshFilter = gameObject.GetComponentInChildren<MeshFilter>();
+        Renderer objectRenderer = gameObject.GetComponentInChildren<Renderer>();
         if (meshFilter && objectRenderer) {
             if (selected) { highlightSelectedMaterial.SetPass(0); }
             else          { highlightDefaultMaterial.SetPass(0);  }
-            Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
+            Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, meshFilter.transform.lossyScale));
 
             objectRenderer.sharedMaterial.SetPass(0);
             GL.wireframe = true;
-            Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, transform.lossyScale));
+            Graphics.DrawMeshNow(meshFilter.sharedMesh, Matrix4x4.TRS(targetPosition, referenceRotation, meshFilter.transform.lossyScale));
             GL.wireframe = false;
         } else {
             Matrix4x4 gizmoMatrix = Matrix4x4.TRS(targetPosition, referenceRotation, Vector3.one);
@@ -85,6 +83,16 @@ public class TransformLerp : MonoBehaviour
                 Gizmos.DrawWireCube(Vector3.zero, objectRenderer.bounds.extents);
             } else if (GetComponent<Collider>()) {
                 Gizmos.DrawWireCube(Vector3.zero, GetComponent<Collider>().bounds.size);
+            } else {
+                Bounds bounds = new Bounds(transform.position, Vector3.zero);
+
+                Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+                foreach (Renderer renderer in renderers) {
+                    if (!(renderer is ParticleSystemRenderer)) {
+                        bounds.Encapsulate(renderer.bounds);
+                    }
+                }
+                Gizmos.DrawWireCube(Vector3.zero, bounds.size);
             }
         }
     }
