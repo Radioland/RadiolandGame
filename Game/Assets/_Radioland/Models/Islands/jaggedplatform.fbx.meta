@@ -19,6 +19,8 @@ ModelImporter:
     3300002: polySurface4
     4300000: polySurface3
     4300002: polySurface4
+    6400000: polySurface3
+    6400002: polySurface4
   materials:
     importMaterials: 0
     materialName: 0
@@ -38,9 +40,9 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 35
     meshCompression: 0
-    addColliders: 0
+    addColliders: 1
     importBlendShapes: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
