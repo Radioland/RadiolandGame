@@ -40,6 +40,10 @@ public class Dance : MonoBehaviour
         lastInputTime = -1000.0f;
         lastInputStartedTime = -1000.0f;
         stillNoInput = true;
+
+        Messenger.AddListener("InputReceived", OnInputReceived);
+        Messenger.AddListener("JumpTriggered", OnJumpTriggered);
+        Messenger.AddListener("NoMovementInput", OnNoMovementInput);
     }
 
     private void Start() {
@@ -77,8 +81,7 @@ public class Dance : MonoBehaviour
         ableToDance = newAbleToDance;
     }
 
-    // Called via SendMessage in CharacterMovement.
-    private void InputReceived() {
+    private void OnInputReceived() {
         lastInputTime = Time.time;
 
         if (dancing && !stillNoInput) {
@@ -91,15 +94,13 @@ public class Dance : MonoBehaviour
         stillNoInput = false;
     }
 
-    // Called via SendMessage in CharacterMovement.
-    private void NoMovementInput() {
+    private void OnNoMovementInput() {
         if (Time.time - lastInputTime > inputPersistTime) {
             stillNoInput = true;
         }
     }
 
-    // Called via SendMessage in CharacterMovement.
-    private void JumpTriggered() {
+    private void OnJumpTriggered() {
         // Jump immediately cancels dancing.
         if (dancing) {
             StopDancing();

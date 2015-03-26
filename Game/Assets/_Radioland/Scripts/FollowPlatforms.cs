@@ -23,6 +23,9 @@ public class FollowPlatforms : MonoBehaviour
         }
 
         lastPlatformUnderTime = -1000f;
+
+        Messenger.AddListener("Jump", OnJump);
+        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     private void Start() {
@@ -45,8 +48,7 @@ public class FollowPlatforms : MonoBehaviour
         }
     }
 
-    // Called via SendMessage in CharacterMovement.
-    private void Jump() {
+    private void OnJump() {
         if (!characterMovement) { return; }
 
         if (latestPlatform) {
@@ -55,8 +57,7 @@ public class FollowPlatforms : MonoBehaviour
         }
     }
 
-    // Called via SendMessage in CharacterMovement.
-    private void Grounded(float verticalSpeed) {
+    private void OnGrounded(float verticalSpeed) {
         SpringPlatform springPlatform = GetSpringPlatformUnder();
         if (springPlatform) {
             springPlatform.ApplyForce(verticalSpeed * characterMovement.mass);

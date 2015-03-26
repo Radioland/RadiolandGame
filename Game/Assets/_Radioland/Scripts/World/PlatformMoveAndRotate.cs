@@ -10,7 +10,7 @@ public class PlatformMoveAndRotate : MonoBehaviour
     [SerializeField] private float reverser = -1;
 
     private void Awake() {
-
+        Messenger.AddListener("JumpStarted", OnJumpStarted);
     }
 
     private void Update() {
@@ -30,7 +30,7 @@ public class PlatformMoveAndRotate : MonoBehaviour
         }
     }
 
-    public void PerformAction() {
+    private void OnJumpStarted() {
         rotationAmount = 0;
         reverser *= -1;
     }

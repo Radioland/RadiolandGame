@@ -15,7 +15,7 @@ public class Landing : MonoBehaviour
     [SerializeField] private float maxStartSpeed = 3.0f;
 
     private void Awake() {
-
+        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     private void Start() {
@@ -26,8 +26,7 @@ public class Landing : MonoBehaviour
 
     }
 
-    // Called via SendMessage in CharacterMovement.
-    private void Grounded(float verticalSpeed) {
+    private void OnGrounded(float verticalSpeed) {
         if (landingEffects && -verticalSpeed > minEffectSpeed) {
             float t = Mathf.InverseLerp(minEffectSpeed, maxEffectSpeed, -verticalSpeed);
 
