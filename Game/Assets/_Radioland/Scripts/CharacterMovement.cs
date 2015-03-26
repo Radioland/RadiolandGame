@@ -91,8 +91,6 @@ public class CharacterMovement : MonoBehaviour
     private float originalMass;
     #endregion Setting backups.
 
-
-
     private void Awake() {
         if (!cameraControl) { Debug.LogWarning("No camera control set on CharacterMovement!"); }
 
@@ -332,7 +330,7 @@ public class CharacterMovement : MonoBehaviour
             if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
                 lastJumpTime = Time.time;
                 inJumpWindup = true;
-				SendMessage("RotatePlatform", SendMessageOptions.DontRequireReceiver);
+                SendMessage("RotatePlatform", SendMessageOptions.DontRequireReceiver);
                 SendMessage("JumpStarted", SendMessageOptions.DontRequireReceiver);
             }
         }
@@ -342,7 +340,7 @@ public class CharacterMovement : MonoBehaviour
             jumping = true;
             verticalSpeed = jumpVerticalSpeed;
 
-			SendMessage("ControlPlatforms", SendMessageOptions.DontRequireReceiver);
+            SendMessage("ControlPlatforms", SendMessageOptions.DontRequireReceiver);
             SendMessage("Jump", SendMessageOptions.DontRequireReceiver);
         }
     }
