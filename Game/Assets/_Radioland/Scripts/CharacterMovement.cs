@@ -335,10 +335,17 @@ public class CharacterMovement : MonoBehaviour
                 inJumpWindup = true;
                 jumpCount = 1;
                 Messenger.Broadcast("JumpStarted");
-            } else if (jumpCount == 1) {
+            } else if (jumpCount == 1 || (!jumping && falling)) {
+                // Double Jump.
+                if (!jumping) {
+                    jumping = true;
+                    Messenger.Broadcast("JumpStarted");
+                    Messenger.Broadcast("Jump");
+                }
                 lastJumpTime = Time.time;
-                jumpCount++;
+                jumpCount = 2;
                 verticalSpeed = jumpVerticalSpeed;
+                Messenger.Broadcast("DoubleJumpStarted");
             }
         }
 
@@ -418,6 +425,7 @@ public class CharacterMovement : MonoBehaviour
     public void SetJumpHeight(float height) { jumpHeight = height; }
     public void ResetJumpHeight() { jumpHeight = originalJumpHeight; }
     public void SetGravity(float newGravity) { gravity = newGravity; }
+    public float GetInitialGravity() { return originalGravity; }
     public void ResetGravity() { gravity = originalGravity; }
     public void SetGroundSmoothDampTime(float newGroundSmoothDampTime) { groundSmoothDampTime = newGroundSmoothDampTime; }
     public void ResetGroundSmoothDampTime() { groundSmoothDampTime = originalGroundSmoothDampTime; }
