@@ -57,6 +57,7 @@ public class CharacterMovement : MonoBehaviour
     private float walkSpeed;
     private float verticalSpeed;
     private const float walkRunCutoff = 0.3f;
+    private int jumpCount;
     private float lastRunInputStartTime;
     private float lastJumpInputTime;
     private float lastJumpTime;
@@ -90,8 +91,6 @@ public class CharacterMovement : MonoBehaviour
     private float originalAirSmoothDampTime;
     private float originalMass;
     #endregion Setting backups.
-
-
 
     private void Awake() {
         if (!cameraControl) { Debug.LogWarning("No camera control set on CharacterMovement!"); }
@@ -128,6 +127,7 @@ public class CharacterMovement : MonoBehaviour
 
         walkSpeed = 0f;
         verticalSpeed = 0f;
+        jumpCount = 0;
         lastRunInputStartTime = -1000f;
         lastJumpInputTime = -1000f;
         lastJumpTime = -1000f;
@@ -190,11 +190,11 @@ public class CharacterMovement : MonoBehaviour
             running = controllable && controlSpeed > walkRunCutoff;
             moving = controllable;
 
-            SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
+            Messenger.Broadcast("InputReceived");
         } else {
             moving = false;
             running = false;
-            SendMessage("NoMovementInput", SendMessageOptions.DontRequireReceiver);
+            Messenger.Broadcast("NoMovementInput");
         }
 
         // Don't rotate within a dead zone.
@@ -279,6 +279,7 @@ public class CharacterMovement : MonoBehaviour
                 Land();
             }
             jumping = false;
+            jumpCount = 0;
             animator.SetBool(landingHash, false);
         } else {
             if (Time.time - lastGroundedTime > fallingTime && verticalSpeed < 0.0f) {
@@ -312,15 +313,15 @@ public class CharacterMovement : MonoBehaviour
 
         float landingVerticalSpeed = verticalSpeed;
         verticalSpeed = 0.0f;
-        SendMessage("Grounded", landingVerticalSpeed, SendMessageOptions.DontRequireReceiver);
+        Messenger.Broadcast("Grounded", landingVerticalSpeed);
         falling = false;
     }
 
     private void ApplyJump() {
+        if (Input.GetButtonDown("Jump")) { TriggerJump(); }
+
         // Do not allow jumping while not controllable.
         if (!controllable) { return; }
-
-        if (Input.GetButtonDown("Jump")) { TriggerJump(); }
 
         // Do not allow jumping while sliding.
         if (sliding && slopeAngle > jumpSlopeLimit) { return; }
@@ -329,28 +330,39 @@ public class CharacterMovement : MonoBehaviour
         if (Time.time < lastJumpInputTime + jumpPreTimeout &&
             Time.time > lastJumpTime + jumpCooldown) {
             // PostTimeout lets you trigger a jump slightly after starting to fall.
-            if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
+            if (!jumping && (grounded || (Time.time < lastGroundedTime + jumpPostTimeout))) {
                 lastJumpTime = Time.time;
                 inJumpWindup = true;
-				SendMessage("RotatePlatform", SendMessageOptions.DontRequireReceiver);
-                SendMessage("JumpStarted", SendMessageOptions.DontRequireReceiver);
+                jumpCount = 1;
+                Messenger.Broadcast("JumpStarted");
+            } else if (jumpCount == 1 || (!jumping && falling)) {
+                // Double Jump.
+                if (!jumping) {
+                    jumping = true;
+                    Messenger.Broadcast("JumpStarted");
+                    Messenger.Broadcast("Jump");
+                }
+                lastJumpTime = Time.time;
+                jumpCount = 2;
+                verticalSpeed = jumpVerticalSpeed;
+                Messenger.Broadcast("DoubleJumpStarted");
             }
         }
 
         if (inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
             inJumpWindup = false;
             jumping = true;
+            jumpCount = 1;
             verticalSpeed = jumpVerticalSpeed;
 
-			SendMessage("ControlPlatforms", SendMessageOptions.DontRequireReceiver);
-            SendMessage("Jump", SendMessageOptions.DontRequireReceiver);
+            Messenger.Broadcast("Jump");
         }
     }
 
     public void TriggerJump() {
         lastJumpInputTime = Time.time;
-        SendMessage("JumpTriggered", SendMessageOptions.DontRequireReceiver);
-        SendMessage("InputReceived", SendMessageOptions.DontRequireReceiver);
+        Messenger.Broadcast("JumpTriggered");
+        Messenger.Broadcast("InputReceived");
     }
 
     public void Bounce(float bounceSpeed) {
@@ -362,7 +374,7 @@ public class CharacterMovement : MonoBehaviour
         lastBouncedTime = Time.time;
         Land();
 
-        SendMessage("BounceTriggered", SendMessageOptions.DontRequireReceiver);
+        Messenger.Broadcast("BounceTriggered");
         Vector3 bounceVelocity = bounceSpeed * bounceDirection;
         verticalSpeed = Vector3.Dot(bounceVelocity, Vector3.up);
         SetVelocity(new Vector3(Vector3.Dot(bounceVelocity, Vector3.right),
@@ -390,7 +402,7 @@ public class CharacterMovement : MonoBehaviour
 
         bounceTrajectory = trajectoryCopy;
 
-        SendMessage("BounceTriggered", SendMessageOptions.DontRequireReceiver);
+        Messenger.Broadcast("BounceTriggered");
         jumping = true;
         bouncing = true;
         lastJumpTime = Time.time;
@@ -413,6 +425,7 @@ public class CharacterMovement : MonoBehaviour
     public void SetJumpHeight(float height) { jumpHeight = height; }
     public void ResetJumpHeight() { jumpHeight = originalJumpHeight; }
     public void SetGravity(float newGravity) { gravity = newGravity; }
+    public float GetInitialGravity() { return originalGravity; }
     public void ResetGravity() { gravity = originalGravity; }
     public void SetGroundSmoothDampTime(float newGroundSmoothDampTime) { groundSmoothDampTime = newGroundSmoothDampTime; }
     public void ResetGroundSmoothDampTime() { groundSmoothDampTime = originalGroundSmoothDampTime; }

@@ -11,6 +11,8 @@ public class Metal : Powerup
 
     public override void Awake() {
         base.Awake();
+
+        Messenger.AddListener("BounceTriggered", OnBounceTriggered);
     }
 
     public override void Start() {
@@ -25,8 +27,7 @@ public class Metal : Powerup
         }
     }
 
-    // Called via SendMessage in CharacterMovement.
-    protected void BounceTriggered() {
+    protected void OnBounceTriggered() {
         if (inUse) {
             EndPowerup();
         }

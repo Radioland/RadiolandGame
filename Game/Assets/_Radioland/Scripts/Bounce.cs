@@ -13,6 +13,8 @@ public class Bounce : MonoBehaviour
         characterMovement = gameObject.GetComponent<CharacterMovement>();
 
         bouncing = false;
+
+        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     private void Start() {
@@ -23,8 +25,7 @@ public class Bounce : MonoBehaviour
 
     }
 
-    // Called via SendMessage in CharacterMovement.
-    private void Grounded(float verticalSpeed) {
+    private void OnGrounded(float verticalSpeed) {
         RaycastHit hit;
 
         if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.2f)) {

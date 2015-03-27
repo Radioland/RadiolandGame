@@ -14,6 +14,8 @@ public class LowGravity : JumpPowerup
         base.Awake();
 
         longJumpHash = Animator.StringToHash("LongJump");
+
+        Messenger.AddListener("JumpStarted", OnJumpStarted);
     }
 
     public override void Start() {
@@ -43,9 +45,8 @@ public class LowGravity : JumpPowerup
         characterMovement.AddVelocity(launchDirectionRelative * launchForce);
     }
 
-    // Called via SendMessage in CharacterMovement.
-    protected override void JumpStarted() {
-        base.JumpStarted();
+    protected override void OnJumpStarted() {
+        base.OnJumpStarted();
 
         if (inUse) {
             characterMovement.SetGravity(gravity);

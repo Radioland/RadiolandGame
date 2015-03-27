@@ -16,6 +16,9 @@ public class JumpPowerup : Powerup
         if (!animator) {
             Debug.LogWarning("No animator found on " + transform.GetPath());
         }
+
+        Messenger.AddListener("JumpStarted", OnJumpStarted);
+        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     public override void Start() {
@@ -30,15 +33,13 @@ public class JumpPowerup : Powerup
         }
     }
 
-    // Called via SendMessage in CharacterMovement.
-    protected virtual void JumpStarted() {
+    protected virtual void OnJumpStarted() {
         if (primed && !inUse) {
             inUse = true;
         }
     }
 
-    // Called via SendMessage in CharacterMovement.
-    protected void Grounded() {
+    protected void OnGrounded(float verticalSpeed) {
         if (inUse) {
             EndPowerup();
         }
