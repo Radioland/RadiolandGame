@@ -57,6 +57,7 @@ public class CharacterMovement : MonoBehaviour
     private float walkSpeed;
     private float verticalSpeed;
     private const float walkRunCutoff = 0.3f;
+    private int jumpCount;
     private float lastRunInputStartTime;
     private float lastJumpInputTime;
     private float lastJumpTime;
@@ -126,6 +127,7 @@ public class CharacterMovement : MonoBehaviour
 
         walkSpeed = 0f;
         verticalSpeed = 0f;
+        jumpCount = 0;
         lastRunInputStartTime = -1000f;
         lastJumpInputTime = -1000f;
         lastJumpTime = -1000f;
@@ -277,6 +279,7 @@ public class CharacterMovement : MonoBehaviour
                 Land();
             }
             jumping = false;
+            jumpCount = 0;
             animator.SetBool(landingHash, false);
         } else {
             if (Time.time - lastGroundedTime > fallingTime && verticalSpeed < 0.0f) {
@@ -327,16 +330,22 @@ public class CharacterMovement : MonoBehaviour
         if (Time.time < lastJumpInputTime + jumpPreTimeout &&
             Time.time > lastJumpTime + jumpCooldown) {
             // PostTimeout lets you trigger a jump slightly after starting to fall.
-            if (grounded || (Time.time < lastGroundedTime + jumpPostTimeout)) {
+            if (!jumping && (grounded || (Time.time < lastGroundedTime + jumpPostTimeout))) {
                 lastJumpTime = Time.time;
                 inJumpWindup = true;
+                jumpCount = 1;
                 Messenger.Broadcast("JumpStarted");
+            } else if (jumpCount == 1) {
+                lastJumpTime = Time.time;
+                jumpCount++;
+                verticalSpeed = jumpVerticalSpeed;
             }
         }
 
         if (inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
             inJumpWindup = false;
             jumping = true;
+            jumpCount = 1;
             verticalSpeed = jumpVerticalSpeed;
 
             Messenger.Broadcast("Jump");
