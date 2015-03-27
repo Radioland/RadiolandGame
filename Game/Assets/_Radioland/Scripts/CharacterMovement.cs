@@ -428,8 +428,10 @@ public class CharacterMovement : MonoBehaviour
     public float GetInitialGravity() { return originalGravity; }
     public void ResetGravity() { gravity = originalGravity; }
     public void SetGroundSmoothDampTime(float newGroundSmoothDampTime) { groundSmoothDampTime = newGroundSmoothDampTime; }
+    public float GetInitialGroundSmoothDampTime() { return originalGroundSmoothDampTime; }
     public void ResetGroundSmoothDampTime() { groundSmoothDampTime = originalGroundSmoothDampTime; }
     public void SetAirSmoothDampTime(float newAirSmoothDampTime) { airSmoothDampTime = newAirSmoothDampTime; }
+    public float GetInitialAirSmoothDampTime() { return originalAirSmoothDampTime; }
     public void ResetAirSmoothDampTime() { airSmoothDampTime = originalAirSmoothDampTime; }
     public void SetMass(float newMass) { mass = newMass; }
     public void ResetMass() { mass = originalMass; }

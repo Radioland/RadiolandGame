@@ -6,10 +6,13 @@ public class JumpExtras : MonoBehaviour
 {
     [SerializeField] private float timeToMinGravity = 1f;
     [SerializeField] private float minGravity = 3f;
+    [SerializeField] private float newSmoothDampTimes = 1f;
     [SerializeField] private List<TrailRenderer> trails;
 
     private CharacterMovement characterMovement;
     private float initialGravity;
+    private float initialGroundSmoothDampTime;
+    private float initialAirSmoothDampTime;
     private float timeHeld;
     private float lastTimeLanded;
 
@@ -42,6 +45,8 @@ public class JumpExtras : MonoBehaviour
 
     private void Start() {
         initialGravity = characterMovement.GetInitialGravity();
+        initialGroundSmoothDampTime = characterMovement.GetInitialGroundSmoothDampTime();
+        initialAirSmoothDampTime = characterMovement.GetInitialAirSmoothDampTime();
     }
 
     private void Update() {
@@ -57,6 +62,8 @@ public class JumpExtras : MonoBehaviour
         float t = timeHeld / timeToMinGravity;
         if (t >= 1) { animator.SetBool(longJumpHash, true); }
         characterMovement.SetGravity(Mathf.Lerp(initialGravity, minGravity, t));
+        characterMovement.SetGroundSmoothDampTime(Mathf.Lerp(initialGroundSmoothDampTime, newSmoothDampTimes, t));
+        characterMovement.SetAirSmoothDampTime(Mathf.Lerp(initialAirSmoothDampTime, newSmoothDampTimes, t));
 
         // Tint trails.
         trailTintAlpha = holdingJump ? Mathf.SmoothDamp(trailTintAlpha, t, ref trailSmoothing, trailFadeInTime) :
