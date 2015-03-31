@@ -293,6 +293,8 @@ public class CharacterMovement : MonoBehaviour
             }
 
             if (jumping && !bouncing || Time.time - lastBouncedTime < minimumBounceTime) {
+                animator.SetBool(landingHash, false);
+
                 // Check if predicted to be landing within landingTime.
                 // d = v * t + 1/2 a * t^2
                 float distance = -(verticalSpeed * landingTime +
