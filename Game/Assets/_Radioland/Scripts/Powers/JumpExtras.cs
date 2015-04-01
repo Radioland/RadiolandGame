@@ -19,6 +19,7 @@ public class JumpExtras : MonoBehaviour
     private Animator animator;
     private int longJumpHash;
     private int highJumpHash;
+    private int doubleJumpHash;
 
     private float trailTintAlpha;
     private const float trailFadeInTime = 2f;
@@ -35,6 +36,7 @@ public class JumpExtras : MonoBehaviour
 
         longJumpHash = Animator.StringToHash("LongJump");
         highJumpHash = Animator.StringToHash("HighJump");
+        doubleJumpHash = Animator.StringToHash("DoubleJump");
 
         trailTintAlpha = 0f;
 
@@ -92,5 +94,6 @@ public class JumpExtras : MonoBehaviour
 
     private void OnDoubleJumpStarted() {
         animator.SetBool(highJumpHash, true);
+        animator.SetTrigger(doubleJumpHash);
     }
 }

@@ -7,6 +7,8 @@ public class CollisionTriggerEffects : TriggerEffects
     [Tooltip("Leave empty to trigger on any tag.")]
     [SerializeField] private string testColliderTag;
 
+    [SerializeField] private bool triggerOnStay = false;
+
     protected override void Awake() {
         base.Awake();
     }
@@ -25,6 +27,12 @@ public class CollisionTriggerEffects : TriggerEffects
 
     private void OnTriggerEnter(Collider other) {
         StartEventIfMatch(other.gameObject.tag);
+    }
+
+    public void OnTriggerStay(Collider other) {
+        if (triggerOnStay) {
+            StartEventIfMatch(other.gameObject.tag);
+        }
     }
 
     private void StartEventIfMatch(string colliderTag) {

@@ -79,7 +79,7 @@ public class HighlightHelper
                 objectTransform.GetComponents<Renderer>();
 
             foreach (Renderer renderer in renderers) {
-                if (!(renderer is ParticleSystemRenderer)) {
+                if (!(renderer is ParticleSystemRenderer) && !(renderer is TrailRenderer)) {
                     Bounds rendererBounds = renderer.bounds;
                     rendererBounds.center = objectTransform.position;
                     bounds.Encapsulate(renderer.bounds);
