@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(SmoothMoveToTarget))]
+[RequireComponent(typeof(AIMovement))]
 public class BabyBirbControl : MonoBehaviour
 {
     private enum BirbState
@@ -10,28 +10,53 @@ public class BabyBirbControl : MonoBehaviour
     }
 
     [SerializeField] private BirbState state;
+    private GameObject player;
+    private Transform followTarget;
+    private AIMovement movement;
 
+    [Header("Activation")]
     private const float minActivateSignalStrength = 0.5f;
     [SerializeField] private float minActivateDistance = 10f;
 
-    private GameObject player;
-    private GameObject followTarget;
-    private SmoothMoveToTarget smoothMoveToTarget;
+    [Header("Chasing")]
+    [SerializeField] private float slowRadius = 2f;
+    [SerializeField] private float timeToTargetSpeed = 1f;
 
     private void Awake() {
         player = GameObject.FindWithTag("Player");
-        followTarget = GameObject.FindWithTag("babybirbtarget");
+        followTarget = GameObject.FindWithTag("babybirbtarget").transform;
 
-        smoothMoveToTarget = gameObject.GetComponent<SmoothMoveToTarget>();
+        movement = gameObject.GetComponent<AIMovement>();
     }
 
     private void Start() {
-        smoothMoveToTarget.SetTarget(followTarget.transform);
-        smoothMoveToTarget.enabled = (state == BirbState.Chasing);
+
     }
 
     private void Update() {
-        smoothMoveToTarget.enabled = (state == BirbState.Chasing);
+        switch (state) {
+            case BirbState.Perched:
+                break;
+            case BirbState.Chasing:
+                HandleChase();
+                break;
+            case BirbState.Wander:
+                break;
+            default:
+                break;
+        }
+
+        transform.LookAt(followTarget);
+    }
+
+    private void HandleChase() {
+        Vector3 directionToTarget = followTarget.position - transform.position;
+        float distance = directionToTarget.magnitude;
+        float targetSpeed = movement.maxLinearSpeed * (distance / slowRadius);
+
+        Vector3 targetVelocity = directionToTarget.normalized * targetSpeed;
+
+        movement.linearAcceleration = (targetVelocity - movement.linearVelocity) / timeToTargetSpeed;
     }
 
     public void Activate(float signalStrength) {
@@ -46,5 +71,12 @@ public class BabyBirbControl : MonoBehaviour
     public void OnDrawGizmos() {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, minActivateDistance);
+    }
+
+    public void OnDrawGizmosSelected() {
+        if (!Application.isPlaying) { return; }
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(followTarget.position, slowRadius);
     }
 }
