@@ -5,6 +5,7 @@ public class TransformLerp : MonoBehaviour
     [SerializeField] private Vector3 finalTranslationDelta;
     [SerializeField] private Vector3 finalLocalRotation;
     [SerializeField] private float duration = 3f;
+    [SerializeField] private bool allowRevert = true;
 
     private Vector3 initialPosition;
     private Vector3 targetPosition;
@@ -43,7 +44,7 @@ public class TransformLerp : MonoBehaviour
     }
 
     public void SetTime(float t) {
-        currentTime = t;
+        currentTime = allowRevert ? t : Mathf.Max(currentTime, t);
 
         transform.position = Vector3.Lerp(initialPosition, targetPosition, currentTime);
         transform.localRotation = Quaternion.Lerp(initialRotation, targetRotation, currentTime);
