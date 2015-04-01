@@ -43,7 +43,6 @@ public class StationPower : MonoBehaviour
         if (enabled) {
             StopPower(stopEvenIfAlreadyStopped:true);
         }
-
     }
 
     private void Update() {
@@ -58,11 +57,9 @@ public class StationPower : MonoBehaviour
 
             continuousEvents.Invoke(allStations.Max(station => station.signalStrength));
         } else if (radioStation) {
-            if (!powered && radioStation.StrongSignal()) {
+            if (radioStation.StrongSignal()) {
                 StartPower();
-            }
-
-            if (powered && !radioStation.StrongSignal()) {
+            } else {
                 StopPower();
             }
 
