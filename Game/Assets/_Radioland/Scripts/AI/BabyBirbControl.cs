@@ -1,30 +1,37 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(SmoothMoveToTarget))]
 public class BabyBirbControl : MonoBehaviour
 {
-    public enum BirbState
+    private enum BirbState
     {
         Perched, Wander, Chasing
     }
 
-    public BirbState state;
+    [SerializeField] private BirbState state;
 
     private const float minActivateSignalStrength = 0.5f;
     [SerializeField] private float minActivateDistance = 10f;
 
     private GameObject player;
+    private GameObject followTarget;
+    private SmoothMoveToTarget smoothMoveToTarget;
 
     private void Awake() {
         player = GameObject.FindWithTag("Player");
+        followTarget = GameObject.FindWithTag("babybirbtarget");
+
+        smoothMoveToTarget = gameObject.GetComponent<SmoothMoveToTarget>();
     }
 
     private void Start() {
-
+        smoothMoveToTarget.SetTarget(followTarget.transform);
+        smoothMoveToTarget.enabled = (state == BirbState.Chasing);
     }
 
     private void Update() {
-
+        smoothMoveToTarget.enabled = (state == BirbState.Chasing);
     }
 
     public void Activate(float signalStrength) {
