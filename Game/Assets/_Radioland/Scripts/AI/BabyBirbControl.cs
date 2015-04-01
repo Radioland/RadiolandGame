@@ -13,6 +13,7 @@ public class BabyBirbControl : MonoBehaviour
 
     [Header("Activation")]
     [SerializeField] private float minActivateDistance = 10f;
+    [SerializeField] private EffectManager activationEffects;
     private const float minActivateSignalStrength = 0.5f;
 
     [Header("General Movement")]
@@ -147,6 +148,7 @@ public class BabyBirbControl : MonoBehaviour
             Vector3.Distance(transform.position, player.transform.position) < minActivateDistance) {
 
             SetState(BirbState.Chasing);
+            if (activationEffects) { activationEffects.StartEvent(); }
         }
     }
 
