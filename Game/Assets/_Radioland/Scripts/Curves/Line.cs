@@ -27,7 +27,7 @@ public class Line : ICurve
     }
 
     public override Vector3 GetVelocity(float t) {
-        return p1 - p0;
+        return transform.TransformPoint(p1) - transform.TransformPoint(p0);
     }
 
     protected override void OnDrawGizmos() {
