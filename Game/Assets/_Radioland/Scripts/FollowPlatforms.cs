@@ -108,8 +108,10 @@ public class FollowPlatforms : MonoBehaviour
         Platform platform = theObject.GetComponent<Platform>();
         if (platform) { return platform; }
 
-        platform = theObject.transform.parent.GetComponent<Platform>();
-        if (platform) { return platform; }
+        if (theObject.transform.parent) {
+            platform = theObject.transform.parent.GetComponent<Platform>();
+            if (platform) { return platform; }
+        }
 
         return null;
     }
@@ -118,8 +120,10 @@ public class FollowPlatforms : MonoBehaviour
         SpringPlatform platform = theObject.GetComponent<SpringPlatform>();
         if (platform) { return platform; }
 
-        platform = theObject.transform.parent.GetComponent<SpringPlatform>();
-        if (platform) { return platform; }
+        if (theObject.transform.parent) {
+            platform = theObject.transform.parent.GetComponent<SpringPlatform>();
+            if (platform) { return platform; }
+        }
 
         return null;
     }
