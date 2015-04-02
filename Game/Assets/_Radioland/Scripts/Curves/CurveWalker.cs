@@ -23,6 +23,7 @@ public class CurveWalker : MonoBehaviour
     [Header("Obstacle Settings")]
     [SerializeField] private bool ignoreObstacles = true;
     [SerializeField] private bool reverseOnCollision = true;
+    [SerializeField] private LayerMask obstacleLayerMask;
 
     private float progress = 0f;
     private float easedProgress = 0f;
@@ -77,7 +78,7 @@ public class CurveWalker : MonoBehaviour
             checkPositions[2] = transform.position - right * sizeDistance;
 
             foreach (Vector3 checkPosition in checkPositions) {
-                Collider[] hitColliders = Physics.OverlapSphere(checkPosition, checkSize);
+                Collider[] hitColliders = Physics.OverlapSphere(checkPosition, checkSize, obstacleLayerMask);
                 if (hitColliders.Any(hitCollider => hitCollider != myCollider)) {
                     if (reverseOnCollision && mode == CurveWalkerMode.PingPong) {
                         goingForward = !goingForward;
