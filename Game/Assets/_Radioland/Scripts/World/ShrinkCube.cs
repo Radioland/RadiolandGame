@@ -30,6 +30,7 @@ public class ShrinkCube : MonoBehaviour {
 				shouldShrink = false;
 				GetComponents<BoxCollider>()[0].enabled = false;
 				GetComponents<BoxCollider>()[1].enabled = false;
+				GetComponent<MeshRenderer>().enabled = false;
 				disappearedTime = Time.time;
 				disappeared = true;
 			}
@@ -37,6 +38,7 @@ public class ShrinkCube : MonoBehaviour {
 		if (Time.time - disappearedTime > growDelay && disappeared) {
 			GetComponents<BoxCollider>()[0].enabled = true;
 			GetComponents<BoxCollider>()[1].enabled = true;
+			GetComponent<MeshRenderer>().enabled = true;
 			shouldGrow = true;
 		}
 		if (shouldGrow) {
