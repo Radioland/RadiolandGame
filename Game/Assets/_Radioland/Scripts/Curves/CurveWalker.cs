@@ -31,12 +31,20 @@ public class CurveWalker : MonoBehaviour
     private Interpolate.Function easeFunction;
 
     private Collider myCollider;
-    private Vector3 checkPosition;
+    private Vector3[] checkPositions = new Vector3[3];
+    private const float aheadScale = 0.8f;
+    private float aheadDistance;
+    private float sizeDistance;
+    private float checkScale = 0.2f;
+    private float checkSize;
 
     private void Awake() {
         easeFunction = Interpolate.Ease(easeType);
 
         myCollider = gameObject.GetComponentInChildren<Collider>();
+        aheadDistance = myCollider ? myCollider.bounds.extents.x * aheadScale : 1f;
+        sizeDistance = myCollider ? myCollider.bounds.extents.z * aheadScale : 1f;
+        checkSize = myCollider ? myCollider.bounds.extents.magnitude * checkScale : 0.3f;
     }
 
     private void Start() {
@@ -55,16 +63,23 @@ public class CurveWalker : MonoBehaviour
         }
 
         if (!ignoreObstacles) {
+            Vector3 forward = curve.GetDirection(easedProgress);
+            Vector3 right = Vector3.Cross(forward, transform.up);
+            Debug.DrawRay(transform.position, forward, Color.magenta);
+
+            // Check forward.
             int orientation = goingForward ? 1 : -1;
-            float forward = myCollider ? myCollider.bounds.extents.x : 0f;
-            Vector3 direction = curve.GetDirection(easedProgress);
-            checkPosition = transform.position + direction * forward * orientation;
+            checkPositions[0] = transform.position + forward * aheadDistance * orientation;
 
-            Collider[] hitColliders = Physics.OverlapSphere(checkPosition, 0.3f);
+            // Check right and left.
+            checkPositions[1] = transform.position + right * sizeDistance;
+            checkPositions[2] = transform.position - right * sizeDistance;
 
-            Debug.DrawRay(transform.position, direction, Color.magenta);
+            foreach (Vector3 checkPosition in checkPositions) {
+                Collider[] hitColliders = Physics.OverlapSphere(checkPosition, checkSize);
+                if (hitColliders.Any(hitCollider => hitCollider != myCollider)) { return; }
+            }
 
-            if (hitColliders.Any(hitCollider => hitCollider != myCollider)) { return; }
         }
 
         if (goingForward) {
@@ -99,9 +114,11 @@ public class CurveWalker : MonoBehaviour
     }
 
     public void OnDrawGizmos() {
-        if (ignoreObstacles) { return; }
+        if (ignoreObstacles || !Application.isPlaying) { return; }
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(checkPosition, 1f);
+        foreach (Vector3 checkPosition in checkPositions) {
+            Gizmos.DrawWireSphere(checkPosition, checkSize);
+        }
     }
 }
