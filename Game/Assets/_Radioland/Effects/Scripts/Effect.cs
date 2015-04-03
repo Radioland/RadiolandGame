@@ -51,6 +51,8 @@ public class Effect : MonoBehaviour
             return;
         }
 
+        if (timing.random && Random.value > timing.playChance) { return; }
+
         isPlaying = true;
         hasStarted = false;
 
