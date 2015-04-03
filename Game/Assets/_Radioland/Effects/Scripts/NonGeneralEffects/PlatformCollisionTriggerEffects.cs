@@ -3,12 +3,13 @@ using System.Collections;
 
 public class PlatformCollisionTriggerEffects : CollisionTriggerEffects
 {
-    [SerializeField] private Platform.SurfaceType surfaceType;
+    [SerializeField] [BitMask(typeof(Platform.SurfaceType))]
+    private Platform.SurfaceType surfaceType;
 
     protected override void StartEventIfMatch(GameObject collisionObject) {
         if (testColliderTag.Length == 0 || collisionObject.tag.Equals(testColliderTag)) {
             Platform platform = GetPlatformOnObject(collisionObject);
-            if (platform && platform.surfaceType == surfaceType) {
+            if (platform && ((platform.surfaceType & surfaceType) > 0)) {
                 StartEvent();
             }
         }

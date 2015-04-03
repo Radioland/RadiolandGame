@@ -3,9 +3,15 @@ using System.Collections;
 
 public class Platform : MonoBehaviour
 {
+    [System.Flags]
     public enum SurfaceType
     {
-        Generic, Grass, Rock, Metal, Plastic, Glass
+        Generic = (1 << 0),
+        Grass = (1 << 1),
+        Rock = (1 << 2),
+        Metal = (1 << 3),
+        Plastic = (1 << 4),
+        Glass = (1 << 5)
     }
 
     public SurfaceType surfaceType = SurfaceType.Generic;
