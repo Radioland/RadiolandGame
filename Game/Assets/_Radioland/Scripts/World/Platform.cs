@@ -3,6 +3,13 @@ using System.Collections;
 
 public class Platform : MonoBehaviour
 {
+    public enum SurfaceType
+    {
+        Generic, Grass, Rock, Metal, Plastic, Glass
+    }
+
+    public SurfaceType surfaceType = SurfaceType.Generic;
+
     private Vector3 m_lastVelocity;
     public Vector3 lastVelocity { get { return m_lastVelocity; } }
 

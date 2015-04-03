@@ -5,7 +5,7 @@ public class CollisionTriggerEffects : TriggerEffects
 {
     // Variables to specify in the editor.
     [Tooltip("Leave empty to trigger on any tag.")]
-    [SerializeField] private string testColliderTag;
+    [SerializeField] protected string testColliderTag;
 
     [SerializeField] private bool triggerOnStay = false;
 
@@ -22,21 +22,21 @@ public class CollisionTriggerEffects : TriggerEffects
     }
 
     private void OnCollisionEnter(Collision collision) {
-        StartEventIfMatch(collision.collider.gameObject.tag);
+        StartEventIfMatch(collision.collider.gameObject);
     }
 
     private void OnTriggerEnter(Collider other) {
-        StartEventIfMatch(other.gameObject.tag);
+        StartEventIfMatch(other.gameObject);
     }
 
     public void OnTriggerStay(Collider other) {
         if (triggerOnStay) {
-            StartEventIfMatch(other.gameObject.tag);
+            StartEventIfMatch(other.gameObject);
         }
     }
 
-    private void StartEventIfMatch(string colliderTag) {
-        if (testColliderTag.Length == 0 || colliderTag.Equals(testColliderTag)) {
+    protected virtual void StartEventIfMatch(GameObject collisionObject) {
+        if (testColliderTag.Length == 0 || collisionObject.tag.Equals(testColliderTag)) {
             StartEvent();
         }
     }
