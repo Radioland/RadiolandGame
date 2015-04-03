@@ -23,13 +23,13 @@ public class RandomEffect : Effect
 
     public override void TriggerEffect() {
         base.TriggerEffect();
-
-        currentEffect = effects[Random.Range(0, effects.Count)];
-        currentEffect.TriggerEffect();
     }
 
     public override void StartEffect() {
         base.StartEffect();
+
+        currentEffect = effects[Random.Range(0, effects.Count)];
+        currentEffect.TriggerEffect();
     }
 
     public override void EndEffect() {
