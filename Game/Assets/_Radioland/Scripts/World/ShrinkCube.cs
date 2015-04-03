@@ -6,7 +6,7 @@ public class ShrinkCube : MonoBehaviour {
 	private Vector3 shrinkValue;
 	private Vector3 initialScale;
 	//Random value for speed.  Lower numbers = more speed
-	private float shrinkDivider = 2;
+	[SerializeField] private float shrinkDivider = 0.85f;
 	private bool shouldShrink = false;
 	private bool shouldGrow = false;
 	private bool disappeared = false;
