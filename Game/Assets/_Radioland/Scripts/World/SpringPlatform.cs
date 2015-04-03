@@ -42,4 +42,16 @@ public class SpringPlatform : MonoBehaviour
     public void ApplyForce(float force) {
         currentVelocity += force / mass;
     }
+
+    public static SpringPlatform GetSpringPlatformOnObject(GameObject theObject) {
+        SpringPlatform platform = theObject.GetComponent<SpringPlatform>();
+        if (platform) { return platform; }
+
+        if (theObject.transform.parent) {
+            platform = theObject.transform.parent.GetComponent<SpringPlatform>();
+            if (platform) { return platform; }
+        }
+
+        return null;
+    }
 }

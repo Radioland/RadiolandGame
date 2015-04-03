@@ -71,7 +71,7 @@ public class FollowPlatforms : MonoBehaviour
         Debug.DrawLine(start, start + Vector3.down * distance, Color.red);
 
         RaycastHit[] hits = Physics.RaycastAll(start, Vector3.down, distance, layerMask).OrderBy(h=>h.distance).ToArray();
-        return hits.Select(hit => GetPlatformOnObject(hit.collider.gameObject)).FirstOrDefault(platform => platform);
+        return hits.Select(hit => Platform.GetPlatformOnObject(hit.collider.gameObject)).FirstOrDefault(platform => platform);
     }
 
     private SpringPlatform GetSpringPlatformUnder() {
@@ -79,7 +79,7 @@ public class FollowPlatforms : MonoBehaviour
         float distance = 1.0f + raycastDistance; // Counteracts the 1.0f up.
 
         RaycastHit[] hits = Physics.RaycastAll(start, Vector3.down, distance, layerMask).OrderBy(h=>h.distance).ToArray();
-        return hits.Select(hit => GetSpringPlatformOnObject(hit.collider.gameObject)).FirstOrDefault(platform => platform);
+        return hits.Select(hit => SpringPlatform.GetSpringPlatformOnObject(hit.collider.gameObject)).FirstOrDefault(platform => platform);
     }
 
     private void Push(Platform platform) {
@@ -95,32 +95,12 @@ public class FollowPlatforms : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision collision) {
-        Platform platform = GetPlatformOnObject(collision.gameObject);
+        Platform platform = Platform.GetPlatformOnObject(collision.gameObject);
         if (platform) { Push(platform); }
     }
 
     private void OnCollisionStay(Collision collision) {
-        Platform platform = GetPlatformOnObject(collision.gameObject);
+        Platform platform = Platform.GetPlatformOnObject(collision.gameObject);
         if (platform) { Push(platform); }
-    }
-
-    private Platform GetPlatformOnObject(GameObject theObject) {
-        Platform platform = theObject.GetComponent<Platform>();
-        if (platform) { return platform; }
-
-        platform = theObject.transform.parent.GetComponent<Platform>();
-        if (platform) { return platform; }
-
-        return null;
-    }
-
-    private SpringPlatform GetSpringPlatformOnObject(GameObject theObject) {
-        SpringPlatform platform = theObject.GetComponent<SpringPlatform>();
-        if (platform) { return platform; }
-
-        platform = theObject.transform.parent.GetComponent<SpringPlatform>();
-        if (platform) { return platform; }
-
-        return null;
     }
 }
