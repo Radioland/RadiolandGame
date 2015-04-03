@@ -35,4 +35,16 @@ public class Platform : MonoBehaviour
         m_lastVelocity = deltaPosition / Time.deltaTime;
         lastPosition = transform.position;
     }
+
+    public static Platform GetPlatformOnObject(GameObject theObject) {
+        Platform platform = theObject.GetComponent<Platform>();
+        if (platform) { return platform; }
+
+        if (theObject.transform.parent) {
+            platform = theObject.transform.parent.GetComponent<Platform>();
+            if (platform) { return platform; }
+        }
+
+        return null;
+    }
 }
