@@ -15,6 +15,7 @@ public class Platform : MonoBehaviour
     }
 
     public SurfaceType surfaceType = SurfaceType.Generic;
+    public bool pushPlayer = true;
 
     private Vector3 m_lastVelocity;
     public Vector3 lastVelocity { get { return m_lastVelocity; } }
