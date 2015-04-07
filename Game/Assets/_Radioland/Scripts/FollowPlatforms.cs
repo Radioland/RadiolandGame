@@ -51,7 +51,7 @@ public class FollowPlatforms : MonoBehaviour
     private void OnJump() {
         if (!characterMovement) { return; }
 
-        if (latestPlatform && latestPlatform.pushPlayer) {
+        if (latestPlatform && latestPlatform.pushPlayerJumping) {
             characterMovement.AddVelocity(latestPlatform.lastVelocity);
             latestPlatform = null;
         }
@@ -85,7 +85,8 @@ public class FollowPlatforms : MonoBehaviour
     private void Push(Platform platform) {
         if (Time.timeScale < 0.01f) { return; }
 
-        if (!platform.pushPlayer) { return; }
+        if (!platform.pushPlayerJumping && characterMovement.jumping) { return; }
+        if (!platform.pushPlayerGrounded && characterMovement.grounded) { return; }
 
         Vector3 movement = platform.lastVelocity * Time.deltaTime;
         // Apply an extra push vertically to prevent falling through platforms.
