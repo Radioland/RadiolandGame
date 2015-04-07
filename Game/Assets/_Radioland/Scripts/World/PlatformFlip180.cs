@@ -14,7 +14,7 @@ public class PlatformFlip180 : MonoBehaviour
     private void Awake() {
         flipping = false;
         flippingForward = true;
-        initialRotation = transform.rotation;
+        initialRotation = transform.localRotation;
 
         Messenger.AddListener("JumpStarted", OnJumpStarted);
     }
@@ -25,7 +25,7 @@ public class PlatformFlip180 : MonoBehaviour
             float angle = flippingForward ? Mathf.Lerp(0f, 180f, t) : Mathf.Lerp(180f, 0f, t);
             if (flipNegative) { angle *= -1; }
 
-            transform.rotation = initialRotation * Quaternion.Euler(0f, 0f, angle);
+            transform.localRotation = initialRotation * Quaternion.Euler(0f, 0f, angle);
 
             if (t > 1) {
                 flipping = false;
