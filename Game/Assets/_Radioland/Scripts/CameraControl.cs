@@ -156,7 +156,7 @@ public class CameraControl : MonoBehaviour
         // Move lookLerpTransform towards followTransform.
         SmoothLookAtTarget();
 
-        CompensateForWalls(playerTransform.position, ref targetCameraPosition);
+//        CompensateForWalls(playerTransform.position, ref targetCameraPosition);
 
         cameraTransform.LookAt(lookLerpTransform);
     }
@@ -354,12 +354,11 @@ public class CameraControl : MonoBehaviour
 
         cameraTransform.position = camPosCache;
 
-        // Commented out: camera snaps to avoid walls very quickly with this.
-//        if (blocked) {
-//            cameraTransform.position = blockTargetPosition;
-//        } else {
-//            cameraTransform.position = camPosCache;
-//        }
+        if (blocked) {
+            cameraTransform.position = blockTargetPosition;
+        } else {
+            cameraTransform.position = camPosCache;
+        }
     }
 
     private void HandleReset() {

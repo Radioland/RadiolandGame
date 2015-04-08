@@ -344,10 +344,10 @@ public class CharacterMovement : MonoBehaviour
                 StartJump();
                 Messenger.Broadcast("JumpStarted");
             } else if (jumpCount == 1 || (!jumping && falling)) {
-                if (!jumping) { jumpCount = 1; }
                 // Double Jump.
                 StartJump();
                 if (!jumping) {
+                    jumpCount = 1;
                     jumping = true;
                     Messenger.Broadcast("Jump");
                 }
@@ -358,7 +358,7 @@ public class CharacterMovement : MonoBehaviour
         }
 
         if (inJumpWindup && ((jumpCount == 0 && Time.time - lastJumpTime > jumpWindupTime) ||
-                             (jumpCount >= 2 && Time.time - lastJumpTime > doubleJumpWindupTime))) {
+                             (jumpCount > 0 && Time.time - lastJumpTime > doubleJumpWindupTime))) {
             inJumpWindup = false;
             jumping = true;
             jumpCount++;
@@ -377,7 +377,6 @@ public class CharacterMovement : MonoBehaviour
     private void StartJump() {
         lastJumpTime = Time.time;
         inJumpWindup = true;
-        jumpCount++;
         Messenger.Broadcast("JumpStarted");
 
     }
