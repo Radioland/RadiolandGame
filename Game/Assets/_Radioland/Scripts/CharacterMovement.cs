@@ -341,34 +341,27 @@ public class CharacterMovement : MonoBehaviour
             Time.time > lastJumpTime + jumpCooldown) {
             // PostTimeout lets you trigger a jump slightly after starting to fall.
             if (!jumping && (grounded || (Time.time < lastGroundedTime + jumpPostTimeout))) {
-                lastJumpTime = Time.time;
-                inJumpWindup = true;
-                controllable = false;
-                jumpCount = 1;
+                StartJump();
                 Messenger.Broadcast("JumpStarted");
             } else if (jumpCount == 1 || (!jumping && falling)) {
+                if (!jumping) { jumpCount = 1; }
                 // Double Jump.
+                StartJump();
                 if (!jumping) {
                     jumping = true;
-                    Messenger.Broadcast("JumpStarted");
                     Messenger.Broadcast("Jump");
                 }
                 verticalSpeed = 0f;
-                lastJumpTime = Time.time;
-                inJumpWindup = true;
-                jumpCount = 2;
                 doubleJumping = true;
-                controllable = false;
                 Messenger.Broadcast("DoubleJumpStarted");
             }
         }
 
         if (inJumpWindup && ((jumpCount == 0 && Time.time - lastJumpTime > jumpWindupTime) ||
                              (jumpCount >= 2 && Time.time - lastJumpTime > doubleJumpWindupTime))) {
-            controllable = true;
             inJumpWindup = false;
             jumping = true;
-            jumpCount += 1;
+            jumpCount++;
             verticalSpeed = jumpVerticalSpeed;
 
             Messenger.Broadcast("Jump");
@@ -379,6 +372,14 @@ public class CharacterMovement : MonoBehaviour
         lastJumpInputTime = Time.time;
         Messenger.Broadcast("JumpTriggered");
         Messenger.Broadcast("InputReceived");
+    }
+
+    private void StartJump() {
+        lastJumpTime = Time.time;
+        inJumpWindup = true;
+        jumpCount++;
+        Messenger.Broadcast("JumpStarted");
+
     }
 
     public void Bounce(float bounceSpeed) {

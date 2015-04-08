@@ -65,7 +65,7 @@ public class CameraControl : MonoBehaviour
 
     // Smoothing and damping.
     [Header("Smoothing")]
-    [SerializeField] private float maxSpeed = 1.5f;
+    [SerializeField] private float maxSpeed = 20f;
     [SerializeField] private float camSmoothDampTime = 0.1f;
     [SerializeField] private float lookLerpDampTime = 0.6f;
     [SerializeField] private float aimAheadDampTime = 0.2f;
@@ -129,7 +129,9 @@ public class CameraControl : MonoBehaviour
         if (mouseLookEnabled) { ApplyMouseLook(ref rightX, ref rightY); }
 
         bool movingOrRotating = (characterMovement.controlSpeed > deadZone ||
-                                 Mathf.Abs(rightX) > deadZone || Mathf.Abs(rightY) > deadZone);
+                                 Mathf.Abs(rightX) > deadZone ||
+                                 Mathf.Abs(rightY) > deadZone ||
+                                 characterMovement.bouncing);
 
         UpdateLookDirectionY(rightX, rightY);
         if (movingOrRotating) { UpdateLookDirectionXZ(); }
@@ -217,7 +219,7 @@ public class CameraControl : MonoBehaviour
     private void SmoothMoveCameraToTarget() {
         // Smoothly translate to the target position.
         cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, targetCameraPosition,
-                                                  ref velocityCamSmooth, camSmoothDampTime, maxSpeed / Time.deltaTime);
+                                                  ref velocityCamSmooth, camSmoothDampTime, maxSpeed);
     }
 
     private void SmoothLookAtTarget() {
