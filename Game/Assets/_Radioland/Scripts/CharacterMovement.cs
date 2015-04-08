@@ -10,18 +10,19 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Range(0f, 20f)] private float maxWalkSpeed = 8f;
     [SerializeField] private AnimationCurve runSpeedCurve;
     [SerializeField] [Range(0f, 100f)] private float gravity = 30f;
-    [SerializeField] [Range(0f, 10f)] private float jumpHeight = 2.0f;
+    [SerializeField] [Range(0f, 10f)] private float jumpHeight = 3.0f;
     [SerializeField] [Tooltip("Extra time to become grounded before jumping.")]
     private float jumpPreTimeout = 0.1f;
     [SerializeField] [Tooltip("Extra time to jump after starting to fall.")]
     private float jumpPostTimeout = 0.3f;
     [SerializeField] private float jumpCooldown = 0.5f;
-    [SerializeField] private float jumpWindupTime = 0.1f;
-    [SerializeField] [Tooltip("Look-ahead time to start landing animation.")]
+    [SerializeField] [Range(0f, 0.5f)] private float jumpWindupTime = 0.1f;
+    [SerializeField] [Range(0f, 0.5f)] private float doubleJumpWindupTime = 0.2f;
+    [SerializeField] [Tooltip("Look-ahead time to start landing animation.")] [Range(0f, 1.0f)]
     private float landingTime = 0.2f;
-    [SerializeField] [Tooltip("Start sliding when the slope exceeds this (degrees).")]
+    [SerializeField] [Tooltip("Start sliding when the slope exceeds this (degrees).")] [Range(0f, 90f)]
     private float slideSlopeLimit = 60f;
-    [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")]
+    [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")] [Range(0f, 90f)]
     private float jumpSlopeLimit = 75f;
     [SerializeField] private float slideSpeed = 5f;
     [SerializeField] [Tooltip("Time required to start being classified as falling.")]
@@ -41,6 +42,7 @@ public class CharacterMovement : MonoBehaviour
     public bool running { get; private set; }
     public bool inJumpWindup { get; private set; }
     public bool jumping { get; private set; }
+    public bool doubleJumping { get; private set; }
     public bool bouncing { get; private set; }
     public bool sliding { get; private set; }
     public bool grounded { get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; } }
@@ -71,7 +73,7 @@ public class CharacterMovement : MonoBehaviour
     private const float slopeRayDistance = 0.1f;
     private Vector3 contactPoint;
     private float slopeAngle;
-    private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * gravity); } }
+    private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * originalGravity); } }
     private float leftX;
     private float leftY;
     #endregion Collision, jumping, sliding, bouncing, and input.
@@ -280,16 +282,22 @@ public class CharacterMovement : MonoBehaviour
             }
             jumping = false;
             jumpCount = 0;
+            doubleJumping = false;
             animator.SetBool(landingHash, false);
         } else {
             if (Time.time - lastGroundedTime > fallingTime && verticalSpeed < 0.0f) {
                 falling = true;
             }
 
-            if (bouncing && bounceTrajectory) {
+            if ((bouncing && bounceTrajectory) || inJumpWindup) {
                 // Gravity is already accounted for.
             } else {
-                verticalSpeed -= gravity * Time.deltaTime;
+                // Use modified gravity only when moving down.
+                if (verticalSpeed > 0) {
+                    verticalSpeed -= originalGravity * Time.deltaTime;
+                } else {
+                    verticalSpeed -= gravity * Time.deltaTime;
+                }
             }
 
             if (jumping && !bouncing || Time.time - lastBouncedTime < minimumBounceTime) {
@@ -333,28 +341,27 @@ public class CharacterMovement : MonoBehaviour
             Time.time > lastJumpTime + jumpCooldown) {
             // PostTimeout lets you trigger a jump slightly after starting to fall.
             if (!jumping && (grounded || (Time.time < lastGroundedTime + jumpPostTimeout))) {
-                lastJumpTime = Time.time;
-                inJumpWindup = true;
-                jumpCount = 1;
+                StartJump();
                 Messenger.Broadcast("JumpStarted");
             } else if (jumpCount == 1 || (!jumping && falling)) {
+                if (!jumping) { jumpCount = 1; }
                 // Double Jump.
+                StartJump();
                 if (!jumping) {
                     jumping = true;
-                    Messenger.Broadcast("JumpStarted");
                     Messenger.Broadcast("Jump");
                 }
-                lastJumpTime = Time.time;
-                jumpCount = 2;
-                verticalSpeed = jumpVerticalSpeed;
+                verticalSpeed = 0f;
+                doubleJumping = true;
                 Messenger.Broadcast("DoubleJumpStarted");
             }
         }
 
-        if (inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
+        if (inJumpWindup && ((jumpCount == 0 && Time.time - lastJumpTime > jumpWindupTime) ||
+                             (jumpCount >= 2 && Time.time - lastJumpTime > doubleJumpWindupTime))) {
             inJumpWindup = false;
             jumping = true;
-            jumpCount = 1;
+            jumpCount++;
             verticalSpeed = jumpVerticalSpeed;
 
             Messenger.Broadcast("Jump");
@@ -365,6 +372,14 @@ public class CharacterMovement : MonoBehaviour
         lastJumpInputTime = Time.time;
         Messenger.Broadcast("JumpTriggered");
         Messenger.Broadcast("InputReceived");
+    }
+
+    private void StartJump() {
+        lastJumpTime = Time.time;
+        inJumpWindup = true;
+        jumpCount++;
+        Messenger.Broadcast("JumpStarted");
+
     }
 
     public void Bounce(float bounceSpeed) {

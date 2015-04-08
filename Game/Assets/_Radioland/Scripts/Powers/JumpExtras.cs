@@ -4,28 +4,46 @@ using System.Collections.Generic;
 
 public class JumpExtras : MonoBehaviour
 {
+    #region Editor-specified values.
     [SerializeField] private float timeToMinGravity = 1f;
+    [SerializeField] private AnimationCurve lowGravityStrength = AnimationCurve.Linear(0f, 0f, 1f, 1f);
     [SerializeField] private float minGravity = 3f;
     [SerializeField] private float newSmoothDampTimes = 1f;
     [SerializeField] private List<TrailRenderer> trails;
+    [SerializeField] private Color doubleJumpColor;
+    [SerializeField] private Color lowGravityColor;
+    #endregion Editor-specified values.
 
+    #region Mechanics.
     private CharacterMovement characterMovement;
     private float initialGravity;
     private float initialGroundSmoothDampTime;
     private float initialAirSmoothDampTime;
     private float timeHeld;
     private float lastTimeLanded;
+    #endregion Mechanics.
 
+    #region Animation.
     private Animator animator;
     private int longJumpHash;
     private int highJumpHash;
     private int doubleJumpHash;
+    #endregion Animation.
 
-    private float trailTintAlpha;
-    private const float trailFadeInTime = 2f;
-    private const float trailFadeOutTime = 0.2f;
-    private float trailSmoothing = 0f;
+    #region Trail color and fading.
+    private float trailDoubleJumpStrength;
+    private float trailLowGravityStrength;
+    private HSBColor doubleJumpColorHSB;
+    private HSBColor lowGravityColorHSB;
+    private const float trailDoubleJumpFadeInTime = 0.2f;
+    private const float trailDoubleJumpFadeOutTime = 0.2f;
+    private const float trailLowGravityFadeInTime = 0.5f;
+    private const float trailLowGravityFadeOutTime = 0.1f;
+    private float trailDoubleJumpSmoothing = 0f;
+    private float trailLowGravitySmoothing = 0f;
     private const float trailDeactivateTime = 1.5f;
+    private bool doubleJumpIncreasing;
+    #endregion Trail color and fading.
 
     private void Awake() {
         characterMovement = gameObject.GetComponent<CharacterMovement>();
@@ -38,7 +56,10 @@ public class JumpExtras : MonoBehaviour
         highJumpHash = Animator.StringToHash("HighJump");
         doubleJumpHash = Animator.StringToHash("DoubleJump");
 
-        trailTintAlpha = 0f;
+        trailDoubleJumpStrength = 0f;
+        trailLowGravityStrength = 0f;
+        doubleJumpColorHSB = new HSBColor(doubleJumpColor);
+        lowGravityColorHSB = new HSBColor(lowGravityColor);
 
         Messenger.AddListener<float>("Grounded", OnGrounded);
         Messenger.AddListener("JumpStarted", OnJumpStarted);
@@ -61,16 +82,32 @@ public class JumpExtras : MonoBehaviour
         }
         timeHeld = Mathf.Clamp(timeHeld, 0f, timeToMinGravity);
 
-        float t = timeHeld / timeToMinGravity;
+        float t = lowGravityStrength.Evaluate(timeHeld / timeToMinGravity); // range [0,1]
         if (t >= 1) { animator.SetBool(longJumpHash, true); }
         characterMovement.SetGravity(Mathf.Lerp(initialGravity, minGravity, t));
         characterMovement.SetGroundSmoothDampTime(Mathf.Lerp(initialGroundSmoothDampTime, newSmoothDampTimes, t));
         characterMovement.SetAirSmoothDampTime(Mathf.Lerp(initialAirSmoothDampTime, newSmoothDampTimes, t));
 
-        // Tint trails.
-        trailTintAlpha = holdingJump ? Mathf.SmoothDamp(trailTintAlpha, t, ref trailSmoothing, trailFadeInTime) :
-                                       Mathf.SmoothDamp(trailTintAlpha, t, ref trailSmoothing, trailFadeOutTime);
-        Color tintColor = new Color(1f, 1f, 1f, trailTintAlpha);
+        // Tint and fade in trails.
+        trailDoubleJumpStrength = doubleJumpIncreasing ?
+                Mathf.SmoothDamp(trailDoubleJumpStrength, 1f, ref trailDoubleJumpSmoothing, trailDoubleJumpFadeInTime) :
+                Mathf.SmoothDamp(trailDoubleJumpStrength, 0f, ref trailDoubleJumpSmoothing, trailDoubleJumpFadeOutTime);
+        if (trailDoubleJumpStrength >= 0.99f) { doubleJumpIncreasing = false; }
+        if (doubleJumpIncreasing) {
+            trailLowGravityStrength =
+                    Mathf.SmoothDamp(trailLowGravityStrength, 0, ref trailLowGravitySmoothing, trailLowGravityFadeOutTime);
+        } else {
+            trailLowGravityStrength = holdingJump ?
+                    Mathf.SmoothDamp(trailLowGravityStrength, t, ref trailLowGravitySmoothing, trailLowGravityFadeInTime) :
+                    Mathf.SmoothDamp(trailLowGravityStrength, t, ref trailLowGravitySmoothing, trailLowGravityFadeOutTime);
+        }
+
+        float totalStrength = trailDoubleJumpStrength + trailLowGravityStrength;
+        float fractionLowGravity = trailLowGravityStrength / totalStrength;
+
+        HSBColor lerpedColor = HSBColor.Lerp(doubleJumpColorHSB, lowGravityColorHSB, fractionLowGravity);
+        Color tintColor = lerpedColor.ToColor();
+        tintColor.a = totalStrength;
         foreach (TrailRenderer trail in trails) {
             if (characterMovement.grounded && Time.time - lastTimeLanded > trailDeactivateTime) {
                 trail.enabled = false;
@@ -86,6 +123,7 @@ public class JumpExtras : MonoBehaviour
         timeHeld = 0f;
         animator.SetBool(longJumpHash, false);
         animator.SetBool(highJumpHash, false);
+        doubleJumpIncreasing = false;
     }
 
     private void OnJumpStarted() {
@@ -95,5 +133,6 @@ public class JumpExtras : MonoBehaviour
     private void OnDoubleJumpStarted() {
         animator.SetBool(highJumpHash, true);
         animator.SetTrigger(doubleJumpHash);
+        doubleJumpIncreasing = true;
     }
 }
