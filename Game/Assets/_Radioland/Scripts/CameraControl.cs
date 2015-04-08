@@ -14,7 +14,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private CharacterMovement characterMovement;
     private Camera cameraComponent;
 
-    // Distances from the player.
+    #region Distances from the player.
     [Header("Positioning and zooming")]
     [SerializeField] [Range(2.0f, 30.0f)] private float defaultRadius = 10.0f;
     [SerializeField] private float minRadius = 4f;
@@ -26,6 +26,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float minAngleUp = -50f;
     [SerializeField] private float maxAngleUp= 80.0f;
     private float angleUp;
+    #endregion Distances from the player.
 
     [Header("Auto zoom")]
     [SerializeField] private bool useAutoZoom = true;
@@ -45,6 +46,8 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private LayerMask cameraBlockLayers;
     private Vector3 nearClipDimensions = Vector3.zero; // width, height, radius
     private Vector3[] viewFrustum;
+    private bool blocked;
+    private Vector3 blockTargetPosition;
 
     // Camera speeds (controller and mouse free look as well as default orbit).
     [Header("Speeds")]
@@ -138,19 +141,22 @@ public class CameraControl : MonoBehaviour
         HandleReset(); // Fixes look rotations while in effect.
 
         UpdateRadius();
-
-        SetTargetPosition();
+        UpdateAutoZoom();
 
         if (movingOrRotating) {
+            // Adjust followTransform's local position based on character speed and lookahead distance.
             SmoothMoveFollowTransform();
         } else {
             aimAheadSmooth = 0;
         }
-        SmoothLookAtTarget();
+        // Set targetCameraPosition based on look angles/radius, centered on followTransform.
+        SetTargetPosition();
+        // Move the camera towards targetCameraPosition.
         SmoothMoveCameraToTarget();
+        // Move lookLerpTransform towards followTransform.
+        SmoothLookAtTarget();
 
         CompensateForWalls(playerTransform.position, ref targetCameraPosition);
-        UpdateAutoZoom();
 
         cameraTransform.LookAt(lookLerpTransform);
     }
@@ -201,6 +207,13 @@ public class CameraControl : MonoBehaviour
                                            Mathf.Sin(angleUpRadians),
                                            Mathf.Sin(xzAngle) * Mathf.Cos(angleUpRadians)) * radius;
         targetCameraPosition = followTransform.position + targetOffset;
+
+        // Commented out: camera gets stuck with this.
+//        if (blocked) {
+//            targetCameraPosition = blockTargetPosition;
+//        } else {
+//            targetCameraPosition = followTransform.position + targetOffset;
+//        }
         Debug.DrawLine(followTransform.position, followTransform.position + targetOffset, Color.white);
     }
 
@@ -297,9 +310,12 @@ public class CameraControl : MonoBehaviour
         RaycastHit wallHit = new RaycastHit();
         Vector3 direction = Vector3.Normalize(toTarget - fromObject);
         if (Physics.Raycast(fromObject, direction, out wallHit,
-                            defaultRadius, cameraBlockLayers)) {
+            radius, cameraBlockLayers)) {
             Debug.DrawRay(wallHit.point, wallHit.normal, Color.red);
-            toTarget = wallHit.point;
+            blockTargetPosition = wallHit.point;
+            blocked = true;
+        } else {
+            blocked = false;
         }
 
         // Compensate for geometry intersecting with near clip plane.
@@ -328,7 +344,7 @@ public class CameraControl : MonoBehaviour
                     }
                 }
 
-                toTarget += (compensationOffset * normal);
+                blockTargetPosition += (compensationOffset * normal);
                 cameraTransform.position += toTarget;
 
                 // Recalculate positions of near clip plane.
@@ -337,6 +353,13 @@ public class CameraControl : MonoBehaviour
         }
 
         cameraTransform.position = camPosCache;
+
+        // Commented out: camera snaps to avoid walls very quickly with this.
+//        if (blocked) {
+//            cameraTransform.position = blockTargetPosition;
+//        } else {
+//            cameraTransform.position = camPosCache;
+//        }
     }
 
     private void HandleReset() {
