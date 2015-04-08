@@ -41,6 +41,7 @@ public class CharacterMovement : MonoBehaviour
     public bool running { get; private set; }
     public bool inJumpWindup { get; private set; }
     public bool jumping { get; private set; }
+    public bool doubleJumping { get; private set; }
     public bool bouncing { get; private set; }
     public bool sliding { get; private set; }
     public bool grounded { get { return (collisionFlags & CollisionFlags.CollidedBelow) != 0; } }
@@ -280,6 +281,7 @@ public class CharacterMovement : MonoBehaviour
             }
             jumping = false;
             jumpCount = 0;
+            doubleJumping = false;
             animator.SetBool(landingHash, false);
         } else {
             if (Time.time - lastGroundedTime > fallingTime && verticalSpeed < 0.0f) {
@@ -346,6 +348,7 @@ public class CharacterMovement : MonoBehaviour
                 }
                 lastJumpTime = Time.time;
                 jumpCount = 2;
+                doubleJumping = true;
                 verticalSpeed = jumpVerticalSpeed;
                 Messenger.Broadcast("DoubleJumpStarted");
             }
