@@ -14,7 +14,6 @@ public class RadioControl : MonoBehaviour
     public float currentFrequency { get { return m_currentFrequency; } }
 
     // Private variables set in the inspector.
-    [SerializeField] private PowerupManager powerupManager;
     [SerializeField] private float frequencySweepTime = 3.0f;
     [SerializeField] private float knobTurnRatio = 4.0f;
     [Tooltip("Plays when seeking between stations.")]
@@ -42,12 +41,6 @@ public class RadioControl : MonoBehaviour
     private float lastIncreaseVolume;
 
     private void Awake() {
-        if (!powerupManager) {
-            Debug.LogWarning("[UI] Please set PowerupManager for RadioControl.");
-        } else {
-            powerupManager.SetRadioControl(this);
-        }
-
         if (!staticSource) {
             Debug.LogWarning("[Audio] Please set the staticSource for RadioControl.");
         } else {
@@ -130,31 +123,14 @@ public class RadioControl : MonoBehaviour
             radioUI.SetKnobRotation(rotationDegrees);
         }
 
-        // Trigger powerups.
-        /*
-        if (Input.GetButtonDown("UsePower")) {
-            foreach (RadioStation station in stations) {
-                if (station.signalStrength > powerupMinSignalStrength) {
-                    station.UsePowerup();
-                }
-            }
-
-            foreach (RadioUI radioUI in radioUIs) {
-                radioUI.TriggerActivity();
-            }
-        }
-        */
-
         maxSignal = 0.0f;
         foreach (RadioStation station in stations) {
             maxSignal = Mathf.Max(maxSignal, station.signalStrength);
         }
 
         // Fade glow image based on max signal.
-        if (powerupManager) {
-            foreach (RadioUI radioUI in radioUIs) {
-                radioUI.SetGlow(maxSignal);
-            }
+        foreach (RadioUI radioUI in radioUIs) {
+            radioUI.SetGlow(maxSignal);
         }
 
         // Adjust the volume of the static to fill in between stations.

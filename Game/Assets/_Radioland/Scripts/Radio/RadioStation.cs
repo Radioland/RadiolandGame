@@ -19,7 +19,6 @@ public class RadioStation : MonoBehaviour
             return strength;
         }
     }
-    public Powerup powerup;
     [SerializeField] private bool m_unlocked = false;
     public bool unlocked { get { return m_unlocked; } }
     public int id;
@@ -39,8 +38,6 @@ public class RadioStation : MonoBehaviour
             Debug.LogWarning("There is no RadioControl linked to this RadioStation!");
         }
 
-        if (powerup) { powerup.radioStation = this; }
-
     }
 
     private void Update() {
@@ -56,24 +53,10 @@ public class RadioStation : MonoBehaviour
         if (stream) {
             stream.volume = signalStrength * maxVolume;
         }
-
-        // End if the station signal is no longer strong enough.
-        if (powerup && powerup.primed && !powerup.inUse &&
-            (signalStrength < radioControl.powerupMinSignalStrength)) {
-            //powerup.EndPowerup();
-        }
     }
 
     public bool StrongSignal() {
         return signalStrength > radioControl.powerupMinSignalStrength;
-    }
-
-    public void UsePowerup() {
-        if (powerup && unlocked) {
-            powerup.TryToUsePowerup();
-        } else {
-            Debug.LogWarning("Found no powerup for " + this.GetPath());
-        }
     }
 
     public void Unlock() {
