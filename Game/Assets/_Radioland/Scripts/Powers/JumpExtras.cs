@@ -6,6 +6,7 @@ public class JumpExtras : MonoBehaviour
 {
     #region Editor-specified values.
     [SerializeField] private float timeToMinGravity = 1f;
+    [SerializeField] private AnimationCurve lowGravityStrength = AnimationCurve.Linear(0f, 0f, 1f, 1f);
     [SerializeField] private float minGravity = 3f;
     [SerializeField] private float newSmoothDampTimes = 1f;
     [SerializeField] private List<TrailRenderer> trails;
@@ -81,7 +82,7 @@ public class JumpExtras : MonoBehaviour
         }
         timeHeld = Mathf.Clamp(timeHeld, 0f, timeToMinGravity);
 
-        float t = timeHeld / timeToMinGravity; // range [0,1]
+        float t = lowGravityStrength.Evaluate(timeHeld / timeToMinGravity); // range [0,1]
         if (t >= 1) { animator.SetBool(longJumpHash, true); }
         characterMovement.SetGravity(Mathf.Lerp(initialGravity, minGravity, t));
         characterMovement.SetGroundSmoothDampTime(Mathf.Lerp(initialGroundSmoothDampTime, newSmoothDampTimes, t));

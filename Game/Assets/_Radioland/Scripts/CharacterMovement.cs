@@ -72,7 +72,7 @@ public class CharacterMovement : MonoBehaviour
     private const float slopeRayDistance = 0.1f;
     private Vector3 contactPoint;
     private float slopeAngle;
-    private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * gravity); } }
+    private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * originalGravity); } }
     private float leftX;
     private float leftY;
     #endregion Collision, jumping, sliding, bouncing, and input.
@@ -291,7 +291,12 @@ public class CharacterMovement : MonoBehaviour
             if (bouncing && bounceTrajectory) {
                 // Gravity is already accounted for.
             } else {
-                verticalSpeed -= gravity * Time.deltaTime;
+                // Use modified gravity only when moving down.
+                if (verticalSpeed > 0) {
+                    verticalSpeed -= originalGravity * Time.deltaTime;
+                } else {
+                    verticalSpeed -= gravity * Time.deltaTime;
+                }
             }
 
             if (jumping && !bouncing || Time.time - lastBouncedTime < minimumBounceTime) {
