@@ -10,18 +10,19 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] [Range(0f, 20f)] private float maxWalkSpeed = 8f;
     [SerializeField] private AnimationCurve runSpeedCurve;
     [SerializeField] [Range(0f, 100f)] private float gravity = 30f;
-    [SerializeField] [Range(0f, 10f)] private float jumpHeight = 2.0f;
+    [SerializeField] [Range(0f, 10f)] private float jumpHeight = 3.0f;
     [SerializeField] [Tooltip("Extra time to become grounded before jumping.")]
     private float jumpPreTimeout = 0.1f;
     [SerializeField] [Tooltip("Extra time to jump after starting to fall.")]
     private float jumpPostTimeout = 0.3f;
     [SerializeField] private float jumpCooldown = 0.5f;
-    [SerializeField] private float jumpWindupTime = 0.1f;
-    [SerializeField] [Tooltip("Look-ahead time to start landing animation.")]
+    [SerializeField] [Range(0f, 0.5f)] private float jumpWindupTime = 0.1f;
+    [SerializeField] [Range(0f, 0.5f)] private float doubleJumpWindupTime = 0.2f;
+    [SerializeField] [Tooltip("Look-ahead time to start landing animation.")] [Range(0f, 1.0f)]
     private float landingTime = 0.2f;
-    [SerializeField] [Tooltip("Start sliding when the slope exceeds this (degrees).")]
+    [SerializeField] [Tooltip("Start sliding when the slope exceeds this (degrees).")] [Range(0f, 90f)]
     private float slideSlopeLimit = 60f;
-    [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")]
+    [SerializeField] [Tooltip("Prevent jumping when slope exceeds this (degrees).")] [Range(0f, 90f)]
     private float jumpSlopeLimit = 75f;
     [SerializeField] private float slideSpeed = 5f;
     [SerializeField] [Tooltip("Time required to start being classified as falling.")]
@@ -288,7 +289,7 @@ public class CharacterMovement : MonoBehaviour
                 falling = true;
             }
 
-            if (bouncing && bounceTrajectory) {
+            if ((bouncing && bounceTrajectory) || inJumpWindup) {
                 // Gravity is already accounted for.
             } else {
                 // Use modified gravity only when moving down.
@@ -342,6 +343,7 @@ public class CharacterMovement : MonoBehaviour
             if (!jumping && (grounded || (Time.time < lastGroundedTime + jumpPostTimeout))) {
                 lastJumpTime = Time.time;
                 inJumpWindup = true;
+                controllable = false;
                 jumpCount = 1;
                 Messenger.Broadcast("JumpStarted");
             } else if (jumpCount == 1 || (!jumping && falling)) {
@@ -351,18 +353,22 @@ public class CharacterMovement : MonoBehaviour
                     Messenger.Broadcast("JumpStarted");
                     Messenger.Broadcast("Jump");
                 }
+                verticalSpeed = 0f;
                 lastJumpTime = Time.time;
+                inJumpWindup = true;
                 jumpCount = 2;
                 doubleJumping = true;
-                verticalSpeed = jumpVerticalSpeed;
+                controllable = false;
                 Messenger.Broadcast("DoubleJumpStarted");
             }
         }
 
-        if (inJumpWindup && Time.time - lastJumpTime > jumpWindupTime) {
+        if (inJumpWindup && ((jumpCount == 0 && Time.time - lastJumpTime > jumpWindupTime) ||
+                             (jumpCount >= 2 && Time.time - lastJumpTime > doubleJumpWindupTime))) {
+            controllable = true;
             inJumpWindup = false;
             jumping = true;
-            jumpCount = 1;
+            jumpCount += 1;
             verticalSpeed = jumpVerticalSpeed;
 
             Messenger.Broadcast("Jump");

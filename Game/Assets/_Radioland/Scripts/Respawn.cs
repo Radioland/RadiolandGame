@@ -10,7 +10,6 @@ public class Respawn : MonoBehaviour
     [SerializeField] private GameObject respawnPrefab;
     [SerializeField] private EffectManager respawnEffects;
     [SerializeField] private float respawnTime = 8.0f;
-    [SerializeField] private bool refillEnergy = true;
 
     [SerializeField] private TurnScriptsOnOffEffect scriptsDisableEffect;
     [SerializeField] private SetActiveEffect playerDisableEffect;
@@ -19,7 +18,6 @@ public class Respawn : MonoBehaviour
 
     private GameObject player;
     private CharacterMovement characterMovement;
-    private PowerupManager powerupManager;
     private bool respawning;
 
     private void Awake() {
@@ -27,7 +25,6 @@ public class Respawn : MonoBehaviour
 
         player = GameObject.FindWithTag("Player");
         characterMovement = player.GetComponent<CharacterMovement>();
-        powerupManager = player.GetComponent<PowerupManager>();
 
         GameObject hairObject = GameObject.FindWithTag("hair");
         Hair hairScript = hairObject.GetComponent<Hair>();
@@ -69,11 +66,7 @@ public class Respawn : MonoBehaviour
     private void FinishRespawn() {
         respawning = false;
 
-        if (refillEnergy) {
-            powerupManager.energy = 1.0f;
-        }
         characterMovement.ResetState();
         characterMovement.Stop();
-        powerupManager.StopAnyPowerups();
     }
 }
