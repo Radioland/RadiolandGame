@@ -37,7 +37,7 @@ public class CollectiblesManager : MonoBehaviour
             collectibleTotals[type] = collectibleGroups[type].Count;
         }
 
-        var sortedGroups = collectibleGroups.Values.OrderBy(group => group[0].sortPriority);
+        var sortedGroups = collectibleGroups.Values.OrderByDescending(group => group[0].sortPriority);
         foreach (List<Collectible> collectibles in sortedGroups) {
             string type = collectibles[0].type;
 
