@@ -13,5 +13,12 @@
 *.pidb
 *.booproj
 
-#Unity3D Generated File On Crash Reports
+# Unity3D Generated File On Crash Reports
 sysinfo.txt
+
+# Baked lightmap files
+# These are large binaries or text files with frequently changing timestamps
+LightmapSnapshot.*
+SkyboxProbe-*
+
+Game/screenshots/*
