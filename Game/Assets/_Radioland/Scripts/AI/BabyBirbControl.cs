@@ -2,7 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(AIMovement))]
-public class BabyBirbControl : MonoBehaviour
+public class BabyBirbControl : Collectible
 {
     private enum BirbState
     {
@@ -149,6 +149,7 @@ public class BabyBirbControl : MonoBehaviour
 
             SetState(BirbState.Chasing);
             if (activationEffects) { activationEffects.StartEvent(); }
+            Collect();
         }
     }
 
