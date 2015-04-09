@@ -66,5 +66,9 @@ public class CollectiblesManager : MonoBehaviour
         collectedCounts[type]++;
 
         collectibleTexts[type].text = collectedCounts[type] + "/" + collectibleTotals[type];
+
+        if (collectedCounts[type] == collectibleTotals[type]) {
+            Messenger.Broadcast("FinishedCollecting", type);
+        }
     }
 }

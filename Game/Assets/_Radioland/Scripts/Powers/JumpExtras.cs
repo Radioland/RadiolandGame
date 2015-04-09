@@ -65,6 +65,7 @@ public class JumpExtras : MonoBehaviour
         Messenger.AddListener<float>("Grounded", OnGrounded);
         Messenger.AddListener("JumpStarted", OnJumpStarted);
         Messenger.AddListener("DoubleJumpStarted", OnDoubleJumpStarted);
+        Messenger.AddListener<string>("FinishedCollecting", OnFinishedCollecting);
     }
 
     private void Start() {
@@ -135,5 +136,11 @@ public class JumpExtras : MonoBehaviour
         animator.SetBool(highJumpHash, true);
         animator.SetTrigger(doubleJumpHash);
         doubleJumpIncreasing = true;
+    }
+
+    private void OnFinishedCollecting(string type) {
+        if (type == "babybirb") {
+            lowGravityEnabled = true;
+        }
     }
 }
