@@ -12,6 +12,7 @@ public class JumpExtras : MonoBehaviour
     [SerializeField] private List<TrailRenderer> trails;
     [SerializeField] private Color doubleJumpColor;
     [SerializeField] private Color lowGravityColor;
+    [SerializeField] private bool lowGravityEnabled;
     #endregion Editor-specified values.
 
     #region Mechanics.
@@ -75,7 +76,7 @@ public class JumpExtras : MonoBehaviour
     private void Update() {
         bool holdingJump = ((characterMovement.jumping || characterMovement.falling)
                              && Input.GetButton("Jump"));
-        if (holdingJump) {
+        if (holdingJump && lowGravityEnabled) {
             timeHeld += Time.deltaTime;
         } else {
             timeHeld -= Time.deltaTime;
