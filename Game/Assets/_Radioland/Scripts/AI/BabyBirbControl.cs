@@ -9,6 +9,7 @@ public class BabyBirbControl : Collectible
         Perched, Wander, Chasing
     }
 
+    [Header("BabyBirb Settings")]
     [SerializeField] private BirbState state;
 
     [Header("Activation")]
