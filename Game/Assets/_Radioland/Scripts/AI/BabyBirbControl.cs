@@ -2,13 +2,14 @@
 using System.Collections;
 
 [RequireComponent(typeof(AIMovement))]
-public class BabyBirbControl : MonoBehaviour
+public class BabyBirbControl : Collectible
 {
     private enum BirbState
     {
         Perched, Wander, Chasing
     }
 
+    [Header("BabyBirb Settings")]
     [SerializeField] private BirbState state;
 
     [Header("Activation")]
@@ -149,6 +150,7 @@ public class BabyBirbControl : MonoBehaviour
 
             SetState(BirbState.Chasing);
             if (activationEffects) { activationEffects.StartEvent(); }
+            Collect();
         }
     }
 
