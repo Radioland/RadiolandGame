@@ -32,7 +32,7 @@ public class CollectiblesManager : MonoBehaviour
 
         Debug.Log("Types of collectibleGroups found: " + collectibleGroups.Count);
 
-        Messenger.AddListener<string>("CollectObject", OnCollectObject);
+        Messenger.AddListener<string, bool>("CollectObject", OnCollectObject);
     }
 
     private void Start() {
@@ -43,7 +43,7 @@ public class CollectiblesManager : MonoBehaviour
 
     }
 
-    private void OnCollectObject(string type) {
+    private void OnCollectObject(string type, bool playAnim) {
         Debug.Log("Collected " + type);
         collectedCounts[type]++;
     }

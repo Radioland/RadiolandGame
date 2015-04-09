@@ -6,6 +6,7 @@ public class Collectible : MonoBehaviour
 {
     public Sprite image;
     public string type;
+    public bool playAnim;
 
     private void Awake() {
 
@@ -19,7 +20,7 @@ public class Collectible : MonoBehaviour
 
     }
 
-    protected void Collect() {
-        Messenger.Broadcast("CollectObject", type);
+    public void Collect() {
+        Messenger.Broadcast("CollectObject", type, playAnim);
     }
 }

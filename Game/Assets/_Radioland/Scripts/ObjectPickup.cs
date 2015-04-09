@@ -9,7 +9,6 @@ public class ObjectPickup : MonoBehaviour {
     private int pickupStateHash;
     private CharacterMovement characterMovement;
     private bool pickingUp;
-    //private GameObject objectiveGUI;
 
     private void Awake() {
         animator = gameObject.GetComponentInChildren<Animator>();
@@ -18,20 +17,12 @@ public class ObjectPickup : MonoBehaviour {
         pickingUp = false;
 
         characterMovement = gameObject.GetComponent<CharacterMovement>();
+
+        Messenger.AddListener<string, bool>("CollectObject", OnCollectObject);
     }
 
     private void Start() {
 
-    }
-
-    private void OnTriggerEnter(Collider c) {
-        if (c.gameObject.tag == "pickupable") {
-            if (pickupEffects) {
-                pickupEffects.StartEvent();
-            }
-
-            animator.SetTrigger(pickupTriggerHash);
-        }
     }
 
     private void Update() {
@@ -52,4 +43,11 @@ public class ObjectPickup : MonoBehaviour {
         }
     }
 
+    private void OnCollectObject(string type, bool playAnim) {
+        if (!playAnim) { return; }
+
+        if (pickupEffects) { pickupEffects.StartEvent(); }
+
+        animator.SetTrigger(pickupTriggerHash);
+    }
 }

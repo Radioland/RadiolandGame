@@ -32,6 +32,8 @@ public class AudioOneShotEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
+        if (!audioClip) { return; }
+
         if (playAtPoint) {
             AudioSource.PlayClipAtPoint(audioClip, transform.position, volumeScale);
         } else {
