@@ -15,6 +15,7 @@ public class StationPower : MonoBehaviour
     }
 
     [SerializeField] private StationChoice stationChoice = StationChoice.Any;
+    [SerializeField] private bool stopOnAwake = true;
     [SerializeField] [Tooltip("Enable when powered, disable without power.")]
     private List<MonoBehaviour> powerBehaviors;
     [SerializeField] private UnityEvent unlockEvents;
@@ -43,7 +44,7 @@ public class StationPower : MonoBehaviour
     }
 
     private void Start() {
-        if (enabled) {
+        if (enabled && stopOnAwake) {
             StopPower(stopEvenIfAlreadyStopped:true);
         }
     }

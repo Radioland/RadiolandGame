@@ -37,7 +37,6 @@ public class RadioStation : MonoBehaviour
         if (!radioControl) {
             Debug.LogWarning("There is no RadioControl linked to this RadioStation!");
         }
-
     }
 
     private void Update() {
