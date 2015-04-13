@@ -9,7 +9,8 @@ public class CharacterMovement : MonoBehaviour
     #region Movement characteristic values to specify in the editor.
     [SerializeField] [Range(0f, 20f)] private float maxWalkSpeed = 8f;
     [SerializeField] private AnimationCurve runSpeedCurve;
-    [SerializeField] [Range(0f, 100f)] private float gravity = 30f;
+    [SerializeField] [Range(0f, 100f)] private float gravity = 25f;
+    [SerializeField] [Range(0f, 100f)] private float gravityUp = 40f;
     [SerializeField] [Range(0f, 10f)] private float jumpHeight = 3.0f;
     [SerializeField] [Tooltip("Extra time to become grounded before jumping.")]
     private float jumpPreTimeout = 0.1f;
@@ -73,7 +74,7 @@ public class CharacterMovement : MonoBehaviour
     private const float slopeRayDistance = 0.1f;
     private Vector3 contactPoint;
     private float slopeAngle;
-    private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * originalGravity); } }
+    private float jumpVerticalSpeed { get { return Mathf.Sqrt(2 * jumpHeight * gravityUp); } }
     private float leftX;
     private float leftY;
     #endregion Collision, jumping, sliding, bouncing, and input.
@@ -292,9 +293,8 @@ public class CharacterMovement : MonoBehaviour
             if ((bouncing && bounceTrajectory) || inJumpWindup) {
                 // Gravity is already accounted for.
             } else {
-                // Use modified gravity only when moving down.
                 if (verticalSpeed > 0) {
-                    verticalSpeed -= originalGravity * Time.deltaTime;
+                    verticalSpeed -= gravityUp * Time.deltaTime;
                 } else {
                     verticalSpeed -= gravity * Time.deltaTime;
                 }
@@ -342,7 +342,6 @@ public class CharacterMovement : MonoBehaviour
             // PostTimeout lets you trigger a jump slightly after starting to fall.
             if (!jumping && (grounded || (Time.time < lastGroundedTime + jumpPostTimeout))) {
                 StartJump();
-                Messenger.Broadcast("JumpStarted");
             } else if (jumpCount == 1 || (!jumping && falling)) {
                 // Double Jump.
                 StartJump();

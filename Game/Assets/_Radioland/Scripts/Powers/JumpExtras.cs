@@ -5,14 +5,18 @@ using System.Collections.Generic;
 public class JumpExtras : MonoBehaviour
 {
     #region Editor-specified values.
+    [Header("Low Gravity (Floating)")]
     [SerializeField] private float timeToMinGravity = 1f;
     [SerializeField] private AnimationCurve lowGravityStrength = AnimationCurve.Linear(0f, 0f, 1f, 1f);
     [SerializeField] private float minGravity = 3f;
     [SerializeField] private float newSmoothDampTimes = 1f;
+    [SerializeField] private bool lowGravityEnabled;
+    [Header("Effects")]
     [SerializeField] private List<TrailRenderer> trails;
     [SerializeField] private Color doubleJumpColor;
     [SerializeField] private Color lowGravityColor;
-    [SerializeField] private bool lowGravityEnabled;
+    [SerializeField] private EffectManager jumpEffects;
+    [SerializeField] private EffectManager doubleJumpEffects;
     #endregion Editor-specified values.
 
     #region Mechanics.
@@ -113,8 +117,10 @@ public class JumpExtras : MonoBehaviour
         foreach (TrailRenderer trail in trails) {
             if (characterMovement.grounded && Time.time - lastTimeLanded > trailDeactivateTime) {
                 trail.enabled = false;
+                trail.gameObject.SetActive(false);
             } else {
                 trail.enabled = true;
+                trail.gameObject.SetActive(true);
             }
             trail.material.SetColor("_TintColor", tintColor);
         }
@@ -129,13 +135,19 @@ public class JumpExtras : MonoBehaviour
     }
 
     private void OnJumpStarted() {
-        // TODO: jump effects? sounds, particles?
+        if (jumpEffects) {
+            jumpEffects.StartEvent();
+        }
     }
 
     private void OnDoubleJumpStarted() {
         animator.SetBool(highJumpHash, true);
         animator.SetTrigger(doubleJumpHash);
         doubleJumpIncreasing = true;
+
+        if (doubleJumpEffects) {
+            doubleJumpEffects.StartEvent();
+        }
     }
 
     private void OnFinishedCollecting(string type) {

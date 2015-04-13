@@ -15,8 +15,10 @@ public class StationPower : MonoBehaviour
     }
 
     [SerializeField] private StationChoice stationChoice = StationChoice.Any;
+    [SerializeField] private bool stopOnAwake = true;
     [SerializeField] [Tooltip("Enable when powered, disable without power.")]
     private List<MonoBehaviour> powerBehaviors;
+    [SerializeField] private UnityEvent unlockEvents;
     [SerializeField] private UnityEvent startPowerEvents;
     [SerializeField] private UnityEvent stopPowerEvents;
     [SerializeField] private UnityEventFloat continuousEvents;
@@ -37,10 +39,12 @@ public class StationPower : MonoBehaviour
                 radioStation = station;
             }
         }
+
+        Messenger.AddListener<int>("UnlockStation", OnUnlockStation);
     }
 
     private void Start() {
-        if (enabled) {
+        if (enabled && stopOnAwake) {
             StopPower(stopEvenIfAlreadyStopped:true);
         }
     }
@@ -64,6 +68,15 @@ public class StationPower : MonoBehaviour
             }
 
             continuousEvents.Invoke(radioStation.signalStrength);
+        }
+    }
+
+    private void OnUnlockStation(int stationId) {
+        if ((stationChoice == StationChoice.Station_1 && stationId == 1) ||
+            (stationChoice == StationChoice.Station_2 && stationId == 2) ||
+            (stationChoice == StationChoice.Station_3 && stationId == 3) ||
+            (stationChoice == StationChoice.Any)) {
+            unlockEvents.Invoke();
         }
     }
 

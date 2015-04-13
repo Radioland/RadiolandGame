@@ -7,6 +7,7 @@ using System.Linq;
 public class CollectiblesManager : MonoBehaviour
 {
     [SerializeField] private Transform layoutPanel;
+    [SerializeField] private GameObject collectiblesUI;
     [SerializeField] private GameObject collectibleEntryPrefab;
 
     // Dictionary keys are the collectible types.
@@ -35,6 +36,10 @@ public class CollectiblesManager : MonoBehaviour
             collectibleGroups[type].Add(collectibleScript);
             collectedCounts[type] = 0;
             collectibleTotals[type] = collectibleGroups[type].Count;
+        }
+
+        if (collectibleGroups.Count > 0) {
+            collectiblesUI.SetActive(true);
         }
 
         var sortedGroups = collectibleGroups.Values.OrderByDescending(group => group[0].sortPriority);

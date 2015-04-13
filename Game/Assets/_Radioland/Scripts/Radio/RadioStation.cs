@@ -37,7 +37,6 @@ public class RadioStation : MonoBehaviour
         if (!radioControl) {
             Debug.LogWarning("There is no RadioControl linked to this RadioStation!");
         }
-
     }
 
     private void Update() {
@@ -61,5 +60,6 @@ public class RadioStation : MonoBehaviour
 
     public void Unlock() {
         m_unlocked = true;
+        Messenger.Broadcast("UnlockStation", id);
     }
 }
