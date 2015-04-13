@@ -61,5 +61,6 @@ public class RadioStation : MonoBehaviour
 
     public void Unlock() {
         m_unlocked = true;
+        Messenger.Broadcast("UnlockStation", id);
     }
 }
