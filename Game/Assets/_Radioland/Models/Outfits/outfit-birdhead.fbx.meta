@@ -17,7 +17,7 @@ ModelImporter:
     3300000: birdhead
     4300000: birdhead
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:

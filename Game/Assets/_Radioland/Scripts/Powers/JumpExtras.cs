@@ -113,8 +113,10 @@ public class JumpExtras : MonoBehaviour
         foreach (TrailRenderer trail in trails) {
             if (characterMovement.grounded && Time.time - lastTimeLanded > trailDeactivateTime) {
                 trail.enabled = false;
+                trail.gameObject.SetActive(false);
             } else {
                 trail.enabled = true;
+                trail.gameObject.SetActive(true);
             }
             trail.material.SetColor("_TintColor", tintColor);
         }
