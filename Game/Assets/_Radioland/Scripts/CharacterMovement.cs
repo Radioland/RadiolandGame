@@ -342,7 +342,6 @@ public class CharacterMovement : MonoBehaviour
             // PostTimeout lets you trigger a jump slightly after starting to fall.
             if (!jumping && (grounded || (Time.time < lastGroundedTime + jumpPostTimeout))) {
                 StartJump();
-                Messenger.Broadcast("JumpStarted");
             } else if (jumpCount == 1 || (!jumping && falling)) {
                 // Double Jump.
                 StartJump();
