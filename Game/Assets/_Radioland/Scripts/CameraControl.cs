@@ -48,6 +48,7 @@ public class CameraControl : MonoBehaviour
     private Vector3[] viewFrustum;
     private bool blocked;
     private Vector3 blockTargetPosition;
+    private float blockHitRadius;
 
     // Camera speeds (controller and mouse free look as well as default orbit).
     [Header("Speeds")]
@@ -156,7 +157,7 @@ public class CameraControl : MonoBehaviour
         // Move lookLerpTransform towards followTransform.
         SmoothLookAtTarget();
 
-//        CompensateForWalls(playerTransform.position, ref targetCameraPosition);
+        CompensateForWalls(playerTransform.position, ref targetCameraPosition);
 
         cameraTransform.LookAt(lookLerpTransform);
     }
@@ -198,6 +199,10 @@ public class CameraControl : MonoBehaviour
             manualTargetRadius = Mathf.Lerp(defaultRadius, maxRadius, angleUpNormalized);
         }
         radius = Mathf.Clamp(manualTargetRadius * autoRadiusFactor, minRadius, maxRadius);
+
+        if (blocked) {
+            radius = blockHitRadius;
+        }
     }
 
     private void SetTargetPosition() {
@@ -309,10 +314,10 @@ public class CameraControl : MonoBehaviour
         // Compensate for walls between camera.
         RaycastHit wallHit = new RaycastHit();
         Vector3 direction = Vector3.Normalize(toTarget - fromObject);
-        if (Physics.Raycast(fromObject, direction, out wallHit,
-            radius, cameraBlockLayers)) {
+        if (Physics.Raycast(fromObject, direction, out wallHit, radius, cameraBlockLayers)) {
             Debug.DrawRay(wallHit.point, wallHit.normal, Color.red);
             blockTargetPosition = wallHit.point;
+            blockHitRadius = wallHit.distance;
             blocked = true;
         } else {
             blocked = false;
@@ -353,12 +358,11 @@ public class CameraControl : MonoBehaviour
         }
 
         cameraTransform.position = camPosCache;
-
-        if (blocked) {
-            cameraTransform.position = blockTargetPosition;
-        } else {
-            cameraTransform.position = camPosCache;
-        }
+//        if (blocked) {
+//            cameraTransform.position = blockTargetPosition;
+//        } else {
+//            cameraTransform.position = camPosCache;
+//        }
     }
 
     private void HandleReset() {
