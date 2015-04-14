@@ -1,54 +1,36 @@
-﻿Shader "Tri-Planar Obj" {
+﻿Shader "Standard Tri-Planar Obj" {
   Properties {
+        _Color ("Color", Color) = (1,1,1,1)
         _Side("Side", 2D) = "white" {}
+        //_GlossinessSide ("Smoothness Side", Range(0,1)) = 0.5
+        //_MetallicSide ("Metallic Side", Range(0,1)) = 0.0
         _Top("Top", 2D) = "white" {}
+        //_GlossinessTop ("Smoothness Top", Range(0,1)) = 0.5
+        //_MetallicTop ("Metallic Top", Range(0,1)) = 0.0
         _Bottom("Bottom", 2D) = "white" {}
+        //_GlossinessBottom ("Smoothness Bottom", Range(0,1)) = 0.5
+        //_MetallicBottom ("Metallic Bottom", Range(0,1)) = 0.0
+
         _SideScale("Side Scale", Float) = 2
         _TopScale("Top Scale", Float) = 2
         _BottomScale ("Bottom Scale", Float) = 2
 
-        _Tint ("Tint Color", Color) = (1,1,1,0.5)
-
-        _Ramp ("Toon Ramp (RGB)", 2D) = "gray" {}
-
-        _OutlineColor ("Outline Color", Color) = (0,0,0,1)
-        _Outline ("Outline width", Range (.002, 0.03)) = .005
     }
 
     SubShader {
-        Tags {
-            "Queue"="Geometry"
-            "IgnoreProjector"="False"
-            "RenderType"="Opaque"
-        }
-
-        Cull Back
-        ZWrite On
+        Tags { "RenderType"="Opaque" }
+        LOD 200
 
         CGPROGRAM
-        #pragma surface surf ToonRamp exclude_path:prepass vertex:vert finalcolor:tint
-        #pragma exclude_renderers flash
+        #pragma surface surf Standard fullforwardshadows vertex:vert
 
+        #pragma target 3.0
+
+        fixed4 _Color;
         sampler2D _Side, _Top, _Bottom;
+        //half _GlossinessSide, _GlossinessTop, _GlossinessBottom;
+        //half _MetallicSide, _MetallicTop, _MetallicBottom;
         float _SideScale, _TopScale, _BottomScale;
-        fixed4 _Tint;
-        uniform sampler2D _Ramp;
-
-        inline half4 LightingToonRamp (SurfaceOutput s, half3 lightDir, half atten)
-        {
-            #ifndef USING_DIRECTIONAL_LIGHT
-            lightDir = normalize(lightDir);
-            #endif
-            // Wrapped lighting
-            half d = dot (s.Normal, lightDir) * 0.5 + 0.5;
-            // Applied through ramp
-            half3 ramp = tex2D (_Ramp, float2(d,d)).rgb;
-            half4 c;
-            c.rgb = s.Albedo * _LightColor0.rgb * ramp * (atten * 2);
-            c.a = 0;
-
-            return c;
-        }
 
         struct Input {
             //float3 worldPos;
@@ -57,19 +39,20 @@
             float3 objPos;
         };
 
-        void tint (Input IN, SurfaceOutput o, inout fixed4 color) {
-            color = saturate(color);
-            color *= _LightColor0 * _Tint;
-        }
-
         void vert (inout appdata_full v, out Input o) {
           UNITY_INITIALIZE_OUTPUT(Input, o);
           o.vertNormal = v.normal;
           o.objPos = v.vertex;
         }
 
-        void surf (Input IN, inout SurfaceOutput o) {
+        void surf (Input IN, inout SurfaceOutputStandard o) {
             //float3 projNormal = saturate(pow(IN.worldNormal * 1.4, 4));
+
+            //o.Smoothness = _GlossinessSide;
+            //o.Smoothness = lerp(o.Smoothness, _GlossinessSide, abs(IN.vertNormal.x));
+
+            //o.Metallic = _MetallicSide;
+            //o.Metallic = lerp(o.Metallic, _MetallicSide, abs(IN.vertNormal.x));
 
             // SIDE X
             float3 x = tex2D(_Side, frac(IN.objPos.zy * _SideScale)) * abs(IN.vertNormal.x);
@@ -78,8 +61,12 @@
             float3 y = 0;
             if (IN.vertNormal.y > 0) {
                 y = tex2D(_Top, frac(IN.objPos.zx * _TopScale)) * abs(IN.vertNormal.y);
+                //o.Smoothness = lerp(o.Smoothness, _GlossinessTop, abs(IN.vertNormal.y));
+                //o.Metallic = lerp(o.Metallic, _MetallicTop, abs(IN.vertNormal.y));
             } else {
                 y = tex2D(_Bottom, frac(IN.objPos.zx * _BottomScale)) * abs(IN.vertNormal.y);
+                //o.Smoothness = lerp(o.Smoothness, _GlossinessBottom, abs(IN.vertNormal.y));
+                //o.Metallic = lerp(o.Metallic, _MetallicBottom, abs(IN.vertNormal.y));
             }
 
             // SIDE Z
@@ -88,13 +75,14 @@
             o.Albedo = z;
             o.Albedo = lerp(o.Albedo, x, abs(IN.vertNormal.x));
             o.Albedo = lerp(o.Albedo, y, abs(IN.vertNormal.y));
+
+            o.Albedo *=  _Color;
+            
             //o.Albedo = IN.vertNormal;
             //o.Albedo = float3((IN.vertNormal.x+1)/2.0,(IN.vertNormal.y+1)/2.0,(IN.vertNormal.z+1)/2.0);
             //o.Albedo = float3(1.0-IN.vertNormal.x,1.0-IN.vertNormal.y,1.0-IN.vertNormal.z);
         }
         ENDCG
-        //UsePass "Toon/Basic Outline/OUTLINE"
     }
-    //Dependency "BaseMapShader" = "Toon/Lit Outline"
     Fallback "Diffuse"
 }
