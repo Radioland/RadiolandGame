@@ -90,9 +90,11 @@ public class JumpExtras : MonoBehaviour
 
         float t = lowGravityStrength.Evaluate(timeHeld / timeToMinGravity); // range [0,1]
         if (t >= 1) { animator.SetBool(longJumpHash, true); }
-        characterMovement.SetGravity(Mathf.Lerp(initialGravity, minGravity, t));
-        characterMovement.SetGroundSmoothDampTime(Mathf.Lerp(initialGroundSmoothDampTime, newSmoothDampTimes, t));
-        characterMovement.SetAirSmoothDampTime(Mathf.Lerp(initialAirSmoothDampTime, newSmoothDampTimes, t));
+        if (lowGravityEnabled) {
+            characterMovement.SetGravity(Mathf.Lerp(initialGravity, minGravity, t));
+            characterMovement.SetGroundSmoothDampTime(Mathf.Lerp(initialGroundSmoothDampTime, newSmoothDampTimes, t));
+            characterMovement.SetAirSmoothDampTime(Mathf.Lerp(initialAirSmoothDampTime, newSmoothDampTimes, t));
+        }
 
         // Tint and fade in trails.
         trailDoubleJumpStrength = doubleJumpIncreasing ?

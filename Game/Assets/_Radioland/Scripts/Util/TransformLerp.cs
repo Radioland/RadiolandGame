@@ -14,6 +14,7 @@ public class TransformLerp : MonoBehaviour
 
     private float currentTime;
     private float timeDamp;
+    private bool runningAuto = false;
 
     private static readonly Color defaultColor = new Color(0.6f, 0.6f, 0.6f, 0.5f);
     private static readonly Color selectedColor = new Color(0.3f, 0.5f, 0.9f, 0.5f);
@@ -40,7 +41,13 @@ public class TransformLerp : MonoBehaviour
     }
 
     private void Update() {
+        if (runningAuto) {
+            SetTime(currentTime + Time.deltaTime / duration);
+        }
+    }
 
+    public void StartAuto() {
+        runningAuto = true;
     }
 
     public void SetTime(float t) {
