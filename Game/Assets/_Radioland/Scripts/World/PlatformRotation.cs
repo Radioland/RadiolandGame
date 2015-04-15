@@ -10,6 +10,10 @@ public class PlatformRotation : MonoBehaviour {
     [SerializeField] private float rotationDegrees;
 
     private void Awake() {
+
+    }
+
+    private void Start() {
         Messenger.AddListener("JumpStarted", OnJumpStarted);
     }
 

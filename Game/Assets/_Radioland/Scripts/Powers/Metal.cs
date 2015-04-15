@@ -11,12 +11,12 @@ public class Metal : Powerup
 
     public override void Awake() {
         base.Awake();
-
-        Messenger.AddListener("BounceTriggered", OnBounceTriggered);
     }
 
     public override void Start() {
         base.Start();
+
+        Messenger.AddListener("BounceTriggered", OnBounceTriggered);
     }
 
     public override void Update() {

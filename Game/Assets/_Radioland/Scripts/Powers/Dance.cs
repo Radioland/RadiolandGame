@@ -40,14 +40,12 @@ public class Dance : MonoBehaviour
         lastInputTime = -1000.0f;
         lastInputStartedTime = -1000.0f;
         stillNoInput = true;
-
-        Messenger.AddListener("InputReceived", OnInputReceived);
-        Messenger.AddListener("JumpTriggered", OnJumpTriggered);
-        Messenger.AddListener("NoMovementInput", OnNoMovementInput);
     }
 
     private void Start() {
-
+        Messenger.AddListener("InputReceived", OnInputReceived);
+        Messenger.AddListener("JumpTriggered", OnJumpTriggered);
+        Messenger.AddListener("NoMovementInput", OnNoMovementInput);
     }
 
     private void Update() {

@@ -15,7 +15,9 @@ public class PlatformFlip180 : MonoBehaviour
         flipping = false;
         flippingForward = true;
         initialRotation = transform.localRotation;
+    }
 
+    private void Start() {
         Messenger.AddListener("JumpStarted", OnJumpStarted);
     }
 

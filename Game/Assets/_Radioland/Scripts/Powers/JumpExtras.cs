@@ -65,17 +65,17 @@ public class JumpExtras : MonoBehaviour
         trailLowGravityStrength = 0f;
         doubleJumpColorHSB = new HSBColor(doubleJumpColor);
         lowGravityColorHSB = new HSBColor(lowGravityColor);
-
-        Messenger.AddListener<float>("Grounded", OnGrounded);
-        Messenger.AddListener("JumpStarted", OnJumpStarted);
-        Messenger.AddListener("DoubleJumpStarted", OnDoubleJumpStarted);
-        Messenger.AddListener<string>("FinishedCollecting", OnFinishedCollecting);
     }
 
     private void Start() {
         initialGravity = characterMovement.GetInitialGravity();
         initialGroundSmoothDampTime = characterMovement.GetInitialGroundSmoothDampTime();
         initialAirSmoothDampTime = characterMovement.GetInitialAirSmoothDampTime();
+
+        Messenger.AddListener<float>("Grounded", OnGrounded);
+        Messenger.AddListener("JumpStarted", OnJumpStarted);
+        Messenger.AddListener("DoubleJumpStarted", OnDoubleJumpStarted);
+        Messenger.AddListener<string>("FinishedCollecting", OnFinishedCollecting);
     }
 
     private void Update() {

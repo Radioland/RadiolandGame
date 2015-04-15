@@ -14,12 +14,12 @@ public class LowGravity : JumpPowerup
         base.Awake();
 
         longJumpHash = Animator.StringToHash("LongJump");
-
-        Messenger.AddListener("JumpStarted", OnJumpStarted);
     }
 
     public override void Start() {
         base.Start();
+
+        Messenger.AddListener("JumpStarted", OnJumpStarted);
     }
 
     public override void Update() {

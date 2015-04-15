@@ -12,7 +12,9 @@ public class PlatformLandingTriggerEffects : TriggerEffects
 
     protected override void Awake() {
         base.Awake();
+    }
 
+    private void Start() {
         Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
@@ -24,7 +26,6 @@ public class PlatformLandingTriggerEffects : TriggerEffects
     }
 
     private Platform GetPlatformUnder() {
-
         Vector3 start = transform.position + Vector3.up; // Adds 1.0f up.
         float distance = 1.0f + raycastDistance; // Counteracts the 1.0f up.
 

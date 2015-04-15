@@ -16,13 +16,13 @@ public class JumpPowerup : Powerup
         if (!animator) {
             Debug.LogWarning("No animator found on " + transform.GetPath());
         }
-
-        Messenger.AddListener("JumpStarted", OnJumpStarted);
-        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     public override void Start() {
         base.Start();
+
+        Messenger.AddListener("JumpStarted", OnJumpStarted);
+        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     public override void Update() {

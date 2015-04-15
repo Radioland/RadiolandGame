@@ -13,12 +13,10 @@ public class Bounce : MonoBehaviour
         characterMovement = gameObject.GetComponent<CharacterMovement>();
 
         bouncing = false;
-
-        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     private void Start() {
-
+        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     private void Update() {

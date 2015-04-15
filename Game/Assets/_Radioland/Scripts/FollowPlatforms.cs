@@ -23,13 +23,11 @@ public class FollowPlatforms : MonoBehaviour
         }
 
         lastPlatformUnderTime = -1000f;
-
-        Messenger.AddListener("Jump", OnJump);
-        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     private void Start() {
-
+        Messenger.AddListener("Jump", OnJump);
+        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     private void Update() {

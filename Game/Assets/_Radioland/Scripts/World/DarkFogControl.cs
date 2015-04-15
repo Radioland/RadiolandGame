@@ -21,13 +21,11 @@ public class DarkFogControl : MonoBehaviour
 
     private void Awake() {
         if (displaySlider) { displaySlider.value = fogLevel; }
-
-        Messenger.AddListener<float>("ChangeFogLevel", OnChangeFogLevel);
-        Messenger.AddListener<float>("ChangeFogLevelSmooth", OnChangeFogLevelSmooth);
     }
 
     private void Start() {
-
+        Messenger.AddListener<float>("ChangeFogLevel", OnChangeFogLevel);
+        Messenger.AddListener<float>("ChangeFogLevelSmooth", OnChangeFogLevelSmooth);
     }
 
     private void Update() {

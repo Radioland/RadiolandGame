@@ -17,12 +17,10 @@ public class ObjectPickup : MonoBehaviour {
         pickingUp = false;
 
         characterMovement = gameObject.GetComponent<CharacterMovement>();
-
-        Messenger.AddListener<string, bool>("CollectObject", OnCollectObject);
     }
 
     private void Start() {
-
+        Messenger.AddListener<string, bool>("CollectObject", OnCollectObject);
     }
 
     private void Update() {

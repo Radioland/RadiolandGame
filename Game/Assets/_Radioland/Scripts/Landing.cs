@@ -15,11 +15,11 @@ public class Landing : MonoBehaviour
     [SerializeField] private float maxStartSpeed = 3.0f;
 
     private void Awake() {
-        Messenger.AddListener<float>("Grounded", OnGrounded);
+
     }
 
     private void Start() {
-
+        Messenger.AddListener<float>("Grounded", OnGrounded);
     }
 
     private void Update() {

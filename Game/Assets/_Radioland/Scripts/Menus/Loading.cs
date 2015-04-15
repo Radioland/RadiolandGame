@@ -26,7 +26,7 @@ public class Loading : MonoBehaviour
         StartCoroutine(DisplayLoadingScreen(level));
     }
 
-    IEnumerator DisplayLoadingScreen(int level) {
+    private IEnumerator DisplayLoadingScreen(int level) {
         loadingDisplay.SetActive(true);
 
         AsyncOperation async = Application.LoadLevelAsync(level);
