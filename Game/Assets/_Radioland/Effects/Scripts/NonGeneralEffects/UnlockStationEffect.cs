@@ -4,7 +4,7 @@ using System.Collections;
 public class UnlockStationEffect : Effect
 {
     // Variables to specify in the editor.
-    [SerializeField] private int stationId;
+    public int stationId;
 
     protected override void Awake() {
         base.Awake();

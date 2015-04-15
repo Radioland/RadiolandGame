@@ -7,14 +7,14 @@ using System.Linq;
 
 public class StationPower : MonoBehaviour
 {
-    private enum StationChoice {
+    public enum StationChoice {
         Any,
         Station_1,
         Station_2,
         Station_3
     }
 
-    [SerializeField] private StationChoice stationChoice = StationChoice.Any;
+    public StationChoice stationChoice = StationChoice.Any;
     [SerializeField] private bool stopOnAwake = true;
     [SerializeField] [Tooltip("Enable when powered, disable without power.")]
     private List<MonoBehaviour> powerBehaviors;
@@ -30,7 +30,9 @@ public class StationPower : MonoBehaviour
     private void Awake() {
         GameObject player = GameObject.FindWithTag("Player");
         allStations = player.GetComponentsInChildren<RadioStation>();
+    }
 
+    private void Start() {
         // Find the radioStation matching stationChoice.
         foreach (RadioStation station in allStations) {
             if ((station.id == 1 && stationChoice == StationChoice.Station_1) ||
@@ -41,9 +43,7 @@ public class StationPower : MonoBehaviour
         }
 
         Messenger.AddListener<int>("UnlockStation", OnUnlockStation);
-    }
 
-    private void Start() {
         if (enabled && stopOnAwake) {
             StopPower(stopEvenIfAlreadyStopped:true);
         }
