@@ -39,4 +39,11 @@ public class SetActiveEffect : Effect
             objectToSetActive.SetActive(activeAtEnd);
         }
     }
+
+    public void OnDrawGizmos() {
+        if (objectToSetActive) {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, objectToSetActive.transform.position);
+        }
+    }
 }
