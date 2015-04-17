@@ -5,6 +5,8 @@ public class SimpleMenu : MonoBehaviour
 {
     [SerializeField] private GameObject loadingScreen;
 
+    private bool alreadyLoading = false;
+
     private void Awake() {
 
     }
@@ -20,6 +22,9 @@ public class SimpleMenu : MonoBehaviour
     }
 
     public void LoadLevel(int level) {
+        if (alreadyLoading) { return; }
+        alreadyLoading = true;
+
         Time.timeScale = 1.0f;
         AudioListener.pause = false;
 

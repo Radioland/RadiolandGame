@@ -8,6 +8,8 @@ public class LoadLevelEffect : Effect
     [SerializeField] private int levelToLoad;
     [SerializeField] private GameObject loadingScreen;
 
+    private bool alreadyLoading = false;
+
     protected override void Awake() {
         base.Awake();
     }
@@ -26,6 +28,9 @@ public class LoadLevelEffect : Effect
 
     public override void StartEffect() {
         base.StartEffect();
+
+        if (alreadyLoading) { return; }
+        alreadyLoading = true;
 
         Time.timeScale = 1.0f;
         AudioListener.pause = false;
