@@ -7,6 +7,7 @@ public class UICosmeticIcon : MonoBehaviour
     [Header("General UI Settings")]
     [SerializeField] private float rotationDegreesPerSecond = 30f;
     [SerializeField] private Button button;
+    [SerializeField] private Text equipText;
 
     [Header("Cosmetic Settings")]
     [SerializeField] private string cosmeticName;
@@ -14,12 +15,14 @@ public class UICosmeticIcon : MonoBehaviour
 
     private Quaternion initialRotation;
     private bool rotating;
+    private bool selected;
 
     private void Awake() {
         initialRotation = transform.rotation;
         rotating = false;
 
         CosmeticsManager.Register(cosmeticName);
+        CosmeticsManager.Unlock(cosmeticName);
 
         if (CosmeticsManager.IsNotLocked(cosmeticName)) {
             GetComponent<Renderer>().material = unlockedMaterial;
@@ -31,14 +34,40 @@ public class UICosmeticIcon : MonoBehaviour
 
     private void Update() {
         transform.Rotate(Vector3.up, rotationDegreesPerSecond * (rotating ? 1 : 0) * Time.deltaTime);
+
+        if (CosmeticsManager.IsEquipped(cosmeticName)) {
+            equipText.enabled = true;
+            rotating = true;
+        } else {
+            equipText.enabled = false;
+            if (!selected) {
+                StopRotate();
+            }
+        }
     }
 
-    public void startRotate() {
+    public void startSelect() {
         rotating = true;
+        selected = true;
     }
 
-    public void stopRotate() {
+    public void stopSelect() {
+        if (!CosmeticsManager.IsEquipped(cosmeticName)) {
+            StopRotate();
+        }
+        selected = false;
+    }
+
+    private void StopRotate() {
         transform.rotation = initialRotation;
         rotating = false;
+    }
+
+    public void ToggleEquip() {
+        if (CosmeticsManager.IsEquipped(cosmeticName)) {
+            CosmeticsManager.Unequip(cosmeticName);
+        } else {
+            CosmeticsManager.Equip(cosmeticName);
+        }
     }
 }

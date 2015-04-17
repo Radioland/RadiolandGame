@@ -22,11 +22,24 @@ static internal class CosmeticsManager
     }
 
     static public void Equip(string cosmeticName) {
+        UnequipAll();
         cosmeticStates[cosmeticName] = UnlockState.Equipped;
     }
 
     static public void Unequip(string cosmeticName) {
-        cosmeticStates[cosmeticName] = UnlockState.Unlocked;
+        UnlockState unlockState;
+        if (cosmeticStates.TryGetValue(cosmeticName, out unlockState)) {
+            if (unlockState == UnlockState.Equipped) {
+                cosmeticStates[cosmeticName] = UnlockState.Unlocked;
+            }
+        }
+    }
+
+    static public void UnequipAll() {
+        List<string> keys = new List<string>(cosmeticStates.Keys);
+        foreach (string key in keys) {
+            Unequip(key);
+        }
     }
 
     static public UnlockState GetState(string cosmeticName) {
