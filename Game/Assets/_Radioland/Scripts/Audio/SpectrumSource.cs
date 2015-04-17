@@ -69,4 +69,15 @@ public class SpectrumSource : MonoBehaviour
 
         frequencyPerElement = sampleRate / 2f / spectrumSamples;
     }
+
+    public float GetVolume() {
+        if (stream && stream.streamInitialized) {
+            return stream.volume;
+        } else if (source) {
+            return source.volume;
+        } else if (stationChoice == StationChoice.None) {
+            return AudioListener.volume;
+        }
+        return 0f;
+    }
 }

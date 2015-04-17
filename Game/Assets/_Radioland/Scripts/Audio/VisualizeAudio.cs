@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(SpectrumSource))]
 public class VisualizeAudio : MonoBehaviour
 {
+    [Header("Spectrum Sources")]
+    [SerializeField] private SpectrumSource primarySource;
+    [SerializeField] private SpectrumSource secondarySource;
     [Header("Automatic Objects Setup")]
     [SerializeField] private GameObject spectrumObjectPrefab;
     [SerializeField] private int spectumObjectCount = 6;
@@ -30,7 +32,9 @@ public class VisualizeAudio : MonoBehaviour
     private static Color gizmoBoxColor = Color.blue;
 
     private void Awake() {
-        spectrumSource = gameObject.GetComponent<SpectrumSource>();
+        if (!primarySource) { primarySource = gameObject.GetComponent<SpectrumSource>(); }
+
+        spectrumSource = primarySource;
         spectrumSamples = spectrumSource.spectrumSamples;
         spectrum = new float[spectrumSamples];
 
@@ -62,7 +66,15 @@ public class VisualizeAudio : MonoBehaviour
 
     }
 
+    private void UpdateSource() {
+        if (!secondarySource) { return; }
+
+        spectrumSource = (primarySource.GetVolume() > secondarySource.GetVolume()) ? primarySource : secondarySource;
+    }
+
     private void Update() {
+        UpdateSource();
+
         spectrum = spectrumSource.spectrum;
 
         int stopIndex = Mathf.Min(Mathf.FloorToInt(upperFrequency / spectrumSource.frequencyPerElement),
@@ -73,8 +85,6 @@ public class VisualizeAudio : MonoBehaviour
             maxAmplitude = Mathf.Max(maxAmplitude, spectrum[i]);
         }
 
-        if (maxAmplitude <= 0.001) { return; }
-
         int spectrumSamplesPerObject = stopIndex / spectumObjectCount;
         for (int i = 0; i < spectumObjectCount; i++) {
             float spectrumSum = 0f;
@@ -83,9 +93,11 @@ public class VisualizeAudio : MonoBehaviour
             }
 
             // Scale the sum based on the samples and volumes.
-            float relativeScaleFactor = spectrumSum / spectrumSamplesPerObject / maxAmplitude;
-            if (spectrumSource.stream) { relativeScaleFactor *= spectrumSource.stream.volume; }
-            else if (spectrumSource.source) { relativeScaleFactor *= spectrumSource.source.volume; }
+            float relativeScaleFactor = 0;
+            if (maxAmplitude > 0.001) {
+                relativeScaleFactor = spectrumSum / spectrumSamplesPerObject / maxAmplitude;
+            }
+            relativeScaleFactor *= spectrumSource.GetVolume();
             if (spectrumSource.radioStation) { relativeScaleFactor /= spectrumSource.radioStation.maxVolume; }
 
             float scaleFactor = Mathf.Lerp(minScale, maxScale, relativeScaleFactor);
@@ -108,8 +120,7 @@ public class VisualizeAudio : MonoBehaviour
         Renderer spectrumObjectPrefabRenderer = spectrumObjectPrefab.GetComponent<Renderer>();
         float depth = spectrumObjectPrefabRenderer.bounds.size.z;
         float width = spectrumObjectPrefabRenderer.bounds.size.x;
-        float height = (spectrumObjectPrefabRenderer.bounds.size.y *
-                        spectrumObjectPrefab.transform.localScale.y * maxScale);
+        float height = (spectrumObjectPrefabRenderer.bounds.size.y * maxScale);
 
         Vector3 start = transform.position - (transform.forward * depth / 2.0f);
         Vector3 end = start + (transform.forward * spectrumObjectOffset * (spectumObjectCount));
