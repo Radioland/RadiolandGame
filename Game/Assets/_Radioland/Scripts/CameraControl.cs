@@ -47,8 +47,11 @@ public class CameraControl : MonoBehaviour
     private Vector3 nearClipDimensions = Vector3.zero; // width, height, radius
     private Vector3[] viewFrustum;
     private bool blocked;
-    private Vector3 blockTargetPosition;
-    private float blockHitRadius;
+    private Vector3 occludePositionSmooth;
+    private Vector3 occludePosition;
+    private Vector3 cameraPositionBackup;
+    private Vector3 velocityOcclude = Vector3.zero;
+    private float occludeDampTime = 0.15f;
 
     // Camera speeds (controller and mouse free look as well as default orbit).
     [Header("Speeds")]
@@ -103,7 +106,10 @@ public class CameraControl : MonoBehaviour
         lookDirXZ = followTransform.forward;
         curLookDirXZ = followTransform.forward;
 
-        lastResetTime = -1000.0f;
+        cameraPositionBackup = cameraTransform.position;
+        occludePositionSmooth = cameraPositionBackup;
+
+        lastResetTime = -1000f;
 
         GameObject lookLerpObject = new GameObject("Camera Look Lerp Object");
         lookLerpTransform = lookLerpObject.transform;
@@ -125,6 +131,8 @@ public class CameraControl : MonoBehaviour
     }
 
     private void LateUpdate() {
+        cameraTransform.position = cameraPositionBackup;
+
         // Get input values from controller/keyboard.
         // TODO: replace with better controller/mouse input management.
         float rightX = Input.GetAxis("RightStickX");
@@ -199,10 +207,6 @@ public class CameraControl : MonoBehaviour
             manualTargetRadius = Mathf.Lerp(defaultRadius, maxRadius, angleUpNormalized);
         }
         radius = Mathf.Clamp(manualTargetRadius * autoRadiusFactor, minRadius, maxRadius);
-
-        if (blocked) {
-            radius = blockHitRadius;
-        }
     }
 
     private void SetTargetPosition() {
@@ -213,12 +217,6 @@ public class CameraControl : MonoBehaviour
                                            Mathf.Sin(xzAngle) * Mathf.Cos(angleUpRadians)) * radius;
         targetCameraPosition = followTransform.position + targetOffset;
 
-        // Commented out: camera gets stuck with this.
-//        if (blocked) {
-//            targetCameraPosition = blockTargetPosition;
-//        } else {
-//            targetCameraPosition = followTransform.position + targetOffset;
-//        }
         Debug.DrawLine(followTransform.position, followTransform.position + targetOffset, Color.white);
     }
 
@@ -311,20 +309,20 @@ public class CameraControl : MonoBehaviour
     }
 
     private void CompensateForWalls(Vector3 fromObject, ref Vector3 toTarget) {
+        cameraPositionBackup = cameraTransform.position;
+
         // Compensate for walls between camera.
         RaycastHit wallHit = new RaycastHit();
         Vector3 direction = Vector3.Normalize(toTarget - fromObject);
-        if (Physics.Raycast(fromObject, direction, out wallHit, radius, cameraBlockLayers)) {
+        if (Physics.Raycast(fromObject + direction * minRadius, direction, out wallHit, radius - minRadius, cameraBlockLayers)) {
             Debug.DrawRay(wallHit.point, wallHit.normal, Color.red);
-            blockTargetPosition = wallHit.point;
-            blockHitRadius = wallHit.distance;
+            occludePosition = wallHit.point;
             blocked = true;
         } else {
             blocked = false;
         }
 
         // Compensate for geometry intersecting with near clip plane.
-        Vector3 camPosCache = cameraTransform.position;
         cameraTransform.position = toTarget;
         viewFrustum = DebugDraw.CalculateViewFrustum(cameraComponent, ref nearClipDimensions);
 
@@ -349,7 +347,7 @@ public class CameraControl : MonoBehaviour
                     }
                 }
 
-                blockTargetPosition += (compensationOffset * normal);
+                occludePosition += (compensationOffset * normal);
                 cameraTransform.position += toTarget;
 
                 // Recalculate positions of near clip plane.
@@ -357,12 +355,15 @@ public class CameraControl : MonoBehaviour
             }
         }
 
-        cameraTransform.position = camPosCache;
-//        if (blocked) {
-//            cameraTransform.position = blockTargetPosition;
-//        } else {
-//            cameraTransform.position = camPosCache;
-//        }
+        if (blocked) {
+            occludePositionSmooth = Vector3.SmoothDamp(occludePositionSmooth, occludePosition,
+                                                       ref velocityOcclude, occludeDampTime);
+            cameraTransform.position = occludePositionSmooth;
+        } else {
+            occludePositionSmooth = Vector3.SmoothDamp(occludePositionSmooth, cameraPositionBackup,
+                                                        ref velocityOcclude, occludeDampTime);
+            cameraTransform.position = occludePositionSmooth;
+        }
     }
 
     private void HandleReset() {
