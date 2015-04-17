@@ -92,7 +92,11 @@ public class BabyBirbControl : Collectible
     }
 
     private void HandlePerched() {
-
+        if (Vector3.Distance(transform.position, player.transform.position) < minActivateDistance) {
+            SetState(BirbState.Chasing);
+            if (activationEffects) { activationEffects.StartEvent(); }
+            Collect();
+        }
     }
 
     private void HandleChasing() {
@@ -140,17 +144,6 @@ public class BabyBirbControl : Collectible
                 break;
             default:
                 break;
-        }
-    }
-
-    public void Activate(float signalStrength) {
-        if (state == BirbState.Perched &&
-            signalStrength > minActivateSignalStrength &&
-            Vector3.Distance(transform.position, player.transform.position) < minActivateDistance) {
-
-            SetState(BirbState.Chasing);
-            if (activationEffects) { activationEffects.StartEvent(); }
-            Collect();
         }
     }
 
