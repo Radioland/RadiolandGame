@@ -21,6 +21,14 @@ static internal class CosmeticsManager
         cosmeticStates[cosmeticName] = UnlockState.Unlocked;
     }
 
+    static public void Equip(string cosmeticName) {
+        cosmeticStates[cosmeticName] = UnlockState.Equipped;
+    }
+
+    static public void Unequip(string cosmeticName) {
+        cosmeticStates[cosmeticName] = UnlockState.Unlocked;
+    }
+
     static public UnlockState GetState(string cosmeticName) {
         UnlockState unlockState;
         return cosmeticStates.TryGetValue(cosmeticName, out unlockState) ? unlockState : UnlockState.UnknownCosmetic;
