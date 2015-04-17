@@ -32,6 +32,10 @@ public class SimpleMenu : MonoBehaviour
         }
     }
 
+    public void LoadNextLevel() {
+        LoadLevel(Application.loadedLevel + 1);
+    }
+
     public void Exit() {
         Application.Quit();
     }
