@@ -18,7 +18,7 @@ public class PlatformFlip180 : MonoBehaviour
     }
 
     private void Start() {
-        Messenger.AddListener("JumpStarted", OnJumpStarted);
+        Messenger.AddListener("SingleJumpStarted", OnSingleJumpStarted);
     }
 
     private void Update() {
@@ -36,7 +36,7 @@ public class PlatformFlip180 : MonoBehaviour
         }
     }
 
-    private void OnJumpStarted() {
+    private void OnSingleJumpStarted() {
         if (!flipping) {
             StartFlipping();
         }
