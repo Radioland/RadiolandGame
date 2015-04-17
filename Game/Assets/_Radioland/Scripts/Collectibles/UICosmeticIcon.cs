@@ -22,7 +22,6 @@ public class UICosmeticIcon : MonoBehaviour
         rotating = false;
 
         CosmeticsManager.Register(cosmeticName);
-        CosmeticsManager.Unlock(cosmeticName);
 
         if (CosmeticsManager.IsNotLocked(cosmeticName)) {
             GetComponent<Renderer>().material = unlockedMaterial;
