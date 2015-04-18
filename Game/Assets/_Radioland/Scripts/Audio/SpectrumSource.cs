@@ -16,7 +16,9 @@ public class SpectrumSource : MonoBehaviour
     [HideInInspector] public float[] spectrum;
     [HideInInspector] public float sampleRate;
     [HideInInspector] public float frequencyPerElement;
+    [HideInInspector] public float maxAmplitude;
     [HideInInspector] public RadioStation radioStation;
+    [HideInInspector] public float volume;
 
     [Header("Automatic Source Setup")]
     [SerializeField] private StationChoice stationChoice = StationChoice.Station_1;
@@ -59,25 +61,21 @@ public class SpectrumSource : MonoBehaviour
             spectrum = stream.spectrum;
             spectrumSamples = stream.spectrum.Length;
             sampleRate = stream.sampleRate;
+            volume = stream.volume;
         } else if (source) {
             source.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
             sampleRate = source.clip.frequency;
+            volume = source.volume;
         } else if (stationChoice == StationChoice.None) {
             AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
             sampleRate = AudioSettings.outputSampleRate;
+            volume = AudioListener.volume;
+        } else {
+            volume = 0f;
         }
 
         frequencyPerElement = sampleRate / 2f / spectrumSamples;
-    }
 
-    public float GetVolume() {
-        if (stream && stream.streamInitialized) {
-            return stream.volume;
-        } else if (source) {
-            return source.volume;
-        } else if (stationChoice == StationChoice.None) {
-            return AudioListener.volume;
-        }
-        return 0f;
+        maxAmplitude = spectrum.Max();
     }
 }

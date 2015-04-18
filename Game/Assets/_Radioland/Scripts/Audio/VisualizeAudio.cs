@@ -69,7 +69,9 @@ public class VisualizeAudio : MonoBehaviour
     private void UpdateSource() {
         if (!secondarySource) { return; }
 
-        spectrumSource = (primarySource.GetVolume() > secondarySource.GetVolume()) ? primarySource : secondarySource;
+        spectrumSource = (primarySource.maxAmplitude * primarySource.volume >
+                          secondarySource.maxAmplitude * secondarySource.volume) ?
+                          primarySource : secondarySource;
     }
 
     private void Update() {
@@ -97,7 +99,7 @@ public class VisualizeAudio : MonoBehaviour
             if (maxAmplitude > 0.001) {
                 relativeScaleFactor = spectrumSum / spectrumSamplesPerObject / maxAmplitude;
             }
-            relativeScaleFactor *= spectrumSource.GetVolume();
+            relativeScaleFactor *= spectrumSource.volume;
             if (spectrumSource.radioStation) { relativeScaleFactor /= spectrumSource.radioStation.maxVolume; }
 
             float scaleFactor = Mathf.Lerp(minScale, maxScale, relativeScaleFactor);
