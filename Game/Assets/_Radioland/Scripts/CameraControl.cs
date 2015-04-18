@@ -374,4 +374,11 @@ public class CameraControl : MonoBehaviour
             angleUp = defaultAngleUp;
         }
     }
+
+    public void HandleRespawn() {
+        occludePositionSmooth = cameraTransform.position;
+        targetCameraPosition = cameraTransform.position;
+        cameraPositionBackup = cameraTransform.position;
+        lookLerpTransform.position = followTransform.position;
+    }
 }
