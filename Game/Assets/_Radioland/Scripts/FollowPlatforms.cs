@@ -13,6 +13,9 @@ public class FollowPlatforms : MonoBehaviour
     private Platform latestPlatform;
     private float lastPlatformUnderTime;
 
+    private int pushesThisFrame;
+    private const int maxPushesPerFrame = 5;
+
     private void Awake() {
         controller = gameObject.GetComponent<CharacterController>();
         characterMovement = gameObject.GetComponent<CharacterMovement>();
@@ -31,6 +34,8 @@ public class FollowPlatforms : MonoBehaviour
     }
 
     private void Update() {
+        pushesThisFrame = 0;
+
         Platform platform = GetPlatformUnder();
         if (platform) {
             latestPlatform = platform;
@@ -81,18 +86,27 @@ public class FollowPlatforms : MonoBehaviour
     }
 
     private void Push(Platform platform) {
+        PushWithNormal(platform, Vector3.zero);
+    }
+
+    private void PushWithNormal(Platform platform, Vector3 normal) {
         if (Time.timeScale < 0.01f) { return; }
+        if (pushesThisFrame > maxPushesPerFrame) { return; }
 
         if (!platform.pushPlayerJumping && !characterMovement.grounded) { return; }
         if (!platform.pushPlayerGrounded && characterMovement.grounded) { return; }
 
         Vector3 movement = platform.lastVelocity * Time.deltaTime;
-        // Apply an extra push vertically to prevent falling through platforms.
-        movement.y = movement.y * 1.5f + 0.02f;
+        if (movement.magnitude > 0.01f) {
+            pushesThisFrame++;
+            // Apply an extra push vertically to prevent falling through platforms.
+            movement.y = movement.y * 1.5f + 0.02f;
 
-        if (movement.magnitude > 0.001f) {
+            movement += normal * movement.magnitude * 2f;
+
             controller.Move(movement);
         }
+
     }
 
     private void OnCollisionEnter(Collision collision) {
@@ -103,5 +117,12 @@ public class FollowPlatforms : MonoBehaviour
     private void OnCollisionStay(Collision collision) {
         Platform platform = Platform.GetPlatformOnObject(collision.gameObject);
         if (platform) { Push(platform); }
+    }
+
+    public void OnControllerColliderHit(ControllerColliderHit hit) {
+        Platform platform = Platform.GetPlatformOnObject(hit.collider.gameObject);
+        if (platform && platform.pushWithNormal) {
+            PushWithNormal(platform, hit.normal);
+        }
     }
 }
