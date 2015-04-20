@@ -27,6 +27,7 @@ public class DialogueManager : MonoBehaviour
     private CameraControl cameraControl;
     private Transform cameraTarget;
     private Transform playerTransform;
+    private bool looking;
 
     private void Awake() {
         availableIds = new HashSet<int>();
@@ -47,6 +48,7 @@ public class DialogueManager : MonoBehaviour
         characterMovement = playerObject.GetComponent<CharacterMovement>();
 
         cameraTarget = new GameObject("Dialogue Camera Target").transform;
+        looking = false;
     }
 
     private void Start() {
@@ -56,6 +58,13 @@ public class DialogueManager : MonoBehaviour
     private void Update() {
         if (currentDialogue) {
             characterMovement.SetControllable(false);
+
+            if (looking) {
+                // Camera look between the player and the source of the dialogue.
+                cameraTarget.position = Vector3.Lerp(currentDialogue.transform.position,
+                                                     playerTransform.position, 0.5f);
+                cameraControl.OverrideTarget(cameraTarget.transform, 12f);
+            }
         }
     }
 
@@ -70,14 +79,9 @@ public class DialogueManager : MonoBehaviour
 
         currentDialogue = nextDialogue;
 
-        if (look) {
-            // Camera look between the player and the source of the dialogue.
-            Vector3 cameraPosition = Vector3.Lerp(nextDialogue.transform.position,
-                                                  playerTransform.position, 0.5f);
-            cameraPosition.y -= 1f;
-            cameraTarget.position = cameraPosition;
-            cameraControl.OverrideTarget(cameraTarget.transform, 12f);
+        looking = look;
 
+        if (look) {
             // Player look at the source of the dialogue.
             characterMovement.LookAt(nextDialogue.transform);
         }
