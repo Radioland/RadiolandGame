@@ -120,6 +120,8 @@ public class Dance : MonoBehaviour
     }
 
     private void StopDancing() {
+        if (!dancing) { return; }
+
         if (animator.isActiveAndEnabled) {
             animator.SetBool(danceBoolHash, false);
         }

@@ -18,7 +18,6 @@ public class Respawn : MonoBehaviour
 
     private GameObject player;
     private CharacterMovement characterMovement;
-    private CameraControl cameraControl;
     private bool respawning;
 
     private void Awake() {
@@ -26,7 +25,6 @@ public class Respawn : MonoBehaviour
 
         player = GameObject.FindWithTag("Player");
         characterMovement = player.GetComponent<CharacterMovement>();
-        cameraControl = player.GetComponent<CameraControl>();
 
         GameObject hairObject = GameObject.FindWithTag("hair");
         Hair hairScript = hairObject.GetComponent<Hair>();
@@ -55,6 +53,8 @@ public class Respawn : MonoBehaviour
         if (respawning) { return; }
         respawning = true;
 
+        Messenger.Broadcast("RespawnStarted");
+
         playerTransformEffect.objectTransform = player.transform;
         playerTransformEffect.position = respawnPosition;
         playerTransformEffect.rotationEulerAngles = Vector3.zero;
@@ -71,6 +71,6 @@ public class Respawn : MonoBehaviour
         characterMovement.ResetState();
         characterMovement.Stop();
 
-        cameraControl.HandleRespawn();
+        Messenger.Broadcast("RespawnFinished");
     }
 }

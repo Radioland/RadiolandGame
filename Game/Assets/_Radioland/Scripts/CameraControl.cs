@@ -88,6 +88,11 @@ public class CameraControl : MonoBehaviour
     private float lastResetTime;
     private float resetDuration = 0.3f;
 
+    // Override target.
+    private Transform followTransformBackup;
+    private float angleUpBackup;
+    private bool overridden;
+
     private void Awake() {
         if (!followTransform) { followTransform = transform; }
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
@@ -115,10 +120,13 @@ public class CameraControl : MonoBehaviour
         lookLerpTransform = lookLerpObject.transform;
 
         InvokeRepeating("AutoZoomObserve", 0f, autoZoomUpdateRate);
+
+        followTransformBackup = followTransform;
+        overridden = false;
     }
 
     private void Start() {
-
+        Messenger.AddListener("RespawnFinished", OnRespawnFinished);
     }
 
     private void Update() {
@@ -139,6 +147,11 @@ public class CameraControl : MonoBehaviour
         float rightY = Input.GetAxis("RightStickY");
 
         if (mouseLookEnabled) { ApplyMouseLook(ref rightX, ref rightY); }
+
+        if (overridden) {
+            rightX = 0f;
+            rightY = 0f;
+        }
 
         bool movingOrRotating = (characterMovement.controlSpeed > deadZone ||
                                  Mathf.Abs(rightX) > deadZone ||
@@ -375,10 +388,23 @@ public class CameraControl : MonoBehaviour
         }
     }
 
-    public void HandleRespawn() {
+    public void OnRespawnFinished() {
         occludePositionSmooth = cameraTransform.position;
         targetCameraPosition = cameraTransform.position;
         cameraPositionBackup = cameraTransform.position;
         lookLerpTransform.position = followTransform.position;
+    }
+
+    public void OverrideTarget(Transform newLookAt, float newAngleUp) {
+        overridden = true;
+        followTransform = newLookAt;
+        angleUpBackup = angleUp;
+        angleUp = newAngleUp;
+    }
+
+    public void ResetTarget() {
+        overridden = false;
+        followTransform = followTransformBackup;
+        angleUp = angleUpBackup;
     }
 }
