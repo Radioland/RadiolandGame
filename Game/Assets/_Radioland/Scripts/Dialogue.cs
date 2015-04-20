@@ -5,7 +5,9 @@ using System.Collections.Generic;
 
 public class Dialogue : MonoBehaviour
 {
+    [Header("Dialogue Content")]
     [SerializeField] private List<TextAsset> messageFiles;
+    [SerializeField] [Tooltip("Optional")] private List<Sprite> messageImages;
     [Header("Dialogue Effects")]
     [SerializeField] private EffectManager allMessagesEffects;
     [SerializeField] private List<EffectManager> specificMessageEffects;
@@ -56,7 +58,11 @@ public class Dialogue : MonoBehaviour
         }
 
         if (currentMessage < messageCount) {
-            dialogueManager.SetMessage(messageFiles[currentMessage].text);
+            if (messageImages.Count > currentMessage && messageImages[currentMessage]) {
+                dialogueManager.SetMessage(messageFiles[currentMessage].text, messageImages[currentMessage]);
+            } else {
+                dialogueManager.SetMessage(messageFiles[currentMessage].text);
+            }
 
             if (allMessagesEffects) { allMessagesEffects.StartEvent(); }
             if (specificMessageEffects.Count > currentMessage &&

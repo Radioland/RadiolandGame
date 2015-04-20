@@ -8,7 +8,8 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private GameObject dialogueUI;
     [SerializeField] private CanvasGroup dialogueCanvasGroup;
     [SerializeField] private Text justText;
-    // TODO: Text + Image layout
+    [SerializeField] private Text withImageText;
+    [SerializeField] private Image withImageImage;
 
     [Header("Fade in/out")]
     [SerializeField] private Interpolate.EaseType easeType = Interpolate.EaseType.EaseInOutQuad;
@@ -22,7 +23,11 @@ public class DialogueManager : MonoBehaviour
 
     private void Awake() {
         easeFunction = Interpolate.Ease(easeType);
+
         dialogueCanvasGroup.alpha = 0f;
+
+        DisableJustTextUI();
+        DisableWithImageUI();
 
         dialogueUI.SetActive(true);
     }
@@ -54,15 +59,26 @@ public class DialogueManager : MonoBehaviour
 
         currentDialogue = null;
 
-        justText.text = "";
-        justText.enabled = false;
-
         StartCoroutine("FadeOut");
     }
 
     public void SetMessage(string messageText) {
+        DisableWithImageUI();
+
+        // Enable the UI with just text.
         justText.text = messageText;
         justText.enabled = true;
+    }
+
+    public void SetMessage(string messageText, Sprite image) {
+        DisableJustTextUI();
+
+        // Enable the UI with text and image.
+        withImageText.text = messageText;
+        withImageImage.sprite = image;
+
+        withImageText.enabled = true;
+        withImageImage.enabled = true;
     }
 
     private IEnumerator FadeIn() {
@@ -87,5 +103,21 @@ public class DialogueManager : MonoBehaviour
             yield return null;
         }
         dialogueCanvasGroup.alpha = 0f;
+
+        DisableJustTextUI();
+        DisableWithImageUI();
+    }
+
+    private void DisableJustTextUI() {
+        justText.text = "";
+        justText.enabled = false;
+    }
+
+    private void DisableWithImageUI() {
+        withImageImage.sprite = null;
+        withImageText.text = "";
+
+        withImageText.enabled = false;
+        withImageImage.enabled = false;
     }
 }
