@@ -91,14 +91,18 @@ public class Dialogue : MonoBehaviour
     }
 
     public void OnTriggerStay(Collider other) {
-        if (other.CompareTag("Player") && Input.GetButtonDown("Dialogue") &&
-            Time.time - lastNextMessageTime > nextMessageCooldown) {
-            NextMessage();
+        if (other.CompareTag("Player")) {
+            dialogueManager.SignalDialogueAvailable(this.GetInstanceID());
+            if (Input.GetButtonDown("Dialogue") &&
+                Time.time - lastNextMessageTime > nextMessageCooldown) {
+                NextMessage();
+            }
         }
     }
 
     public void OnTriggerExit(Collider other) {
         if (other.CompareTag("Player")) {
+            dialogueManager.SignalDialogueNoLongerAvailable(this.GetInstanceID());
             ClearMessage();
         }
     }

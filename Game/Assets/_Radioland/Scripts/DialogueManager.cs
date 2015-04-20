@@ -1,22 +1,26 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class DialogueManager : MonoBehaviour
 {
     [Header("Setup")]
     [SerializeField] private GameObject dialogueUI;
-    [SerializeField] private CanvasGroup dialogueCanvasGroup;
     [SerializeField] private Text justText;
     [SerializeField] private Text withImageText;
     [SerializeField] private Image withImageImage;
 
     [Header("Fade in/out")]
+    [SerializeField] private CanvasGroup activeDialogueCanvasGroup;
+    [SerializeField] private CanvasGroup dialogueAvailableCanvasGroup;
     [SerializeField] private Interpolate.EaseType easeType = Interpolate.EaseType.EaseInOutQuad;
     [SerializeField] private float fadeInTime = 1f;
     [SerializeField] private float fadeOutTime = 1f;
 
     private Dialogue currentDialogue;
+    private HashSet<int> availableIds;
+
     private Interpolate.Function easeFunction;
 
     private CharacterMovement characterMovement;
@@ -25,9 +29,12 @@ public class DialogueManager : MonoBehaviour
     private Transform playerTransform;
 
     private void Awake() {
+        availableIds = new HashSet<int>();
+
         easeFunction = Interpolate.Ease(easeType);
 
-        dialogueCanvasGroup.alpha = 0f;
+        activeDialogueCanvasGroup.alpha = 0f;
+        dialogueAvailableCanvasGroup.alpha = 0f;
 
         DisableJustTextUI();
         DisableWithImageUI();
@@ -75,7 +82,7 @@ public class DialogueManager : MonoBehaviour
             characterMovement.LookAt(nextDialogue.transform);
         }
 
-        StartCoroutine("FadeIn");
+        StartCoroutine("FadeInActiveDialogue");
     }
 
     public void EndDialogue() {
@@ -87,7 +94,7 @@ public class DialogueManager : MonoBehaviour
 
         characterMovement.SetControllable(true);
 
-        StartCoroutine("FadeOut");
+        StartCoroutine("FadeOutActiveDialogue");
     }
 
     public void SetMessage(string messageText) {
@@ -109,31 +116,51 @@ public class DialogueManager : MonoBehaviour
         withImageImage.enabled = true;
     }
 
-    private IEnumerator FadeIn() {
-        StopCoroutine("FadeOut");
+    private IEnumerator FadeInActiveDialogue() {
+        StopCoroutine("FadeOutActiveDialogue");
 
         float startTime = Time.time;
-
         while (Time.time - startTime < fadeOutTime) {
-            dialogueCanvasGroup.alpha = easeFunction(0f, 1f, Time.time - startTime, fadeInTime);
+            activeDialogueCanvasGroup.alpha = easeFunction(0f, 1f, Time.time - startTime, fadeInTime);
             yield return null;
         }
-        dialogueCanvasGroup.alpha = 1f;
+        activeDialogueCanvasGroup.alpha = 1f;
     }
 
-    private IEnumerator FadeOut() {
-        StopCoroutine("FadeIn");
+    private IEnumerator FadeOutActiveDialogue() {
+        StopCoroutine("FadeInActiveDialogue");
 
         float startTime = Time.time;
-
         while (Time.time - startTime < fadeOutTime) {
-            dialogueCanvasGroup.alpha = easeFunction(1f, -1f, Time.time - startTime, fadeOutTime);
+            activeDialogueCanvasGroup.alpha = easeFunction(1f, -1f, Time.time - startTime, fadeOutTime);
             yield return null;
         }
-        dialogueCanvasGroup.alpha = 0f;
+        activeDialogueCanvasGroup.alpha = 0f;
 
         DisableJustTextUI();
         DisableWithImageUI();
+    }
+
+    private IEnumerator FadeInDialogueAvailable() {
+        StopCoroutine("FadeOutDialogueAvailable");
+
+        float startTime = Time.time;
+        while (Time.time - startTime < fadeOutTime) {
+            dialogueAvailableCanvasGroup.alpha = easeFunction(0f, 1f, Time.time - startTime, fadeInTime);
+            yield return null;
+        }
+        dialogueAvailableCanvasGroup.alpha = 1f;
+    }
+
+    private IEnumerator FadeOutDialogueAvailable() {
+        StopCoroutine("FadeInDialogueAvailable");
+
+        float startTime = Time.time;
+        while (Time.time - startTime < fadeOutTime) {
+            dialogueAvailableCanvasGroup.alpha = easeFunction(1f, -1f, Time.time - startTime, fadeOutTime);
+            yield return null;
+        }
+        dialogueAvailableCanvasGroup.alpha = 0f;
     }
 
     private void DisableJustTextUI() {
@@ -149,8 +176,24 @@ public class DialogueManager : MonoBehaviour
         withImageImage.enabled = false;
     }
 
+    public void SignalDialogueAvailable(int id) {
+        if (availableIds.Count == 0) {
+            StartCoroutine("FadeInDialogueAvailable");
+        }
+
+        availableIds.Add(id);
+    }
+
+    public void SignalDialogueNoLongerAvailable(int id) {
+        availableIds.Remove(id);
+
+        if (availableIds.Count == 0) {
+            StartCoroutine("FadeOutDialogueAvailable");
+        }
+    }
+
     private void OnRespawnStarted() {
-        // Ensure that we cleanup if the player dies!
+        // Ensure that we cleanup if the player dies.
         EndDialogue();
     }
 }
