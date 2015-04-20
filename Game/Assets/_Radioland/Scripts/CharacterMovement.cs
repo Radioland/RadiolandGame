@@ -484,4 +484,9 @@ public class CharacterMovement : MonoBehaviour
         float angleRootToMove = Vector3.Angle(rootDirection, moveDirection) * (axisSign.y >= 0 ? -1f : 1f);
         angleOut = isPivoting ? 0f: angleRootToMove;
     }
+
+    public void LookAt(Transform target) {
+        transform.LookAt(target);
+        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+    }
 }
