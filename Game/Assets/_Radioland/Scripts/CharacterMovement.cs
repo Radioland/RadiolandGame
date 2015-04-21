@@ -328,6 +328,9 @@ public class CharacterMovement : MonoBehaviour
     }
 
     private void ApplyJump() {
+        // Don't even trigger if paused.
+        if (Time.timeScale < 0.01f) { return; }
+
         if (Input.GetButtonDown("Jump")) { TriggerJump(); }
 
         // Do not allow jumping while not controllable.
