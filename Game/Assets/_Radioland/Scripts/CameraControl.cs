@@ -73,6 +73,8 @@ public class CameraControl : MonoBehaviour
     private Vector3 lookDirXZ;
     private Vector3 curLookDirXZ;
     private static float deadZone = 0.1f;
+    private bool invertX;
+    private bool invertY;
 
     // Smoothing and damping.
     [Header("Smoothing")]
@@ -128,10 +130,13 @@ public class CameraControl : MonoBehaviour
 
         followTransformBackup = followTransform;
         overridden = false;
+
+        OnOptionsChanged();
     }
 
     private void Start() {
         Messenger.AddListener("RespawnFinished", OnRespawnFinished);
+        Messenger.AddListener("OptionsChanged", OnOptionsChanged);
     }
 
     private void Update() {
@@ -152,6 +157,9 @@ public class CameraControl : MonoBehaviour
         float rightY = Input.GetAxis("RightStickY");
 
         if (mouseLookEnabled) { ApplyMouseLook(ref rightX, ref rightY); }
+
+        rightX *= (invertX ? -1 : 1);
+        rightY *= (invertY ? -1 : 1);
 
         if (overridden) {
             rightX = 0f;
@@ -448,6 +456,14 @@ public class CameraControl : MonoBehaviour
         targetCameraPosition = cameraTransform.position;
         cameraPositionBackup = cameraTransform.position;
         lookLerpTransform.position = followTransform.position;
+    }
+
+    private void OnOptionsChanged() {
+        int invertXValue = PlayerPrefs.GetInt("InvertX", 0);
+        invertX = invertXValue == 1;
+
+        int invertYValue = PlayerPrefs.GetInt("InvertY", 0);
+        invertY = invertYValue == 1;
     }
 
     public void OverrideTarget(Transform newLookAt, float newAngleUp) {

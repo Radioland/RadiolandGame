@@ -30,10 +30,12 @@ public class GameController : MonoBehaviour
         respawnScript = gameObject.GetComponentInChildren<Respawn>();
 
         lastPausedTime = -1000f;
+
+        OnOptionsChanged();
     }
 
     private void Start() {
-
+        Messenger.AddListener("OptionsChanged", OnOptionsChanged);
     }
 
     private void Update() {
@@ -54,7 +56,7 @@ public class GameController : MonoBehaviour
     }
 
     private void HandlePause() {
-        if (Input.GetButtonDown("Pause") && !paused) {
+        if (Input.GetButtonDown("Pause")) {
             TogglePause();
         }
     }
@@ -101,6 +103,11 @@ public class GameController : MonoBehaviour
             respawnPosition = fallbackRespawnPosition;
         }
         respawnScript.RespawnPlayer(respawnPosition);
+    }
+
+    private void OnOptionsChanged() {
+        int muteValue = PlayerPrefs.GetInt("Mute", 0);
+        masterMute = muteValue == 1;
     }
 
     public void Exit() {
