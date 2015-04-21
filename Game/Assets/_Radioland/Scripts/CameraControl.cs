@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 // The player orbits around the camera, see CharacterMovement.StickToWorldspace.
 // Reference tutorial video: https://www.youtube.com/watch?v=lnguV1v38z4
@@ -44,6 +45,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] [Tooltip("Extra space between obstacle and camera")]
     private float compensationOffset = 0.2f;
     [SerializeField] private LayerMask cameraBlockLayers;
+    [SerializeField] private LayerMask cameraHideLayers;
     private Vector3 nearClipDimensions = Vector3.zero; // width, height, radius
     private Vector3[] viewFrustum;
     private bool blocked;
@@ -52,6 +54,7 @@ public class CameraControl : MonoBehaviour
     private Vector3 cameraPositionBackup;
     private Vector3 velocityOcclude = Vector3.zero;
     private float occludeDampTime = 0.15f;
+    private List<Transform> hiddenTransforms;
 
     // Camera speeds (controller and mouse free look as well as default orbit).
     [Header("Speeds")]
@@ -113,6 +116,7 @@ public class CameraControl : MonoBehaviour
 
         cameraPositionBackup = cameraTransform.position;
         occludePositionSmooth = cameraPositionBackup;
+        hiddenTransforms = new List<Transform>();
 
         lastResetTime = -1000f;
 
@@ -181,6 +185,8 @@ public class CameraControl : MonoBehaviour
         CompensateForWalls(playerTransform.position, ref targetCameraPosition);
 
         cameraTransform.LookAt(lookLerpTransform);
+
+        HideObjects();
     }
 
     private void UpdateLookDirectionY(float rightX, float rightY) {
@@ -327,7 +333,7 @@ public class CameraControl : MonoBehaviour
         // Compensate for walls between camera.
         RaycastHit wallHit = new RaycastHit();
         Vector3 direction = Vector3.Normalize(toTarget - fromObject);
-        if (Physics.Raycast(fromObject + direction * minRadius, direction, out wallHit, radius - minRadius, cameraBlockLayers)) {
+        if (Physics.Raycast(fromObject + direction * minRadius / 2f, direction, out wallHit, radius - minRadius / 2f, cameraBlockLayers)) {
             Debug.DrawRay(wallHit.point, wallHit.normal, Color.red);
             occludePosition = wallHit.point;
             blocked = true;
@@ -376,6 +382,44 @@ public class CameraControl : MonoBehaviour
             occludePositionSmooth = Vector3.SmoothDamp(occludePositionSmooth, cameraPositionBackup,
                                                         ref velocityOcclude, occludeDampTime);
             cameraTransform.position = occludePositionSmooth;
+        }
+    }
+
+    private void HideObjects() {
+        foreach (Transform hiddenTransform in hiddenTransforms) {
+            Renderer[] renderers = hiddenTransform.GetComponentsInChildren<Renderer>();
+            foreach (Renderer hiddenRenderer in renderers) {
+                HideChangeMaterial hideChangeMaterial = hiddenRenderer.GetComponent<HideChangeMaterial>();
+                if (hideChangeMaterial) {
+                    hideChangeMaterial.UnHide();
+                } else {
+                    hiddenRenderer.enabled = true;
+                }
+            }
+        }
+        hiddenTransforms.Clear();
+
+        Vector3 direction = playerTransform.position - cameraTransform.position;
+        RaycastHit[] hits = Physics.RaycastAll(cameraTransform.position, direction.normalized,
+                                               direction.magnitude, cameraHideLayers);
+
+        foreach (RaycastHit hit in hits) {
+            Renderer[] renderers = hit.collider.gameObject.GetComponentsInChildren<Renderer>();
+
+            Debug.DrawLine(cameraTransform.position, hit.point, Color.yellow);
+
+            foreach (Renderer hiddenRenderer in renderers) {
+                HideChangeMaterial hideChangeMaterial = hiddenRenderer.GetComponent<HideChangeMaterial>();
+                if (hideChangeMaterial) {
+                    hideChangeMaterial.Hide();
+                } else {
+                    hiddenRenderer.enabled = false;
+                }
+            }
+
+            if (renderers.Length > 0) {
+                hiddenTransforms.Add(hit.collider.transform);
+            }
         }
     }
 
