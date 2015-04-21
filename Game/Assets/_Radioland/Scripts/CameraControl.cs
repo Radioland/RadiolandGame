@@ -130,6 +130,8 @@ public class CameraControl : MonoBehaviour
 
         followTransformBackup = followTransform;
         overridden = false;
+
+        OnOptionsChanged();
     }
 
     private void Start() {
@@ -460,7 +462,7 @@ public class CameraControl : MonoBehaviour
         int invertXValue = PlayerPrefs.GetInt("InvertX", 0);
         invertX = invertXValue == 1;
 
-        int invertYValue = PlayerPrefs.GetInt("InvertX", 0);
+        int invertYValue = PlayerPrefs.GetInt("InvertY", 0);
         invertY = invertYValue == 1;
     }
 

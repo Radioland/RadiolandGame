@@ -30,6 +30,8 @@ public class GameController : MonoBehaviour
         respawnScript = gameObject.GetComponentInChildren<Respawn>();
 
         lastPausedTime = -1000f;
+
+        OnOptionsChanged();
     }
 
     private void Start() {
@@ -54,7 +56,7 @@ public class GameController : MonoBehaviour
     }
 
     private void HandlePause() {
-        if (Input.GetButtonDown("Pause") && !paused) {
+        if (Input.GetButtonDown("Pause")) {
             TogglePause();
         }
     }
