@@ -6,6 +6,7 @@ internal enum Axis
     WorldX, WorldY, WorldZ, LocalX, LocalY, LocalZ
 }
 
+[RequireComponent(typeof(Renderer))]
 public class TileMaterial : MonoBehaviour
 {
     [SerializeField] private float xScaleMultipler = 1.0f;
@@ -18,16 +19,13 @@ public class TileMaterial : MonoBehaviour
     [SerializeField] private string[] materialPropertyNames = {
         "_MainTex", "_NormalMap", "_SpecMap", "_BumpMap" };
 
+    private Renderer myRenderer;
+    private Material latestMaterial;
+
     private void Awake() {
-        float materialScaleX = xScaleMultipler * (proportionalScale ? GetScale(materialXAxis) : 1f);
-        float materialScaleY = yScaleMultipler * (proportionalScale ? GetScale(materialYAxis) : 1f);
+        myRenderer = gameObject.GetComponent<Renderer>();
 
-        Renderer rendererToChange = gameObject.GetComponent<Renderer>();
-
-        foreach (string propertyName in materialPropertyNames.Where(propertyName => rendererToChange.material.HasProperty(propertyName))) {
-            rendererToChange.material.SetTextureScale(propertyName, new Vector2(materialScaleX, materialScaleY));
-            rendererToChange.material.SetTextureOffset(propertyName, new Vector2(xOffset, yOffset));
-        }
+        SetupMaterial();
     }
 
     private float GetScale(Axis axis) {
@@ -46,6 +44,23 @@ public class TileMaterial : MonoBehaviour
                 return transform.localScale.z;
             default:
                 return 1f;
+        }
+    }
+
+    private void Update() {
+        if (myRenderer.material != latestMaterial) {
+            latestMaterial = myRenderer.material;
+            SetupMaterial();
+        }
+    }
+
+    private void SetupMaterial() {
+        float materialScaleX = xScaleMultipler * (proportionalScale ? GetScale(materialXAxis) : 1f);
+        float materialScaleY = yScaleMultipler * (proportionalScale ? GetScale(materialYAxis) : 1f);
+
+        foreach (string propertyName in materialPropertyNames.Where(propertyName => myRenderer.material.HasProperty(propertyName))) {
+            myRenderer.material.SetTextureScale(propertyName, new Vector2(materialScaleX, materialScaleY));
+            myRenderer.material.SetTextureOffset(propertyName, new Vector2(xOffset, yOffset));
         }
     }
 }
