@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 // The player orbits around the camera, see CharacterMovement.StickToWorldspace.
 // Reference tutorial video: https://www.youtube.com/watch?v=lnguV1v38z4
@@ -386,41 +387,51 @@ public class CameraControl : MonoBehaviour
     }
 
     private void HideObjects() {
-        foreach (Transform hiddenTransform in hiddenTransforms) {
-            Renderer[] renderers = hiddenTransform.GetComponentsInChildren<Renderer>();
-            foreach (Renderer hiddenRenderer in renderers) {
-                HideChangeMaterial hideChangeMaterial = hiddenRenderer.GetComponent<HideChangeMaterial>();
-                if (hideChangeMaterial) {
-                    hideChangeMaterial.UnHide();
-                } else {
-                    hiddenRenderer.enabled = true;
-                }
-            }
-        }
-        hiddenTransforms.Clear();
+        // Find all Transforms between player and camera on cameraHideLayers.
+        List<Transform> newHiddenTransforms = new List<Transform>();
 
         Vector3 direction = playerTransform.position - cameraTransform.position;
         RaycastHit[] hits = Physics.RaycastAll(cameraTransform.position, direction.normalized,
                                                direction.magnitude, cameraHideLayers);
-
         foreach (RaycastHit hit in hits) {
-            Renderer[] renderers = hit.collider.gameObject.GetComponentsInChildren<Renderer>();
-
             Debug.DrawLine(cameraTransform.position, hit.point, Color.yellow);
 
-            foreach (Renderer hiddenRenderer in renderers) {
-                HideChangeMaterial hideChangeMaterial = hiddenRenderer.GetComponent<HideChangeMaterial>();
-                if (hideChangeMaterial) {
-                    hideChangeMaterial.Hide();
-                } else {
-                    hiddenRenderer.enabled = false;
-                }
-            }
-
+            // Only add those with Renderers under them.
+            Renderer[] renderers = hit.collider.gameObject.GetComponentsInChildren<Renderer>();
             if (renderers.Length > 0) {
-                hiddenTransforms.Add(hit.collider.transform);
+                newHiddenTransforms.Add(hit.collider.transform);
             }
         }
+
+        // Hide/fade each object. Fade in/out based on the current and previous observations.
+
+        // In new but not old -> hide.
+        IEnumerable<Transform> hideTransforms = newHiddenTransforms.Except(hiddenTransforms);
+        foreach (Transform hideTransform in hideTransforms) {
+            foreach (Renderer hideRenderer in hideTransform.GetComponentsInChildren<Renderer>()) {
+                FadeGlass fadeGlass = hideRenderer.GetComponent<FadeGlass>();
+                if (fadeGlass) {
+                    fadeGlass.StartFadeOut();
+                } else {
+                    hideRenderer.enabled = false;
+                }
+            }
+        }
+
+        // In old but not new -> unhide.
+        IEnumerable<Transform> unhideTransforms = hiddenTransforms.Except(newHiddenTransforms);
+        foreach (Transform hideTransform in unhideTransforms) {
+            foreach (Renderer hideRenderer in hideTransform.GetComponentsInChildren<Renderer>()) {
+                FadeGlass fadeGlass = hideRenderer.GetComponent<FadeGlass>();
+                if (fadeGlass) {
+                    fadeGlass.StartFadeIn();
+                } else {
+                    hideRenderer.enabled = true;
+                }
+            }
+        }
+
+        hiddenTransforms = newHiddenTransforms;
     }
 
     private void HandleReset() {
