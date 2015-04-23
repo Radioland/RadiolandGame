@@ -2,6 +2,12 @@
 
 public class TransformLerp : MonoBehaviour
 {
+    private enum RotateMode
+    {
+        Quaternion, Euler
+    }
+
+    [SerializeField] private RotateMode rotateMode = RotateMode.Quaternion;
     [SerializeField] private Vector3 finalTranslationDelta;
     [SerializeField] private Vector3 finalLocalRotation;
     [SerializeField] private float duration = 3f;
@@ -9,8 +15,10 @@ public class TransformLerp : MonoBehaviour
 
     private Vector3 initialPosition;
     private Vector3 targetPosition;
-    private Quaternion initialRotation;
-    private Quaternion targetRotation;
+    private Quaternion initialRotationQuat;
+    private Quaternion targetRotationQuat;
+    private Vector3 initialRotationEuler;
+    private Vector3 targetRotationEuler;
 
     private float currentTime;
     private float timeDamp;
@@ -36,8 +44,11 @@ public class TransformLerp : MonoBehaviour
         initialPosition = transform.position;
         targetPosition = initialPosition + finalTranslationDelta;
 
-        initialRotation = transform.localRotation;
-        targetRotation = Quaternion.Euler(finalLocalRotation);
+        initialRotationQuat = transform.localRotation;
+        targetRotationQuat = Quaternion.Euler(finalLocalRotation);
+
+        initialRotationEuler = transform.localRotation.eulerAngles;
+        targetRotationEuler = finalLocalRotation;
     }
 
     private void Update() {
@@ -54,7 +65,12 @@ public class TransformLerp : MonoBehaviour
         currentTime = allowRevert ? t : Mathf.Max(currentTime, t);
 
         transform.position = Vector3.Lerp(initialPosition, targetPosition, currentTime);
-        transform.localRotation = Quaternion.Lerp(initialRotation, targetRotation, currentTime);
+        if (rotateMode == RotateMode.Quaternion) {
+            transform.localRotation = Quaternion.Lerp(initialRotationQuat, targetRotationQuat, currentTime);
+        } else {
+            Vector3 rotation = Vector3.Lerp(initialRotationEuler, targetRotationEuler, currentTime);
+            transform.localRotation = Quaternion.Euler(rotation);
+        }
     }
 
     public void SetTimeSmooth(float t) {
@@ -68,8 +84,8 @@ public class TransformLerp : MonoBehaviour
         if (!Application.isPlaying) { SetupTransformations(); }
 
         Quaternion referenceRotation = transform.parent ?
-                                           transform.parent.rotation * targetRotation :
-                                           targetRotation;
+                                           transform.parent.rotation * targetRotationQuat :
+                                           targetRotationQuat;
 
         MeshFilter[] meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
         if (meshFilters.Length > 0) {
