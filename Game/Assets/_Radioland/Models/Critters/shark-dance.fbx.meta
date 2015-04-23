@@ -1,0 +1,239 @@
+fileFormatVersion: 2
+guid: b5ef367cd4afd6a478889123f36a9f06
+timeCreated: 1429821020
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: chest
+    100002: Controls
+    100004: CTRL_body
+    100006: CTRL_chest
+    100008: CTRL_head
+    100010: CTRL_L_elbow
+    100012: CTRL_L_foot
+    100014: CTRL_L_legPV
+    100016: CTRL_L_shoulder
+    100018: CTRL_R_elbow
+    100020: CTRL_R_foot
+    100022: CTRL_R_legPV
+    100024: CTRL_R_shoulder
+    100026: Geometry
+    100028: head
+    100030: ikHandle1
+    100032: ikHandle2
+    100034: Joints
+    100036: L_ankle
+    100038: L_elbow
+    100040: L_hand
+    100042: L_hip
+    100044: L_knee
+    100046: L_shoulder
+    100048: L_toe
+    100050: nose
+    100052: R_ankle
+    100054: R_elbow
+    100056: R_hand
+    100058: R_hip
+    100060: R_knee
+    100062: R_shoulder
+    100064: R_toe
+    100066: root
+    100068: shark
+    100070: //RootNode
+    400000: chest
+    400002: Controls
+    400004: CTRL_body
+    400006: CTRL_chest
+    400008: CTRL_head
+    400010: CTRL_L_elbow
+    400012: CTRL_L_foot
+    400014: CTRL_L_legPV
+    400016: CTRL_L_shoulder
+    400018: CTRL_R_elbow
+    400020: CTRL_R_foot
+    400022: CTRL_R_legPV
+    400024: CTRL_R_shoulder
+    400026: Geometry
+    400028: head
+    400030: ikHandle1
+    400032: ikHandle2
+    400034: Joints
+    400036: L_ankle
+    400038: L_elbow
+    400040: L_hand
+    400042: L_hip
+    400044: L_knee
+    400046: L_shoulder
+    400048: L_toe
+    400050: nose
+    400052: R_ankle
+    400054: R_elbow
+    400056: R_hand
+    400058: R_hip
+    400060: R_knee
+    400062: R_shoulder
+    400064: R_toe
+    400066: root
+    400068: shark
+    400070: //RootNode
+    4300000: shark
+    7400000: Take 001
+    9500000: //RootNode
+    13700000: shark
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 49
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Controls
+        weight: 1
+      - path: Controls/CTRL_body
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_chest
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_chest/CTRL_head
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_chest/CTRL_L_shoulder
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_chest/CTRL_L_shoulder/CTRL_L_elbow
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_chest/CTRL_R_shoulder
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_chest/CTRL_R_shoulder/CTRL_R_elbow
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_L_foot
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_L_foot/CTRL_L_legPV
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_L_foot/ikHandle1
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_R_foot
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_R_foot/CTRL_R_legPV
+        weight: 1
+      - path: Controls/CTRL_body/CTRL_R_foot/ikHandle2
+        weight: 1
+      - path: Geometry
+        weight: 1
+      - path: Geometry/shark
+        weight: 1
+      - path: Joints
+        weight: 1
+      - path: Joints/root
+        weight: 1
+      - path: Joints/root/chest
+        weight: 1
+      - path: Joints/root/chest/head
+        weight: 1
+      - path: Joints/root/chest/head/nose
+        weight: 1
+      - path: Joints/root/chest/L_shoulder
+        weight: 1
+      - path: Joints/root/chest/L_shoulder/L_elbow
+        weight: 1
+      - path: Joints/root/chest/L_shoulder/L_elbow/L_hand
+        weight: 1
+      - path: Joints/root/chest/R_shoulder
+        weight: 1
+      - path: Joints/root/chest/R_shoulder/R_elbow
+        weight: 1
+      - path: Joints/root/chest/R_shoulder/R_elbow/R_hand
+        weight: 1
+      - path: Joints/root/L_hip
+        weight: 1
+      - path: Joints/root/L_hip/L_knee
+        weight: 1
+      - path: Joints/root/L_hip/L_knee/L_ankle
+        weight: 1
+      - path: Joints/root/L_hip/L_knee/L_ankle/L_toe
+        weight: 1
+      - path: Joints/root/R_hip
+        weight: 1
+      - path: Joints/root/R_hip/R_knee
+        weight: 1
+      - path: Joints/root/R_hip/R_knee/R_ankle
+        weight: 1
+      - path: Joints/root/R_hip/R_knee/R_ankle/R_toe
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
