@@ -62,7 +62,9 @@ public class CollectiblesManager : MonoBehaviour
     }
 
     private void Update() {
-
+        if (Input.GetKeyDown(KeyCode.H)) {
+            collectiblesUI.SetActive(!collectiblesUI.activeInHierarchy);
+        }
     }
 
     private void OnCollectObject(string type, bool playAnim) {

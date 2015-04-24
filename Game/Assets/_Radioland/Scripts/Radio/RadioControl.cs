@@ -156,6 +156,10 @@ public class RadioControl : MonoBehaviour
 
             staticSource.volume = volume;
         }
+
+        if (Input.GetKeyDown(KeyCode.H)) {
+            radioUIs[1].gameObject.SetActive(!radioUIs[1].gameObject.activeInHierarchy);
+        }
     }
 
     public void RespondToEnergyChange() {
