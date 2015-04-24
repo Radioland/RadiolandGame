@@ -12,6 +12,7 @@ public class VisualizeAudio : MonoBehaviour
     [SerializeField] private int spectumObjectCount = 6;
     [SerializeField] [Tooltip("This will be applied in the forward direction.")]
     private float spectrumObjectOffset = 0.5f;
+    [SerializeField] private Gradient colorGradient;
     [Header("Manual Objects Setup")]
     [SerializeField] private List<GameObject> spectrumObjects;
     [Header("Configuration")]
@@ -49,6 +50,12 @@ public class VisualizeAudio : MonoBehaviour
                 spectrumObject.transform.parent = transform;
                 spectrumObject.transform.position = transform.position + i * transform.forward * spectrumObjectOffset;
                 spectrumObject.transform.localRotation = Quaternion.identity;
+
+                // Set tint color.
+                Renderer spectrumObjectRenderer = spectrumObject.GetComponent<Renderer>();
+                if (spectrumObjectRenderer) {
+                    spectrumObjectRenderer.material.SetColor("_Color", colorGradient.Evaluate(i * 1.0f / spectumObjectCount));
+                }
 
                 spectrumObjects.Add(spectrumObject);
             }
