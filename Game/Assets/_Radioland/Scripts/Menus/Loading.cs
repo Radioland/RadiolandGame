@@ -19,6 +19,7 @@ public class Loading : MonoBehaviour
     [SerializeField] private List<Sprite> backgroundImages;
     [SerializeField] private List<string> messages;
     [SerializeField] private List<bool> waitForSubmit;
+    [SerializeField] private List<string> titles;
 
     private void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -76,6 +77,16 @@ public class Loading : MonoBehaviour
 
             while (!Input.GetButtonDown("SubmitAny")) {
                 yield return null;
+            }
+        }
+
+        if (level < titles.Count && titles[level].Length > 0) {
+            GameObject gameControllerObject = GameObject.FindWithTag("GameController");
+            if (gameControllerObject) {
+                GameController gameController = gameControllerObject.GetComponent<GameController>();
+                gameController.SetTitle(titles[level]);
+            } else {
+                Debug.LogWarning("Title set for level " + level + " but no GameController found.");
             }
         }
 

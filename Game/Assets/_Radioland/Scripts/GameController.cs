@@ -15,6 +15,8 @@ public class GameController : MonoBehaviour
     private bool m_paused = false;
     public bool paused { get { return m_paused; } }
 
+    [SerializeField] private Text titleText;
+
     private Vector3 fallbackRespawnPosition;
     private GameObject latestCheckpoint;
     private Respawn respawnScript;
@@ -113,5 +115,9 @@ public class GameController : MonoBehaviour
 
     public void Exit() {
         Application.Quit();
+    }
+
+    public void SetTitle(string title) {
+        titleText.text = title;
     }
 }
