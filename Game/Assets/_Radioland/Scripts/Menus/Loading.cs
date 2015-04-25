@@ -12,6 +12,7 @@ public class Loading : MonoBehaviour
     [SerializeField] private Text messageText;
     [SerializeField] private Text submitToContinueText;
     [SerializeField] private Text loadingText;
+    [SerializeField] private Text finalizingLoadText;
 
     // List of background images and text strings
     [Header("Customize Per Level")]
@@ -39,8 +40,6 @@ public class Loading : MonoBehaviour
     }
 
     private IEnumerator DisplayLoadingScreen(int level) {
-        loadingDisplay.SetActive(true);
-
         if (level < backgroundImages.Count && backgroundImages[level]) {
             overrideBackgroundImage.sprite = backgroundImages[level];
             overrideBackgroundImage.enabled = true;
@@ -55,28 +54,32 @@ public class Loading : MonoBehaviour
             messageText.enabled = false;
         }
 
+        finalizingLoadText.enabled = false;
+
+        loadingDisplay.SetActive(true);
+
         AsyncOperation async = Application.LoadLevelAsync(level);
 
         bool waitingForSubmit = (level < waitForSubmit.Count && waitForSubmit[level]);
-        if (waitingForSubmit) { async.allowSceneActivation = false; }
 
         while(!async.isDone) {
-            slider.value = Mathf.Clamp01(async.progress + 0.1f);
-
-            if (waitingForSubmit) {
-                if (async.progress >= 0.9f) {
-                    submitToContinueText.enabled = true;
-                    loadingText.enabled = false;
-
-                    if (Input.GetButtonDown("Submit")) {
-                        async.allowSceneActivation = true;
-                    }
-                }
-            }
-
+            slider.value = Mathf.Clamp(async.progress, 0f, 0.8f);
+            Time.timeScale = 0f;
             yield return null;
         }
 
+        slider.value = 1f;
+
+        if (waitingForSubmit) {
+            submitToContinueText.enabled = true;
+            loadingText.enabled = false;
+
+            while (!Input.GetButtonDown("SubmitAny")) {
+                yield return null;
+            }
+        }
+
+        Time.timeScale = 1f;
         Destroy(gameObject);
     }
 }

@@ -19,7 +19,8 @@ public class GameController : MonoBehaviour
     private GameObject latestCheckpoint;
     private Respawn respawnScript;
 
-    private float pauseCooldown = 0.5f;
+    private const float pauseCooldown = 0.5f;
+    private const float pauseTimeSinceLoad = 2f; // Require this much time before allow to pause.
     private float lastPausedTime;
 
     private void Awake() {
@@ -56,7 +57,7 @@ public class GameController : MonoBehaviour
     }
 
     private void HandlePause() {
-        if (Input.GetButtonDown("Pause")) {
+        if (Input.GetButtonDown("Pause") && Time.timeSinceLevelLoad > pauseTimeSinceLoad) {
             TogglePause();
         }
     }
