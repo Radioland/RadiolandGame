@@ -15,11 +15,14 @@ public class GameController : MonoBehaviour
     private bool m_paused = false;
     public bool paused { get { return m_paused; } }
 
+    [SerializeField] private Text titleText;
+
     private Vector3 fallbackRespawnPosition;
     private GameObject latestCheckpoint;
     private Respawn respawnScript;
 
-    private float pauseCooldown = 0.5f;
+    private const float pauseCooldown = 0.5f;
+    private const float pauseTimeSinceLoad = 2f; // Require this much time before allow to pause.
     private float lastPausedTime;
 
     private void Awake() {
@@ -56,7 +59,7 @@ public class GameController : MonoBehaviour
     }
 
     private void HandlePause() {
-        if (Input.GetButtonDown("Pause")) {
+        if (Input.GetButtonDown("Pause") && Time.timeSinceLevelLoad > pauseTimeSinceLoad) {
             TogglePause();
         }
     }
@@ -112,5 +115,9 @@ public class GameController : MonoBehaviour
 
     public void Exit() {
         Application.Quit();
+    }
+
+    public void SetTitle(string title) {
+        titleText.text = title;
     }
 }
