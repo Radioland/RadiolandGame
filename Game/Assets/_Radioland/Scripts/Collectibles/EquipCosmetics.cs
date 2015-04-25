@@ -5,6 +5,8 @@ public class EquipCosmetics : MonoBehaviour
 {
     [SerializeField] private Renderer bodyRenderer;
     private Material originalOutfit;
+    [SerializeField] private EffectManager equipEffects;
+    [SerializeField] [Range(0f, 2f)] private float equipDelay = 0f;
 
     [Header("Float Hat")]
     [SerializeField] private GameObject flowerhat;
@@ -15,6 +17,8 @@ public class EquipCosmetics : MonoBehaviour
     [Header("Birb Outfit")]
     [SerializeField] private GameObject birbHat;
     [SerializeField] private Material birbOutfit;
+
+    private string latestEquippedCosmetic;
 
     private void Awake() {
         CosmeticsManager.Register("flowerhat");
@@ -30,6 +34,8 @@ public class EquipCosmetics : MonoBehaviour
         if (CosmeticsManager.IsEquipped("birboutfit")) { EquipBirbOutfit(); }
 
         Messenger.AddListener<string>("UnlockCosmetic", OnUnlockCosmetic);
+        Messenger.AddListener<string>("EquipCosmetic", OnEquipCosmetic);
+        Messenger.AddListener<string>("UnequipCosmetic", OnUnequipCosmetic);
     }
 
     private void Update() {
@@ -38,15 +44,35 @@ public class EquipCosmetics : MonoBehaviour
 
     private void OnUnlockCosmetic(string cosmeticName) {
         // Only allow one to be equipped at a time.
-        if (CosmeticsManager.IsEquipped("flowerhat")) { UnEquipFlowerHat(); }
-        if (CosmeticsManager.IsEquipped("mustache")) { UnEquipMustache(); }
-        if (CosmeticsManager.IsEquipped("birboutfit")) { UnEquipBirbOutfit(); }
+        if (CosmeticsManager.IsEquipped("flowerhat")) { UnequipFlowerHat(); }
+        if (CosmeticsManager.IsEquipped("mustache")) { UnequipMustache(); }
+        if (CosmeticsManager.IsEquipped("birboutfit")) { UnequipBirbOutfit(); }
 
         CosmeticsManager.Equip(cosmeticName);
+    }
 
-        if (cosmeticName == "flowerhat") { EquipFlowerHat(); }
-        if (cosmeticName == "mustache") { EquipMustache(); }
-        if (cosmeticName == "birboutfit") { EquipBirbOutfit(); }
+    private void OnEquipCosmetic(string cosmeticName) {
+        CancelInvoke("Equip");
+
+        latestEquippedCosmetic = cosmeticName;
+
+        Invoke("Equip", equipDelay);
+
+        if (equipEffects) {
+            equipEffects.StartEvent();
+        }
+    }
+
+    private void Equip() {
+        if (latestEquippedCosmetic == "flowerhat") { EquipFlowerHat(); }
+        if (latestEquippedCosmetic == "mustache") { EquipMustache(); }
+        if (latestEquippedCosmetic == "birboutfit") { EquipBirbOutfit(); }
+    }
+
+    private void OnUnequipCosmetic(string cosmeticName) {
+        if (cosmeticName == "flowerhat") { UnequipFlowerHat(); }
+        if (cosmeticName == "mustache") { UnequipMustache(); }
+        if (cosmeticName == "birboutfit") { UnequipBirbOutfit(); }
     }
 
     #region Flower Hat
@@ -54,7 +80,7 @@ public class EquipCosmetics : MonoBehaviour
         flowerhat.SetActive(true);
     }
 
-    private void UnEquipFlowerHat() {
+    private void UnequipFlowerHat() {
         flowerhat.SetActive(false);
     }
     #endregion Flower Hat
@@ -64,7 +90,7 @@ public class EquipCosmetics : MonoBehaviour
         mustache.SetActive(true);
     }
 
-    private void UnEquipMustache() {
+    private void UnequipMustache() {
         mustache.SetActive(false);
     }
     #endregion Mustache
@@ -75,7 +101,7 @@ public class EquipCosmetics : MonoBehaviour
         bodyRenderer.material = birbOutfit;
     }
 
-    private void UnEquipBirbOutfit() {
+    private void UnequipBirbOutfit() {
         birbHat.SetActive(false);
         bodyRenderer.material = originalOutfit;
     }

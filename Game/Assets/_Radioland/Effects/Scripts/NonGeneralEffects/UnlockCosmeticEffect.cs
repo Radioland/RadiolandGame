@@ -26,8 +26,6 @@ public class UnlockCosmeticEffect : Effect
 
         CosmeticsManager.Register(cosmeticName);
         CosmeticsManager.Unlock(cosmeticName);
-
-        Messenger.Broadcast("UnlockCosmetic", cosmeticName);
     }
 
     public override void EndEffect() {

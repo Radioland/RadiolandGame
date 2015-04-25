@@ -19,11 +19,13 @@ static internal class CosmeticsManager
 
     static public void Unlock(string cosmeticName) {
         cosmeticStates[cosmeticName] = UnlockState.Unlocked;
+        Messenger.Broadcast("UnlockCosmetic", cosmeticName);
     }
 
     static public void Equip(string cosmeticName) {
         UnequipAll();
         cosmeticStates[cosmeticName] = UnlockState.Equipped;
+        Messenger.Broadcast("EquipCosmetic", cosmeticName);
     }
 
     static public void Unequip(string cosmeticName) {
@@ -31,6 +33,7 @@ static internal class CosmeticsManager
         if (cosmeticStates.TryGetValue(cosmeticName, out unlockState)) {
             if (unlockState == UnlockState.Equipped) {
                 cosmeticStates[cosmeticName] = UnlockState.Unlocked;
+                Messenger.Broadcast("UnequipCosmetic", cosmeticName);
             }
         }
     }
