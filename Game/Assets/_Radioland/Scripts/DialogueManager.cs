@@ -64,6 +64,7 @@ public class DialogueManager : MonoBehaviour
                 cameraTarget.position = Vector3.Lerp(currentDialogue.transform.position,
                                                      playerTransform.position, 0.5f);
                 cameraControl.OverrideTarget(cameraTarget.transform, 12f);
+                characterMovement.LookAt(currentDialogue.transform);
             }
         }
     }
@@ -80,11 +81,6 @@ public class DialogueManager : MonoBehaviour
         currentDialogue = nextDialogue;
 
         looking = look;
-
-        if (look) {
-            // Player look at the source of the dialogue.
-            characterMovement.LookAt(nextDialogue.transform);
-        }
 
         StartCoroutine("FadeInActiveDialogue");
     }
