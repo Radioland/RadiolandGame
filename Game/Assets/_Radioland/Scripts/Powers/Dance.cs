@@ -106,6 +106,8 @@ public class Dance : MonoBehaviour
     }
 
     private void StartDancing() {
+        if (dancing) { return; }
+
         dancing = true;
         stopping = false;
         lastDanceTime = Time.time;
