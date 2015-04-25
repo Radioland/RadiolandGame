@@ -3,7 +3,7 @@ Radioland
 
 ![Radioland Poster](/Web/RadiolandPoster.png?raw=true "Radioland Poster")
 
-Radioland is a 3D puzzle platformer set on a chain of islands floating in the sky. Players control Gunther as he navigates through four seasonally themed levels collecting audio logs for retransmission at the ultimate radio tower. We built this game as our final project for Experimental Game Design at RPI and plan to continue development next semester.
+Join Gunther in Radioland, where you guide our lovable hero in helping the critters of Radioland get life back from the silence that has surrounded them. In this 3D puzzle platformer, use the power of radio to traverse colorful environments, solve puzzles, and collect crazy outfits. Turn on the radio towers, move the environment, complete the levels and guide Radioland back to a brighter future!
 
 ---------
 
