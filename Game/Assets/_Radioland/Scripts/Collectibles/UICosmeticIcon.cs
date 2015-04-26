@@ -31,6 +31,10 @@ public class UICosmeticIcon : MonoBehaviour
         }
     }
 
+    private void Start() {
+        Messenger.AddListener<string>("UnlockCosmetic", OnUnlockCosmetic);
+    }
+
     private void Update() {
         transform.Rotate(Vector3.up, rotationDegreesPerSecond * (rotating ? 1 : 0) * Time.deltaTime);
 
@@ -67,6 +71,13 @@ public class UICosmeticIcon : MonoBehaviour
             CosmeticsManager.Unequip(cosmeticName);
         } else {
             CosmeticsManager.Equip(cosmeticName);
+        }
+    }
+
+    private void OnUnlockCosmetic(string unlockedCosmeticName) {
+        if (unlockedCosmeticName == cosmeticName) {
+            GetComponent<Renderer>().material = unlockedMaterial;
+            if (button) { button.interactable = true; }
         }
     }
 }
