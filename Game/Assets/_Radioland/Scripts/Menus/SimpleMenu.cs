@@ -5,10 +5,12 @@ public class SimpleMenu : MonoBehaviour
 {
     [SerializeField] private GameObject loadingScreen;
 
-    private bool alreadyLoading = false;
+    private bool alreadyLoading;
+    private bool alreadyWaitingToLoad;
 
     private void Awake() {
-
+        alreadyLoading = false;
+        alreadyWaitingToLoad = false;
     }
 
     private void Start() {
@@ -39,6 +41,12 @@ public class SimpleMenu : MonoBehaviour
 
     public void LoadNextLevel() {
         LoadLevel(Application.loadedLevel + 1);
+    }
+
+    public void LoadNextLevel(float delay) {
+        if (alreadyWaitingToLoad) { return; }
+        alreadyWaitingToLoad = true;
+        Invoke("LoadNextLevel", delay);
     }
 
     public void Exit() {
