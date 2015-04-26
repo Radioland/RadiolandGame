@@ -8,15 +8,35 @@ ModelImporter:
     100000: bowtie
     100002: glasses
     100004: //RootNode
+    100006: nerd_bowtie
+    100008: nerd_glasses
+    100010: frame
+    100012: glass
     400000: bowtie
     400002: glasses
     400004: //RootNode
+    400006: nerd_bowtie
+    400008: nerd_glasses
+    400010: frame
+    400012: glass
     2300000: bowtie
     2300002: glasses
+    2300004: nerd_bowtie
+    2300006: nerd_glasses
+    2300008: frame
+    2300010: glass
     3300000: bowtie
     3300002: glasses
+    3300004: nerd_bowtie
+    3300006: nerd_glasses
+    3300008: frame
+    3300010: glass
     4300000: bowtie
     4300002: glasses
+    4300004: nerd_bowtie
+    4300006: nerd_glasses
+    4300008: frame
+    4300010: glass
     9500000: //RootNode
   materials:
     importMaterials: 0
