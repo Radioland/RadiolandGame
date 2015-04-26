@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
     private bool m_paused = false;
     public bool paused { get { return m_paused; } }
 
+    [SerializeField] private GameObject titleUI;
     [SerializeField] private Text titleText;
 
     private Vector3 fallbackRespawnPosition;
@@ -35,6 +36,10 @@ public class GameController : MonoBehaviour
         lastPausedTime = -1000f;
 
         OnOptionsChanged();
+
+        if (titleUI) {
+            titleUI.SetActive(true);
+        }
     }
 
     private void Start() {

@@ -7,7 +7,13 @@ public class TransformLerp : MonoBehaviour
         Quaternion, Euler
     }
 
+    private enum TranslateMode
+    {
+        Global, Local
+    }
+
     [SerializeField] private RotateMode rotateMode = RotateMode.Quaternion;
+    [SerializeField] private TranslateMode translateMode = TranslateMode.Global;
     [SerializeField] private Vector3 finalTranslationDelta;
     [SerializeField] private Vector3 finalLocalRotation;
     [SerializeField] private float duration = 3f;
@@ -41,7 +47,11 @@ public class TransformLerp : MonoBehaviour
     }
 
     private void SetupTransformations() {
-        initialPosition = transform.position;
+        if (translateMode == TranslateMode.Global) {
+            initialPosition = transform.position;
+        } else {
+            initialPosition = transform.localPosition;
+        }
         targetPosition = initialPosition + finalTranslationDelta;
 
         initialRotationQuat = transform.localRotation;
@@ -64,7 +74,11 @@ public class TransformLerp : MonoBehaviour
     public void SetTime(float t) {
         currentTime = allowRevert ? t : Mathf.Max(currentTime, t);
 
-        transform.position = Vector3.Lerp(initialPosition, targetPosition, currentTime);
+        if (translateMode == TranslateMode.Global) {
+            transform.position = Vector3.Lerp(initialPosition, targetPosition, currentTime);
+        } else {
+            transform.localPosition = Vector3.Lerp(initialPosition, targetPosition, currentTime);
+        }
         if (rotateMode == RotateMode.Quaternion) {
             transform.localRotation = Quaternion.Lerp(initialRotationQuat, targetRotationQuat, currentTime);
         } else {
