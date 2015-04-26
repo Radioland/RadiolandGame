@@ -5,6 +5,7 @@ public class EquipCosmetics : MonoBehaviour
 {
     [SerializeField] private Renderer bodyRenderer;
     private Material originalOutfit;
+    [SerializeField] private Renderer hairRenderer;
     [SerializeField] private EffectManager equipEffects;
     [SerializeField] [Range(0f, 2f)] private float equipDelay = 0f;
 
@@ -123,21 +124,25 @@ public class EquipCosmetics : MonoBehaviour
     private void EquipBirbOutfit() {
         birbHat.SetActive(true);
         bodyRenderer.material = birbOutfit;
+        hairRenderer.enabled = false;
     }
 
     private void UnequipBirbOutfit() {
         birbHat.SetActive(false);
         bodyRenderer.material = originalOutfit;
+        hairRenderer.enabled = true;
     }
     #endregion Birb Outfit
 
     #region Kimi
     private void EquipKimi() {
         kimi.SetActive(true);
+        hairRenderer.enabled = false;
     }
 
     private void UnequipKimi() {
         kimi.SetActive(false);
+        hairRenderer.enabled = true;
     }
     #endregion Kimi
 
