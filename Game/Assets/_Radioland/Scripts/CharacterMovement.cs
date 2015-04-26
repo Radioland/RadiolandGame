@@ -51,6 +51,7 @@ public class CharacterMovement : MonoBehaviour
     public float controlSpeed { get; private set; }
     public float speed { get { return (velocity + Vector3.up * verticalSpeed).magnitude; } }
     public bool controllable { get; private set; }
+    public bool gravityEnabled { get; private set; }
     #endregion State (read-only visible to other scripts).
 
     #region Collision, jumping, sliding, bouncing, and input.
@@ -149,6 +150,7 @@ public class CharacterMovement : MonoBehaviour
         falling = false;
         controlSpeed = 0f;
         controllable = true;
+        gravityEnabled = true;
 
         ResetAirSmoothDampTime();
         ResetGroundSmoothDampTime();
@@ -290,7 +292,7 @@ public class CharacterMovement : MonoBehaviour
                 falling = true;
             }
 
-            if ((bouncing && bounceTrajectory) || inJumpWindup) {
+            if ((bouncing && bounceTrajectory) || inJumpWindup || !gravityEnabled) {
                 // Gravity is already accounted for.
             } else {
                 if (verticalSpeed > 0) {
@@ -455,6 +457,8 @@ public class CharacterMovement : MonoBehaviour
     public void SetMass(float newMass) { mass = newMass; }
     public void ResetMass() { mass = originalMass; }
     public void SetControllable(bool isControllable) { controllable = isControllable; }
+    public void DisableGravity() { gravityEnabled = false; }
+    public void EnableGravity() { gravityEnabled = true; }
     #endregion Set and reset properties.
 
     private void StickToWorldspace(Transform root, Transform camera,
