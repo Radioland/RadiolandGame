@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class UICosmeticIcon : MonoBehaviour
 {
     [Header("General UI Settings")]
+    [SerializeField] private Transform rotationRoot;
     [SerializeField] private float rotationDegreesPerSecond = 30f;
     [SerializeField] private Button button;
     [SerializeField] private Text equipText;
@@ -16,6 +17,10 @@ public class UICosmeticIcon : MonoBehaviour
     private Quaternion initialRotation;
     private bool rotating;
     private bool selected;
+
+    private void Reset() {
+        rotationRoot = transform;
+    }
 
     private void Awake() {
         initialRotation = transform.rotation;
@@ -36,7 +41,9 @@ public class UICosmeticIcon : MonoBehaviour
     }
 
     private void Update() {
-        transform.Rotate(Vector3.up, rotationDegreesPerSecond * (rotating ? 1 : 0) * Time.deltaTime);
+        if (rotationRoot) {
+            rotationRoot.Rotate(Vector3.up, rotationDegreesPerSecond * (rotating ? 1 : 0) * Time.deltaTime);
+        }
 
         if (CosmeticsManager.IsEquipped(cosmeticName)) {
             equipText.enabled = true;
@@ -62,7 +69,9 @@ public class UICosmeticIcon : MonoBehaviour
     }
 
     private void StopRotate() {
-        transform.rotation = initialRotation;
+        if (rotationRoot) {
+            rotationRoot.rotation = initialRotation;
+        }
         rotating = false;
     }
 
