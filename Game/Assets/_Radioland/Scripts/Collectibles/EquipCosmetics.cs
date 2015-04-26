@@ -5,6 +5,7 @@ public class EquipCosmetics : MonoBehaviour
 {
     [SerializeField] private Renderer bodyRenderer;
     private Material originalOutfit;
+    [SerializeField] private Renderer hairRenderer;
     [SerializeField] private EffectManager equipEffects;
     [SerializeField] [Range(0f, 2f)] private float equipDelay = 0f;
 
@@ -18,12 +19,21 @@ public class EquipCosmetics : MonoBehaviour
     [SerializeField] private GameObject birbHat;
     [SerializeField] private Material birbOutfit;
 
+    [Header("Kimi")]
+    [SerializeField] private GameObject kimi;
+
+    [Header("Nerd Outfit")]
+    [SerializeField] private GameObject nerdGlasses;
+    [SerializeField] private GameObject nerdOutfit;
+
     private string latestEquippedCosmetic;
 
     private void Awake() {
         CosmeticsManager.Register("flowerhat");
         CosmeticsManager.Register("mustache");
         CosmeticsManager.Register("birboutfit");
+        CosmeticsManager.Register("kimi");
+        CosmeticsManager.Register("nerdoutfit");
 
         originalOutfit = bodyRenderer.material;
     }
@@ -32,6 +42,8 @@ public class EquipCosmetics : MonoBehaviour
         if (CosmeticsManager.IsEquipped("flowerhat")) { EquipFlowerHat(); }
         if (CosmeticsManager.IsEquipped("mustache")) { EquipMustache(); }
         if (CosmeticsManager.IsEquipped("birboutfit")) { EquipBirbOutfit(); }
+        if (CosmeticsManager.IsEquipped("kimi")) { EquipKimi(); }
+        if (CosmeticsManager.IsEquipped("nerdoutfit")) { EquipNerdOutfit(); }
 
         Messenger.AddListener<string>("UnlockCosmetic", OnUnlockCosmetic);
         Messenger.AddListener<string>("EquipCosmetic", OnEquipCosmetic);
@@ -39,15 +51,19 @@ public class EquipCosmetics : MonoBehaviour
     }
 
     private void Update() {
+        // Unlock all cosmetics cheat.
+        if (Input.GetKeyDown(KeyCode.U)) {
+            CosmeticsManager.Unlock("flowerhat");
+            CosmeticsManager.Unlock("mustache");
+            CosmeticsManager.Unlock("birboutfit");
+            CosmeticsManager.Unlock("kimi");
+            CosmeticsManager.Unlock("nerdoutfit");
 
+            UnequipAll();
+        }
     }
 
     private void OnUnlockCosmetic(string cosmeticName) {
-        // Only allow one to be equipped at a time.
-        if (CosmeticsManager.IsEquipped("flowerhat")) { UnequipFlowerHat(); }
-        if (CosmeticsManager.IsEquipped("mustache")) { UnequipMustache(); }
-        if (CosmeticsManager.IsEquipped("birboutfit")) { UnequipBirbOutfit(); }
-
         CosmeticsManager.Equip(cosmeticName);
     }
 
@@ -67,12 +83,21 @@ public class EquipCosmetics : MonoBehaviour
         if (latestEquippedCosmetic == "flowerhat") { EquipFlowerHat(); }
         if (latestEquippedCosmetic == "mustache") { EquipMustache(); }
         if (latestEquippedCosmetic == "birboutfit") { EquipBirbOutfit(); }
+        if (latestEquippedCosmetic == "kimi") { EquipKimi(); }
+        if (latestEquippedCosmetic == "nerdoutfit") { EquipNerdOutfit(); }
     }
 
     private void OnUnequipCosmetic(string cosmeticName) {
         if (cosmeticName == "flowerhat") { UnequipFlowerHat(); }
         if (cosmeticName == "mustache") { UnequipMustache(); }
         if (cosmeticName == "birboutfit") { UnequipBirbOutfit(); }
+        if (cosmeticName == "kimi") { UnequipKimi(); }
+        if (cosmeticName == "nerdoutfit") { UnequipNerdOutfit(); }
+    }
+
+    private void UnequipAll() {
+        CancelInvoke("Equip");
+        CosmeticsManager.UnequipAll();
     }
 
     #region Flower Hat
@@ -99,11 +124,37 @@ public class EquipCosmetics : MonoBehaviour
     private void EquipBirbOutfit() {
         birbHat.SetActive(true);
         bodyRenderer.material = birbOutfit;
+        hairRenderer.enabled = false;
     }
 
     private void UnequipBirbOutfit() {
         birbHat.SetActive(false);
         bodyRenderer.material = originalOutfit;
+        hairRenderer.enabled = true;
     }
     #endregion Birb Outfit
+
+    #region Kimi
+    private void EquipKimi() {
+        kimi.SetActive(true);
+        hairRenderer.enabled = false;
+    }
+
+    private void UnequipKimi() {
+        kimi.SetActive(false);
+        hairRenderer.enabled = true;
+    }
+    #endregion Kimi
+
+    #region Nerd Outfit
+    private void EquipNerdOutfit() {
+        nerdGlasses.SetActive(true);
+        nerdOutfit.SetActive(true);
+    }
+
+    private void UnequipNerdOutfit() {
+        nerdGlasses.SetActive(false);
+        nerdOutfit.SetActive(false);
+    }
+    #endregion Nerd Outfit
 }
