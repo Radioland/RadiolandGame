@@ -46,6 +46,7 @@ public class Dance : MonoBehaviour
         Messenger.AddListener("InputReceived", OnInputReceived);
         Messenger.AddListener("JumpTriggered", OnJumpTriggered);
         Messenger.AddListener("NoMovementInput", OnNoMovementInput);
+        Messenger.AddListener("KickTriggered", OnKickTriggered);
     }
 
     private void Update() {
@@ -100,6 +101,13 @@ public class Dance : MonoBehaviour
 
     private void OnJumpTriggered() {
         // Jump immediately cancels dancing.
+        if (dancing) {
+            StopDancing();
+        }
+    }
+
+    private void OnKickTriggered() {
+        // Kick immediately cancels dancing.
         if (dancing) {
             StopDancing();
         }

@@ -383,7 +383,6 @@ public class CharacterMovement : MonoBehaviour
         lastJumpTime = Time.time;
         inJumpWindup = true;
         Messenger.Broadcast("JumpStarted");
-
     }
 
     public void Bounce(float bounceSpeed) {

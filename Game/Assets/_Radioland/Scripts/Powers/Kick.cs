@@ -5,6 +5,9 @@ public class Kick : MonoBehaviour
 {
     [SerializeField] private Vector3 kickDisplacement = new Vector3(0f, 0.2f, 1f);
     [SerializeField] private float kickDuration = 1f;
+    [SerializeField] private AnimationCurve displacementX;
+    [SerializeField] private AnimationCurve displacementY;
+    [SerializeField] private AnimationCurve displacementZ;
     [SerializeField] private GameObject kickObject;
 
     private CharacterMovement characterMovement;
@@ -14,6 +17,7 @@ public class Kick : MonoBehaviour
     private int kickingStateHash;
 
     private bool kicking;
+    private float kickTime;
 
     private void Awake() {
         characterMovement = gameObject.GetComponent<CharacterMovement>();
@@ -35,8 +39,13 @@ public class Kick : MonoBehaviour
     }
 
     private void Update() {
-        if (Input.GetButtonDown("Kick") && characterMovement.controllable) {
-            animator.SetTrigger(kickHash);
+        if (Input.GetButtonDown("Kick")) {
+            Messenger.Broadcast("InputReceived");
+            Messenger.Broadcast("KickTriggered");
+
+            if (characterMovement.controllable) {
+                animator.SetTrigger(kickHash);
+            }
         }
 
         bool inKickState = animator.GetCurrentAnimatorStateInfo(0).fullPathHash == kickingStateHash;
@@ -50,18 +59,21 @@ public class Kick : MonoBehaviour
             characterMovement.DisableGravity();
             characterMovement.SetControllable(false);
 
-            // TODO: curve or some delay for this?
+            kickTime += Time.deltaTime / kickDuration;
 
-            Vector3 displacement = transform.right * kickDisplacement.x +
-                                   transform.up * kickDisplacement.y +
-                                   transform.forward * kickDisplacement.z;
+            Vector3 displacement = transform.right   * kickDisplacement.x * displacementX.Evaluate(kickTime) +
+                                   transform.up      * kickDisplacement.y * displacementY.Evaluate(kickTime) +
+                                   transform.forward * kickDisplacement.z * displacementZ.Evaluate(kickTime);
+
             characterController.Move(displacement * Time.deltaTime / kickDuration);
         }
     }
 
     private void StartKicking() {
         kicking = true;
+        kickTime = 0f;
         kickObject.SetActive(true);
+        characterMovement.Stop();
     }
 
     private void StopKicking() {
