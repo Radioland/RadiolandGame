@@ -18,6 +18,7 @@ public class Kick : MonoBehaviour
 
     private bool kicking;
     private float kickTime;
+    private bool kickedAlready;
 
     private void Awake() {
         characterMovement = gameObject.GetComponent<CharacterMovement>();
@@ -32,6 +33,7 @@ public class Kick : MonoBehaviour
         kickingStateHash = Animator.StringToHash("Base Layer.Kicking");
 
         kicking = false;
+        kickedAlready = false;
     }
 
     private void Start() {
@@ -43,13 +45,11 @@ public class Kick : MonoBehaviour
             Messenger.Broadcast("InputReceived");
             Messenger.Broadcast("KickTriggered");
 
-            if (characterMovement.controllable) {
-                animator.SetTrigger(kickHash);
-            }
+            TriggerKick();
         }
 
         bool inKickState = animator.GetCurrentAnimatorStateInfo(0).fullPathHash == kickingStateHash;
-        if (inKickState && !kicking) {
+        if (inKickState && !kicking && !kickedAlready) {
             StartKicking();
         } else if (!inKickState && kicking) {
             StopKicking();
@@ -66,11 +66,20 @@ public class Kick : MonoBehaviour
                                    transform.forward * kickDisplacement.z * displacementZ.Evaluate(kickTime);
 
             characterController.Move(displacement * Time.deltaTime / kickDuration);
+        } else if (characterMovement.grounded) {
+            kickedAlready = false;
         }
+    }
+
+    private void TriggerKick() {
+        if (!characterMovement.controllable || kicking || kickedAlready) { return; }
+
+        animator.SetTrigger(kickHash);
     }
 
     private void StartKicking() {
         kicking = true;
+        kickedAlready = true;
         kickTime = 0f;
         kickObject.SetActive(true);
         characterMovement.Stop();
