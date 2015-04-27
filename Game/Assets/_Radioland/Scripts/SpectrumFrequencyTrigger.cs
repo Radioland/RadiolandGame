@@ -11,6 +11,7 @@ public class SpectrumFrequencyTrigger : MonoBehaviour
     [SerializeField] private float minWatchFrequency = 0f;
     [SerializeField] private float maxWatchFrequency = 2048f;
     [SerializeField] private float thresholdPercent = 0.5f;
+    [SerializeField] private float cooldown = 0f;
     [SerializeField] private UnityEvent triggerEvent;
 
     private SpectrumSource spectrumSource;
@@ -22,6 +23,8 @@ public class SpectrumFrequencyTrigger : MonoBehaviour
     private int stopTriggerIndex;
     private int startWatchIndex;
     private int stopWatchIndex;
+
+    private float lastTriggeredTime;
 
     private void Awake() {
         spectrumSource = gameObject.GetComponent<SpectrumSource>();
@@ -38,6 +41,8 @@ public class SpectrumFrequencyTrigger : MonoBehaviour
     }
 
     private void Update() {
+        if (Time.time - lastTriggeredTime < cooldown) { return; }
+
         spectrum = spectrumSource.spectrum;
 
         startTriggerIndex = GetSpectrumIndex(minTriggerFrequency);
@@ -62,6 +67,7 @@ public class SpectrumFrequencyTrigger : MonoBehaviour
         if (spectrumSource.radioStation) { relativeTriggerAmplitude /= spectrumSource.radioStation.maxVolume; }
 
         if (relativeTriggerAmplitude > thresholdPercent) {
+            lastTriggeredTime = Time.time;
             triggerEvent.Invoke();
         }
     }
