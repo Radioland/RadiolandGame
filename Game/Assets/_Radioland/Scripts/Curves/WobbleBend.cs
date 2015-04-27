@@ -10,7 +10,8 @@ public class WobbleBend : MonoBehaviour
     [SerializeField] private ICurve bendCurveA;
     [SerializeField] private ICurve bendCurveB;
     [SerializeField] private bool bendChildren = true;
-    [SerializeField] private float bendSpeed = 0.2f;
+    [SerializeField] private float duration = 3f;
+    [SerializeField] private bool allowRevert = true;
     #endregion Internal representation.
 
     #region Public interface for reference points.
@@ -24,6 +25,12 @@ public class WobbleBend : MonoBehaviour
     public void SetEndWorld(Vector3 end) { referenceEnd = transform.InverseTransformPoint(end); }
     public void SetEndLocal(Vector3 end) { referenceEnd = end; }
     #endregion Public interface for reference points.
+
+    private static float updateRate = 1 / 3f;
+    private float currentTime;
+    private float lastUpdatedColliderTime;
+    private float timeDamp;
+    private bool runningAuto = false;
 
     // Key: meshFilter InstanceID, Value: original meshFilter.sharedMesh.vertices
     private Dictionary<int, Vector3[]> originalVertices;
@@ -46,6 +53,8 @@ public class WobbleBend : MonoBehaviour
             MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
             originalVertices.Add(meshFilter.GetInstanceID(), meshFilter.sharedMesh.vertices);
         }
+
+        InvokeRepeating("UpdateAllColliders", 0f, updateRate);
     }
 
     private void Start() {
@@ -53,7 +62,23 @@ public class WobbleBend : MonoBehaviour
     }
 
     private void Update() {
-        PerformBend(Mathf.PingPong(Time.time * bendSpeed, 1f));
+        if (runningAuto) {
+            SetTime(currentTime + Time.deltaTime / duration);
+        }
+    }
+
+    public void StartAuto() {
+        runningAuto = true;
+    }
+
+    public void SetTime(float t) {
+        currentTime = allowRevert ? t : Mathf.Max(currentTime, t);
+
+        PerformBend(currentTime);
+    }
+
+    public void SetTimeSmooth(float t) {
+        SetTime(Mathf.SmoothDamp(currentTime, t, ref timeDamp, duration));
     }
 
     public void PerformBend(float t) {
@@ -110,5 +135,29 @@ public class WobbleBend : MonoBehaviour
         meshFilter.mesh.vertices = vertices;
         meshFilter.mesh.RecalculateNormals();
         meshFilter.mesh.RecalculateBounds();
+    }
+
+    private void UpdateCollider(MeshFilter meshFilter) {
+        MeshCollider meshCollider = meshFilter.GetComponent<MeshCollider>();
+        if (meshCollider) {
+            meshCollider.sharedMesh = null;
+            meshCollider.sharedMesh = meshFilter.mesh;
+        }
+    }
+
+    private void UpdateAllColliders() {
+        if (currentTime - lastUpdatedColliderTime < 0.02f) { return; }
+
+        lastUpdatedColliderTime = currentTime;
+
+        if (bendChildren) {
+            MeshFilter[] childMeshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
+            foreach (MeshFilter childMeshFilter in childMeshFilters) {
+                UpdateCollider(childMeshFilter);
+            }
+        } else {
+            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+            UpdateCollider(meshFilter);
+        }
     }
 }
