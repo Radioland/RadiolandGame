@@ -5,7 +5,7 @@ public class SpawnParticleOnCollide : MonoBehaviour {
 	public ParticleSystem thisParticleSystem;
     public ParticleCollisionEvent[] collisionEvents;
 
-    public ParticleSystem subParticleSystem;
+    public GameObject subParticleSystem;
     [Range(0,1)]
     public float spawnChance;
     
@@ -21,7 +21,7 @@ public class SpawnParticleOnCollide : MonoBehaviour {
         
         int numCollisionEvents = thisParticleSystem.GetCollisionEvents(other, collisionEvents);
         int i = 0;
-        //while (i < numCollisionEvents) {
+        while (i < numCollisionEvents) {
             if (Random.value <= spawnChance) {
                 Vector3 pos = collisionEvents[i].intersection;
                 GameObject subParticle = (GameObject)Instantiate(subParticleSystem, pos, subParticleSystem.transform.rotation);
@@ -29,7 +29,7 @@ public class SpawnParticleOnCollide : MonoBehaviour {
 
             	// Want to destroy this specific particle that collided...
             }
-           // i++;
-        //}
+            i++;
+        }
     }
 }
