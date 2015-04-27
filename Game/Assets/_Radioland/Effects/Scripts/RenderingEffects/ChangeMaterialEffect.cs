@@ -5,6 +5,7 @@ public class ChangeMaterialEffect : Effect
 {
     // Variables to specify in the editor.
     [SerializeField] private Renderer rendererToChange;
+    [SerializeField] private int materialIndex = 0;
     [SerializeField] private Material newMaterial;
     [SerializeField] private bool revertAtEnd = false;
 
@@ -13,7 +14,7 @@ public class ChangeMaterialEffect : Effect
     protected override void Awake() {
         base.Awake();
 
-        originalMaterial = rendererToChange.material;
+        originalMaterial = rendererToChange.materials[materialIndex];
     }
 
     protected override void Start() {
@@ -31,14 +32,18 @@ public class ChangeMaterialEffect : Effect
     public override void StartEffect() {
         base.StartEffect();
 
-        rendererToChange.material = newMaterial;
+        Material[] materials = rendererToChange.materials;
+        materials[materialIndex] = newMaterial;
+        rendererToChange.materials = materials;
     }
 
     public override void EndEffect() {
         base.EndEffect();
 
         if (revertAtEnd) {
-            rendererToChange.material = originalMaterial;
+            Material[] materials = rendererToChange.materials;
+            materials[materialIndex] = originalMaterial;
+            rendererToChange.materials = materials;
         }
     }
 }
