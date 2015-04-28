@@ -21,6 +21,7 @@ public class AudioStream : MonoBehaviour
     private static bool bassInitialized = false; // Only initialize BASS once between all instances.
     private bool paused;
     [HideInInspector] public bool streamInitialized;
+    private InitializeStreamJob initializeStreamJob;
 
     private static int maxRetryAttempts = 2;
 
@@ -117,50 +118,74 @@ public class AudioStream : MonoBehaviour
             }
         }
 
-        StartCoroutine("RunInitialization");
+        if (bassInitialized) {
+            initializeStreamJob = new InitializeStreamJob();
+            initializeStreamJob.in_url = url;
+            initializeStreamJob.Start();
+        }
+
+//        StartCoroutine("RunInitialization");
 
         #if UNITY_EDITOR
         EditorApplication.playmodeStateChanged = HandleOnPlayModeChanged;
         #endif
     }
 
-    private IEnumerator RunInitialization() {
-        for (int i = 0; i < maxRetryAttempts; i++) {
-            InitializeStream();
-
-            if (streamInitialized) { yield break; }
-
-            float retrySeconds = Mathf.Pow(2, i);
-            Debug.Log("Initialization attempt #" + (i + 1) + " failed, retrying in " +
-                      retrySeconds + " seconds.");
-            yield return new WaitForSeconds(retrySeconds);
-        }
-
-        Debug.Log("Initialzation attempt #" + maxRetryAttempts + " failed, giving up.");
-    }
-
-    private void InitializeStream() {
-        if (!bassInitialized || streamInitialized) { return; }
-
-        BASS_SetConfig(configs.BASS_CONFIG_NET_PLAYLIST, 2);
-        stream = BASS_StreamCreateURL(url, 0, flags.BASS_DEFAULT, IntPtr.Zero, IntPtr.Zero);
-
-        if (stream != 0) {
-            streamInitialized = true;
-            volume = 0;
-            BASS_ChannelPlay(stream, false);
-
-            BASS_ChannelGetAttribute(stream, attribs.BASS_ATTRIB_FREQ, out sampleRate);
-        } else {
-            Debug.LogError("Unable to create stream, error code: " + BASS_ErrorGetCode());
-        }
-    }
+//    private IEnumerator RunInitialization() {
+//
+//        for (int i = 0; i < maxRetryAttempts; i++) {
+//            InitializeStream();
+//
+//            if (streamInitialized) { yield break; }
+//
+//            float retrySeconds = Mathf.Pow(2, i);
+//            Debug.Log("Initialization attempt #" + (i + 1) + " failed, retrying in " +
+//                      retrySeconds + " seconds.");
+//            yield return new WaitForSeconds(retrySeconds);
+//        }
+//
+//        Debug.Log("Initialzation attempt #" + maxRetryAttempts + " failed, giving up.");
+//    }
+//
+//    private void InitializeStream() {
+//        if (!bassInitialized || streamInitialized) { return; }
+//
+//        BASS_SetConfig(configs.BASS_CONFIG_NET_PLAYLIST, 2);
+//        stream = BASS_StreamCreateURL(url, 0, flags.BASS_DEFAULT, IntPtr.Zero, IntPtr.Zero);
+//
+//        if (stream != 0) {
+//            streamInitialized = true;
+//            volume = 0;
+//            BASS_ChannelPlay(stream, false);
+//
+//            BASS_ChannelGetAttribute(stream, attribs.BASS_ATTRIB_FREQ, out sampleRate);
+//        } else {
+//            Debug.LogError("Unable to create stream, error code: " + BASS_ErrorGetCode());
+//        }
+//    }
 
     private void Start() {
 
     }
 
     private void Update() {
+        if (initializeStreamJob != null) {
+            if (initializeStreamJob.Update()) {
+                if (initializeStreamJob.successful) {
+                    stream = initializeStreamJob.out_stream;
+                    Debug.Log("Finished, stream:" + stream);
+                    streamInitialized = true;
+
+                    volume = 0;
+
+                    BASS_ChannelPlay(stream, false);
+                    BASS_ChannelGetAttribute(stream, attribs.BASS_ATTRIB_FREQ, out sampleRate);
+                }
+
+                initializeStreamJob = null;
+            }
+        }
+
         if (!streamInitialized) { return; }
 
         if (AudioListener.volume < 0.001f) { volume = 0f; }
