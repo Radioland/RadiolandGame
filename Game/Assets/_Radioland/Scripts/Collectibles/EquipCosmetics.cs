@@ -26,6 +26,10 @@ public class EquipCosmetics : MonoBehaviour
     [SerializeField] private GameObject nerdGlasses;
     [SerializeField] private GameObject nerdOutfit;
 
+    [Header("Butterfly Outfit")]
+    [SerializeField] private GameObject butterflyHead;
+    [SerializeField] private GameObject butterflyBack;
+
     private string latestEquippedCosmetic;
 
     private void Awake() {
@@ -34,6 +38,7 @@ public class EquipCosmetics : MonoBehaviour
         CosmeticsManager.Register("birboutfit");
         CosmeticsManager.Register("kimi");
         CosmeticsManager.Register("nerdoutfit");
+        CosmeticsManager.Register("butterflyoutfit");
 
         originalOutfit = bodyRenderer.material;
     }
@@ -44,6 +49,7 @@ public class EquipCosmetics : MonoBehaviour
         if (CosmeticsManager.IsEquipped("birboutfit")) { EquipBirbOutfit(); }
         if (CosmeticsManager.IsEquipped("kimi")) { EquipKimi(); }
         if (CosmeticsManager.IsEquipped("nerdoutfit")) { EquipNerdOutfit(); }
+        if (CosmeticsManager.IsEquipped("butterflyoutfit")) { EquipButterflyOutfit(); }
 
         Messenger.AddListener<string>("UnlockCosmetic", OnUnlockCosmetic);
         Messenger.AddListener<string>("EquipCosmetic", OnEquipCosmetic);
@@ -58,6 +64,7 @@ public class EquipCosmetics : MonoBehaviour
             CosmeticsManager.Unlock("birboutfit");
             CosmeticsManager.Unlock("kimi");
             CosmeticsManager.Unlock("nerdoutfit");
+            CosmeticsManager.Unlock("butterflyoutfit");
 
             UnequipAll();
         }
@@ -85,6 +92,7 @@ public class EquipCosmetics : MonoBehaviour
         if (latestEquippedCosmetic == "birboutfit") { EquipBirbOutfit(); }
         if (latestEquippedCosmetic == "kimi") { EquipKimi(); }
         if (latestEquippedCosmetic == "nerdoutfit") { EquipNerdOutfit(); }
+        if (latestEquippedCosmetic == "butterflyoutfit") { EquipButterflyOutfit(); }
     }
 
     private void OnUnequipCosmetic(string cosmeticName) {
@@ -93,6 +101,7 @@ public class EquipCosmetics : MonoBehaviour
         if (cosmeticName == "birboutfit") { UnequipBirbOutfit(); }
         if (cosmeticName == "kimi") { UnequipKimi(); }
         if (cosmeticName == "nerdoutfit") { UnequipNerdOutfit(); }
+        if (cosmeticName == "butterflyoutfit") { UnequipButterflyOutfit(); }
     }
 
     private void UnequipAll() {
@@ -157,4 +166,16 @@ public class EquipCosmetics : MonoBehaviour
         nerdOutfit.SetActive(false);
     }
     #endregion Nerd Outfit
+
+    #region Butterfly Outfit
+    private void EquipButterflyOutfit() {
+        butterflyHead.SetActive(true);
+        butterflyBack.SetActive(true);
+    }
+
+    private void UnequipButterflyOutfit() {
+        butterflyHead.SetActive(false);
+        butterflyBack.SetActive(false);
+    }
+    #endregion Butterfly Outfit
 }
