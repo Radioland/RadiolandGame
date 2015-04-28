@@ -22,7 +22,7 @@ public class AudioStream : MonoBehaviour
     private bool paused;
     [HideInInspector] public bool streamInitialized;
 
-    private static int maxRetryAttempts = 1;
+    private static int maxRetryAttempts = 3;
 
     public enum flags
     {
