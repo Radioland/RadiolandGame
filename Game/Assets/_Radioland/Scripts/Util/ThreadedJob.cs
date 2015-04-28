@@ -20,13 +20,16 @@ public class ThreadedJob
             }
         }
     }
+    private bool m_IsAborted = false;
 
     public virtual void Start() {
         m_Thread = new System.Threading.Thread(Run);
         m_Thread.Start();
     }
     public virtual void Abort() {
+        if (m_IsAborted || IsDone) { return; }
         m_Thread.Abort();
+        m_IsAborted = true;
     }
 
     protected virtual void ThreadFunction() { }
