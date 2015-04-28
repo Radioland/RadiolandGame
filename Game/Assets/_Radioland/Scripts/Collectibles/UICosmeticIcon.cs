@@ -9,6 +9,7 @@ public class UICosmeticIcon : MonoBehaviour
     [SerializeField] private float rotationDegreesPerSecond = 30f;
     [SerializeField] private Button button;
     [SerializeField] private Text equipText;
+    [SerializeField] private Image lockedImage;
 
     [Header("Cosmetic Settings")]
     [SerializeField] private string cosmeticName;
@@ -30,9 +31,9 @@ public class UICosmeticIcon : MonoBehaviour
 
         if (CosmeticsManager.IsNotLocked(cosmeticName)) {
             GetComponent<Renderer>().material = unlockedMaterial;
-            if (button) { button.interactable = true; }
+            if (button) { button.interactable = true; lockedImage.enabled = false; }
         } else {
-            if (button) { button.interactable = false; }
+            if (button) { button.interactable = false; lockedImage.enabled = true; }
         }
     }
 
@@ -86,7 +87,7 @@ public class UICosmeticIcon : MonoBehaviour
     private void OnUnlockCosmetic(string unlockedCosmeticName) {
         if (unlockedCosmeticName == cosmeticName) {
             GetComponent<Renderer>().material = unlockedMaterial;
-            if (button) { button.interactable = true; }
+            if (button) { button.interactable = true; lockedImage.enabled = false; }
         }
     }
 }
