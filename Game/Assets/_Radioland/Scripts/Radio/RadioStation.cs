@@ -43,9 +43,7 @@ public class RadioStation : MonoBehaviour
     private void Update() {
         if ((!stream || (stream && !stream.streamInitialized)) && (audioSource)) {
             audioSource.enabled = true;
-            stream.enabled = false;
         } else {
-            stream.enabled = true;
             audioSource.enabled = false;
         }
 

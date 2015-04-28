@@ -21,8 +21,8 @@ public class AudioStream : MonoBehaviour
     private static bool bassInitialized = false; // Only initialize BASS once between all instances.
     private bool paused;
     [HideInInspector] public bool streamInitialized;
-
-    private static int maxRetryAttempts = 2;
+    private static InitializeStreamJob initializeStreamJob;
+    private static bool jobStarted = false; // Single job started once between all instances.
 
     public enum flags
     {
@@ -115,52 +115,42 @@ public class AudioStream : MonoBehaviour
             if (!bassInitialized) {
                 Debug.LogError("Unable to initialize BASS, error code: " + BASS_ErrorGetCode());
             }
+
+            initializeStreamJob = new InitializeStreamJob();
         }
 
-        StartCoroutine("RunInitialization");
+        if (bassInitialized) {
+            initializeStreamJob.QueueURL(url);
+        }
 
         #if UNITY_EDITOR
         EditorApplication.playmodeStateChanged = HandleOnPlayModeChanged;
         #endif
     }
 
-    private IEnumerator RunInitialization() {
-        for (int i = 0; i < maxRetryAttempts; i++) {
-            InitializeStream();
-
-            if (streamInitialized) { yield break; }
-
-            float retrySeconds = Mathf.Pow(2, i);
-            Debug.Log("Initialization attempt #" + (i + 1) + " failed, retrying in " +
-                      retrySeconds + " seconds.");
-            yield return new WaitForSeconds(retrySeconds);
-        }
-
-        Debug.Log("Initialzation attempt #" + maxRetryAttempts + " failed, giving up.");
-    }
-
-    private void InitializeStream() {
-        if (!bassInitialized || streamInitialized) { return; }
-
-        BASS_SetConfig(configs.BASS_CONFIG_NET_PLAYLIST, 2);
-        stream = BASS_StreamCreateURL(url, 0, flags.BASS_DEFAULT, IntPtr.Zero, IntPtr.Zero);
-
-        if (stream != 0) {
-            streamInitialized = true;
-            volume = 0;
-            BASS_ChannelPlay(stream, false);
-
-            BASS_ChannelGetAttribute(stream, attribs.BASS_ATTRIB_FREQ, out sampleRate);
-        } else {
-            Debug.LogError("Unable to create stream, error code: " + BASS_ErrorGetCode());
-        }
-    }
-
     private void Start() {
-
+        if (!jobStarted && bassInitialized) {
+            initializeStreamJob.Start();
+            jobStarted = true;
+        }
     }
 
     private void Update() {
+        if (initializeStreamJob != null) {
+            if (!streamInitialized) {
+                initializeStreamJob.Update();
+
+                if (initializeStreamJob.InitializedForURL(url)) {
+                    stream = initializeStreamJob.GetStreamForURL(url);
+                    streamInitialized = true;
+                    volume = 0;
+
+                    BASS_ChannelPlay(stream, false);
+                    BASS_ChannelGetAttribute(stream, attribs.BASS_ATTRIB_FREQ, out sampleRate);
+                }
+            }
+        }
+
         if (!streamInitialized) { return; }
 
         if (AudioListener.volume < 0.001f) { volume = 0f; }
@@ -193,13 +183,22 @@ public class AudioStream : MonoBehaviour
     }
 
     private void OnApplicationQuit() {
+        if (initializeStreamJob != null) {
+            initializeStreamJob.Abort();
+            initializeStreamJob = null;
+        }
         BASS_StreamFree(stream);
         BASS_Free();
     }
 
     public void OnDestroy() {
+        if (initializeStreamJob != null) {
+            initializeStreamJob.Abort();
+            initializeStreamJob = null;
+        }
         BASS_StreamFree(stream);
         BASS_Free();
         bassInitialized = false;
+        jobStarted = false;
     }
 }
