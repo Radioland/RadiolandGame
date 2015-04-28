@@ -15,12 +15,13 @@ public class RadioStation : MonoBehaviour
             float strength = radioControl.frequencyHighScale -
                              (radioControl.frequencyHighScale *
                               frequencyDifference / radioControl.frequencyFadeLimit);
-            strength = Mathf.Clamp(strength, 0.0f, 1.0f);
+            strength = Mathf.Lerp(0f, maxSignalStrength, strength);
             return strength;
         }
     }
     [SerializeField] private bool m_unlocked = false;
     public bool unlocked { get { return m_unlocked; } }
+    public float maxSignalStrength = 1.0f;
     public int id;
 
     public AudioStream stream;
