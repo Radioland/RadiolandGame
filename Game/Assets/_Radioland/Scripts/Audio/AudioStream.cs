@@ -22,9 +22,7 @@ public class AudioStream : MonoBehaviour
     private bool paused;
     [HideInInspector] public bool streamInitialized;
     private static InitializeStreamJob initializeStreamJob;
-    private static bool jobStarted = false;
-
-    private static int maxRetryAttempts = 2;
+    private static bool jobStarted = false; // Single job started once between all instances.
 
     public enum flags
     {
@@ -194,6 +192,9 @@ public class AudioStream : MonoBehaviour
     }
 
     public void OnDestroy() {
+        if (initializeStreamJob != null) {
+            initializeStreamJob.Abort();
+        }
         BASS_StreamFree(stream);
         BASS_Free();
         bassInitialized = false;

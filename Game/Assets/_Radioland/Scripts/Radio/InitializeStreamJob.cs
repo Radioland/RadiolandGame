@@ -8,9 +8,7 @@ using UnityEngine;
 
 public class InitializeStreamJob : ThreadedJob
 {
-    public bool successful;
-
-    private static int maxRetryAttempts = 2;
+    private static int maxRetryAttempts = 4;
 
     private Queue<string> urls;
     private Dictionary<string, int> streams;
@@ -37,26 +35,43 @@ public class InitializeStreamJob : ThreadedJob
     }
 
     protected override void ThreadFunction() {
-        InitializeStreams();
+        for (int i = 0; i < maxRetryAttempts; i++) {
+            InitializeStreams();
 
-        Debug.Log("Finished initializing streams for all provided urls.");
+            if (urls.Count == 0) {
+                Debug.Log("Finished initializing streams for all provided urls.");
+                return;
+            }
+
+            int retrySeconds = Mathf.FloorToInt(Mathf.Pow(2, i));
+            Debug.Log("Initialization attempt #" + (i + 1) + " failed, retrying in " +
+                      retrySeconds + " seconds.");
+
+            Thread.Sleep(retrySeconds * 1000); // Milliseconds
+        }
+
+        Debug.Log("Initialzation attempt #" + maxRetryAttempts + " failed, giving up.");
     }
 
     private void InitializeStreams() {
+        Queue<string> urlsNext = new Queue<string>();
+
         while (urls.Count > 0) {
             string url = urls.Dequeue();
 
-            Debug.Log("Processing " + url);
+            Debug.Log("Initializing stream for " + url);
 
             int stream = InitializeStream(url);
 
             if (stream == 0) {
-                urls.Enqueue(url);
+                urlsNext.Enqueue(url);
             } else {
                 streams.Add(url, stream);
                 initializationStatus[url] = true;
             }
         }
+
+        urls = urlsNext;
     }
 
     protected override void OnFinished() {
