@@ -27,7 +27,7 @@ public class ThreadedJob
         m_Thread.Start();
     }
     public virtual void Abort() {
-        if (m_IsAborted || IsDone) { return; }
+        if (m_IsAborted || IsDone || m_Thread == null) { return; }
         m_Thread.Abort();
         m_IsAborted = true;
     }

@@ -185,8 +185,8 @@ public class AudioStream : MonoBehaviour
     private void OnApplicationQuit() {
         if (initializeStreamJob != null) {
             initializeStreamJob.Abort();
+            initializeStreamJob = null;
         }
-
         BASS_StreamFree(stream);
         BASS_Free();
     }
@@ -194,9 +194,11 @@ public class AudioStream : MonoBehaviour
     public void OnDestroy() {
         if (initializeStreamJob != null) {
             initializeStreamJob.Abort();
+            initializeStreamJob = null;
         }
         BASS_StreamFree(stream);
         BASS_Free();
         bassInitialized = false;
+        jobStarted = false;
     }
 }
