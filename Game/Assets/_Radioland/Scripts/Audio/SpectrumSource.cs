@@ -25,13 +25,15 @@ public class SpectrumSource : MonoBehaviour
     [Header("Manual Source Setup")]
     public AudioSource source;
     public AudioStream stream;
-    [Header("Configuration")]
+
+    private RadioControl radioControl;
     private RadioStation[] allStations;
 
     private void Awake() {
         spectrum = new float[spectrumSamples];
 
         GameObject player = GameObject.FindWithTag("Player");
+        radioControl = player.GetComponentInChildren<RadioControl>();
         allStations = player.GetComponentsInChildren<RadioStation>();
     }
 
@@ -50,8 +52,7 @@ public class SpectrumSource : MonoBehaviour
 
     private void Update() {
         if (stationChoice == StationChoice.StrongestSignal) {
-            float strongestSignal = allStations.Max(x => x.signalStrength);
-            radioStation = allStations.First(x => Mathf.Approximately(x.signalStrength, strongestSignal));
+            radioStation = radioControl.strongestSignalStation;
 
             source = radioStation.audioSource;
             stream = radioStation.stream;
