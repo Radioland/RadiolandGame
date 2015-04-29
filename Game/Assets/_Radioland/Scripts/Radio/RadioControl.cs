@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class RadioControl : MonoBehaviour
 {
@@ -40,6 +41,11 @@ public class RadioControl : MonoBehaviour
     private float lastDecreaseVolume;
     private float lastIncreaseVolume;
 
+    // Public for other classes (avoiding duplicate computation).
+    [HideInInspector] public RadioStation strongestSignalStation;
+    [HideInInspector] public float strongestSignal;
+    [HideInInspector] public bool anyStrongSignal;
+
     private void Awake() {
         if (!staticSource) {
             Debug.LogWarning("[Audio] Please set the staticSource for RadioControl.");
@@ -63,7 +69,7 @@ public class RadioControl : MonoBehaviour
     }
 
     private void Start() {
-
+        UpdateStations();
     }
 
     private void ResetStatic() {
@@ -75,11 +81,35 @@ public class RadioControl : MonoBehaviour
     }
 
     private void Update() {
+        HandleTuning();
+
+        AdjustStatic();
+
+        UpdateStations();
+
+        // Hide UI.
+        if (Input.GetKeyDown(KeyCode.H)) {
+            radioUIs[1].gameObject.SetActive(!radioUIs[1].gameObject.activeInHierarchy);
+        }
+
+        // Fade glow image based on max signal.
+        foreach (RadioUI radioUI in radioUIs) {
+            radioUI.SetGlow(strongestSignal);
+        }
+    }
+
+    private void UpdateStations() {
+        anyStrongSignal = stations.Any(station => station.StrongSignal());
+        strongestSignal = stations.Max(station => station.signalStrength);
+        strongestSignalStation = stations.First(x => Mathf.Approximately(x.signalStrength, strongestSignal));
+    }
+
+    private void HandleTuning() {
         // TODO: replace with better controller/mouse input management.
         float scrollValue = Input.GetAxis("Mouse ScrollWheel") + Input.GetAxisRaw("Tune");
         scrollValue = Mathf.Clamp(scrollValue, -1f, 1f);
 
-        // Debug controls.
+        // Keyboard controls.
         if (Input.GetKey(KeyCode.Alpha1)) {
             scrollValue += 1f;
         }
@@ -122,17 +152,9 @@ public class RadioControl : MonoBehaviour
             float rotationDegrees = m_currentFrequency * 360.0f * knobTurnRatio;
             radioUI.SetKnobRotation(rotationDegrees);
         }
+    }
 
-        maxSignal = 0.0f;
-        foreach (RadioStation station in stations) {
-            maxSignal = Mathf.Max(maxSignal, station.signalStrength);
-        }
-
-        // Fade glow image based on max signal.
-        foreach (RadioUI radioUI in radioUIs) {
-            radioUI.SetGlow(maxSignal);
-        }
-
+    private void AdjustStatic() {
         // Adjust the volume of the static to fill in between stations.
         if (staticSource) {
             float staticStrength = (1.0f - maxSignal / stationCutoff) * staticMaxVolume;
@@ -155,10 +177,6 @@ public class RadioControl : MonoBehaviour
             }
 
             staticSource.volume = volume;
-        }
-
-        if (Input.GetKeyDown(KeyCode.H)) {
-            radioUIs[1].gameObject.SetActive(!radioUIs[1].gameObject.activeInHierarchy);
         }
     }
 

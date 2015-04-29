@@ -24,11 +24,13 @@ public class StationPower : MonoBehaviour
     [SerializeField] private UnityEventFloat continuousEvents;
 
     private bool powered;
+    private RadioControl radioControl;
     private RadioStation radioStation;
     private RadioStation[] allStations;
 
     private void Awake() {
         GameObject player = GameObject.FindWithTag("Player");
+        radioControl = player.GetComponentInChildren<RadioControl>();
         allStations = player.GetComponentsInChildren<RadioStation>();
     }
 
@@ -53,13 +55,13 @@ public class StationPower : MonoBehaviour
         if (!enabled) { return; }
 
         if (stationChoice == StationChoice.Any) {
-            if (allStations.Any(station => station.StrongSignal())) {
+            if (radioControl.anyStrongSignal) {
                 StartPower();
             } else {
                 StopPower();
             }
 
-            continuousEvents.Invoke(allStations.Max(station => station.signalStrength));
+            continuousEvents.Invoke(radioControl.strongestSignal);
         } else if (radioStation) {
             if (radioStation.StrongSignal()) {
                 StartPower();
