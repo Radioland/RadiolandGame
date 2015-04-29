@@ -47,15 +47,18 @@ public class RadioStation : MonoBehaviour
         }
 
         // Update signal strength.
-        if (!unlocked) { signalStrength = 0f; }
-        // Lerp signalStrength from 0 to 1 within frequencyFadeLimit.
-        // When outside of frequencyFadeLimit from the current frequency, clamp to 0.
-        float frequencyDifference = Mathf.Abs(radioControl.currentFrequency - frequency);
-        float strength = radioControl.frequencyHighScale -
-                            (radioControl.frequencyHighScale *
-                            frequencyDifference / radioControl.frequencyFadeLimit);
-        strength = Mathf.Lerp(0f, maxSignalStrength, strength);
-        signalStrength = strength;
+        if (!unlocked) {
+            signalStrength = 0f;
+        } else {
+            // Lerp signalStrength from 0 to 1 within frequencyFadeLimit.
+            // When outside of frequencyFadeLimit from the current frequency, clamp to 0.
+            float frequencyDifference = Mathf.Abs(radioControl.currentFrequency - frequency);
+            float strength = radioControl.frequencyHighScale -
+                                (radioControl.frequencyHighScale *
+                                frequencyDifference / radioControl.frequencyFadeLimit);
+            strength = Mathf.Lerp(0f, maxSignalStrength, strength);
+            signalStrength = strength;
+        }
     }
 
     public bool StrongSignal() {
