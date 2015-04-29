@@ -67,6 +67,20 @@ using System.Collections;
                      placeAbove:true, orientToSurface:true);
     }
 
+    [MenuItem("GameObject/Create Radioland/Critters/Talking Shark", false, 1)]
+    [MenuItem("Radioland/Critters/Talking Shark", false, 1)]
+    private static void CreateShark() {
+        CreateObject("Talking Shark", "Assets/_Radioland/Prefabs/Critters/Talking Shark.prefab",
+                     placeAbove:true, orientToSurface:true);
+    }
+
+    [MenuItem("GameObject/Create Radioland/Critters/Talking Dad Birb", false, 1)]
+    [MenuItem("Radioland/Critters/Talking Dad Birb", false, 1)]
+    private static void CreateDadBirb() {
+        CreateObject("Talking Dad Birb", "Assets/_Radioland/Prefabs/Critters/Talking Dad Birb.prefab",
+                     placeAbove:true, orientToSurface:true);
+    }
+
     [MenuItem("GameObject/Create Radioland/Props/Leaves", false, 1)]
     [MenuItem("Radioland/Props/Leaves", false, 1)]
     private static void CreateLeaves() {
