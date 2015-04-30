@@ -14,6 +14,7 @@ public class PlatformFlip180 : MonoBehaviour
     private void Awake() {
         flipping = false;
         flippingForward = true;
+        lastFlippedTime = Time.time;
         initialRotation = transform.localRotation;
     }
 
