@@ -53,7 +53,7 @@ public class PlayVideo : MonoBehaviour
     }
 
     private void Update() {
-        if (Time.time > duration + padding || Input.GetButtonDown("Submit")) {
+        if (Time.time > duration + padding || Input.GetButtonDown("SubmitAny")) {
             menu.LoadNextLevel();
         }
     }

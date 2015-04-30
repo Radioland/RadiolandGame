@@ -141,8 +141,12 @@ public class CameraControl : MonoBehaviour
 
     private void Update() {
         #if !UNITY_EDITOR
-        Cursor.lockState = UnityEngine.CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.lockState = UnityEngine.CursorLockMode.Confined;
+        if (Time.timeScale > 0.001f) {
+            Cursor.visible = false;
+        } else {
+            Cursor.visible = true;
+        }
         #else
         if (Input.GetKeyDown(KeyCode.Escape)) { mouseLookEnabled = !mouseLookEnabled; }
         #endif
