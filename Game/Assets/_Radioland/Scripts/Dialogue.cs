@@ -11,6 +11,8 @@ public class Dialogue : MonoBehaviour
     [Header("Dialogue Effects")]
     [SerializeField] private EffectManager allMessagesEffects;
     [SerializeField] private List<EffectManager> specificMessageEffects;
+    public bool facePlayer = false;
+    [SerializeField] private Transform rootTransform;
 
     private bool visible;
     private int currentMessage = 0;
@@ -105,5 +107,11 @@ public class Dialogue : MonoBehaviour
             dialogueManager.SignalDialogueNoLongerAvailable(this.GetInstanceID());
             ClearMessage();
         }
+    }
+
+    public void LookAt(Transform target) {
+        // TODO: maybe let other angles rotate?
+        rootTransform.LookAt(target);
+        rootTransform.rotation = Quaternion.Euler(0f, rootTransform.rotation.eulerAngles.y, 0f);
     }
 }

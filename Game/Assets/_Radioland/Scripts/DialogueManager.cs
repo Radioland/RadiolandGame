@@ -79,8 +79,10 @@ public class DialogueManager : MonoBehaviour
         }
 
         currentDialogue = nextDialogue;
-
         looking = look;
+        if (nextDialogue.facePlayer) {
+            nextDialogue.LookAt(playerTransform);
+        }
 
         StartCoroutine("FadeInActiveDialogue");
     }
