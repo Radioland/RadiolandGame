@@ -21,6 +21,11 @@ public class SimpleMenu : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Exit();
         }
+
+        #if !UNITY_EDITOR
+        Cursor.lockState = CursorLockMode.Confined;
+        #endif
+        Cursor.visible = true;
     }
 
     public void LoadLevel(int level) {
