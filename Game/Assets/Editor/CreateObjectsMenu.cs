@@ -151,6 +151,13 @@ using System.Collections;
                      placeAbove:true, orientToSurface:false);
     }
 
+    [MenuItem("GameObject/Create Radioland/Props/Firework Zone", false, 1)]
+    [MenuItem("Radioland/Props/Firework Zone", false, 1)]
+    private static void CreateFireworkZone() {
+        CreateObject("Firework Zone", "Assets/_Radioland/Environment/Prefabs/Props/Firework Zone.prefab",
+                     placeAbove:true, orientToSurface:false);
+    }
+
     [MenuItem("GameObject/Create Radioland/General/Checkpoint", false, 1)]
     [MenuItem("Radioland/General/Checkpoint", false, 1)]
     private static void CreateCheckpoint() {
