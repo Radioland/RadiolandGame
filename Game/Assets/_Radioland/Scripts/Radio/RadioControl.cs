@@ -46,6 +46,8 @@ public class RadioControl : MonoBehaviour
     [HideInInspector] public float strongestSignal;
     [HideInInspector] public bool anyStrongSignal;
 
+    private bool hidden;
+
     private void Awake() {
         if (!staticSource) {
             Debug.LogWarning("[Audio] Please set the staticSource for RadioControl.");
@@ -66,6 +68,8 @@ public class RadioControl : MonoBehaviour
         radioUIs.Add(screenUI);
 
         ResetStatic();
+
+        hidden = false;
     }
 
     private void Start() {
@@ -90,6 +94,13 @@ public class RadioControl : MonoBehaviour
         // Hide UI.
         if (Input.GetKeyDown(KeyCode.H)) {
             radioUIs[1].gameObject.SetActive(!radioUIs[1].gameObject.activeInHierarchy);
+            hidden = !hidden;
+        }
+
+        if (Time.timeScale <= 0.001) {
+            radioUIs[1].gameObject.SetActive(false);
+        } else if (!hidden) {
+            radioUIs[1].gameObject.SetActive(true);
         }
 
         // Fade glow image based on max signal.
