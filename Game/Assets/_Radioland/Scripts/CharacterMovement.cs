@@ -336,7 +336,10 @@ public class CharacterMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump")) { TriggerJump(); }
 
         // Do not allow jumping while not controllable.
-        if (!controllable) { return; }
+        if (!controllable) {
+            inJumpWindup = false;
+            return;
+        }
 
         // Do not allow jumping while sliding.
         if (sliding && slopeAngle > jumpSlopeLimit) { return; }
