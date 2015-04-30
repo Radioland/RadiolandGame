@@ -7,7 +7,6 @@ public class Loading : MonoBehaviour
 {
     [Header("General")]
     [SerializeField] private GameObject loadingDisplay;
-    [SerializeField] private Slider slider;
     [SerializeField] private Image overrideBackgroundImage;
     [SerializeField] private Text messageText;
     [SerializeField] private Text submitToContinueText;
@@ -64,12 +63,9 @@ public class Loading : MonoBehaviour
         bool waitingForSubmit = (level < waitForSubmit.Count && waitForSubmit[level]);
 
         while(!async.isDone) {
-            slider.value = Mathf.Clamp(async.progress, 0f, 0.8f);
             Time.timeScale = 0f;
             yield return null;
         }
-
-        slider.value = 1f;
 
         if (waitingForSubmit) {
             submitToContinueText.enabled = true;
