@@ -4,10 +4,15 @@ using System.Collections.Generic;
 
 public class EffectManager : MonoBehaviour
 {
+    [SerializeField] private bool onlyExecuteOnce = false;
     private Effect[] effects;
+
+    private bool executed;
 
     private void Awake() {
         effects = gameObject.GetComponents<Effect>();
+
+        executed = false;
     }
 
     private void Start() {
@@ -20,11 +25,13 @@ public class EffectManager : MonoBehaviour
 
     // Triggers all effects on this object.
     public void StartEvent() {
-        if (!enabled) { return; }
+        if (!enabled || (onlyExecuteOnce && executed)) { return; }
 
         foreach (Effect effect in effects) {
             effect.TriggerEffect();
         }
+
+        executed = true;
     }
 
     // Prematurely end all effects (ahead of their own durations).
