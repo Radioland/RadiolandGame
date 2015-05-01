@@ -62,7 +62,7 @@ public class TransformLerp : MonoBehaviour
     }
 
     private void Update() {
-        if (runningAuto) {
+        if (runningAuto && currentTime < 1f) {
             SetTime(currentTime + Time.deltaTime / duration);
         }
     }
