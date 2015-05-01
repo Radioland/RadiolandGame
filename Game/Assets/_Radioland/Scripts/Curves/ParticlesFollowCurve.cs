@@ -3,6 +3,7 @@
 public class ParticlesFollowCurve : MonoBehaviour
 {
     [SerializeField] private ParticleSystem system;
+    [SerializeField] private bool flickerParticles = true;
     [SerializeField] private ICurve curve;
 
     [SerializeField] [Tooltip("Higher values interpolate to target position faster.")]
@@ -76,6 +77,10 @@ public class ParticlesFollowCurve : MonoBehaviour
                 t = 1f - (particle.lifetime / particle.startLifetime);
             }
             particle.position = Vector3.Lerp(particle.position, curve.GetPoint(t), smoothing);
+
+            if (flickerParticles) {
+                particle.size = Mathf.Lerp(1,0.5f, Random.value);
+            }
 
             particles[i] = particle;
         }
