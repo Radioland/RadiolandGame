@@ -34,6 +34,10 @@ public class LevelSelectController : MonoBehaviour
         if (!lastSelectedGameObject) { return; }
         LevelSelectEntry entry = lastSelectedGameObject.GetComponent<LevelSelectEntry>();
 
+        if (!entry) {
+            return;
+        }
+
         largePreviewImage.sprite = entry.largePreview;
         titleText.text = entry.levelName;
         descriptionText.text = entry.levelDescription;
