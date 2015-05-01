@@ -34,6 +34,8 @@ public class RadioUIGlow : MonoBehaviour
             }
         }
 
+        if (!radioStation) { return; }
+
         float centerX = Mathf.Lerp(leftCenterX, rightCenterX, radioStation.frequency);
 
         Vector2 anchorMin = rectTransform.anchorMin;
