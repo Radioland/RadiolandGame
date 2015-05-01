@@ -4,9 +4,9 @@ using System.Collections;
 
 public class LevelSelectEntry : MonoBehaviour
 {
-    [SerializeField] private Sprite largePreview;
-    [SerializeField] private string levelName;
-    [SerializeField] private string levelDescription;
+    public Sprite largePreview;
+    public string levelName;
+    public string levelDescription;
 
     private void Reset() {
         Image image = gameObject.GetComponent<Image>();
