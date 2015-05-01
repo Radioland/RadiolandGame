@@ -26,6 +26,17 @@ public class SimpleMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Confined;
         #endif
         Cursor.visible = true;
+
+        HandleCheats();
+    }
+
+    private void HandleCheats() {
+        if (Input.GetKeyDown(KeyCode.Equals)) {
+            Application.LoadLevel(Application.loadedLevel + 1);
+        }
+        if (Input.GetKeyDown(KeyCode.Minus)) {
+            Application.LoadLevel(Application.loadedLevel - 1);
+        }
     }
 
     public void LoadLevel(int level) {

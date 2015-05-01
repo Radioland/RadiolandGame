@@ -13,6 +13,7 @@ public class PlayVideo : MonoBehaviour
     private Camera mainCamera;
 
     private const float padding = 1f;
+    private const float skipTimeSinceLoad = 2f;
 
     private void Awake() {
         Renderer myRenderer = gameObject.GetComponent<Renderer>();
@@ -53,7 +54,8 @@ public class PlayVideo : MonoBehaviour
     }
 
     private void Update() {
-        if (Time.time > duration + padding || Input.GetButtonDown("SubmitAny")) {
+        if (Time.time > duration + padding ||
+            (Input.GetButtonDown("SubmitAny") && Time.timeSinceLevelLoad > skipTimeSinceLoad)) {
             menu.LoadNextLevel();
         }
     }
