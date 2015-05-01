@@ -62,10 +62,12 @@ public class RadioControl : MonoBehaviour
 
         maxSignal = 0.0f;
 
-        screenUIObject = (GameObject) GameObject.Instantiate(screenUIPrefab);
-        screenUI = screenUIObject.GetComponent<RadioUI>();
+        if (screenUIPrefab) {
+            screenUIObject = (GameObject) GameObject.Instantiate(screenUIPrefab);
+            screenUI = screenUIObject.GetComponent<RadioUI>();
 
-        radioUIs.Add(screenUI);
+            radioUIs.Add(screenUI);
+        }
 
         ResetStatic();
 
@@ -97,10 +99,12 @@ public class RadioControl : MonoBehaviour
             hidden = !hidden;
         }
 
-        if (Time.timeScale <= 0.001) {
-            radioUIs[1].gameObject.SetActive(false);
-        } else if (!hidden) {
-            radioUIs[1].gameObject.SetActive(true);
+        if (radioUIs.Count > 1) {
+            if (Time.timeScale <= 0.001) {
+                radioUIs[1].gameObject.SetActive(false);
+            } else if (!hidden) {
+                radioUIs[1].gameObject.SetActive(true);
+            }
         }
 
         // Fade glow image based on max signal.
