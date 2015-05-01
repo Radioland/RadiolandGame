@@ -17,9 +17,13 @@ public class RadioStation : MonoBehaviour
     [HideInInspector] public RadioControl radioControl;
     [HideInInspector] public AudioSource audioSource;
 
+    private bool unlockMessageSent;
+
     private void Awake() {
         audioSource = gameObject.GetComponent<AudioSource>();
         audioSource.volume = 0;
+
+        unlockMessageSent = false;
     }
 
     private void Start() {
@@ -29,6 +33,10 @@ public class RadioStation : MonoBehaviour
     }
 
     private void Update() {
+        if (unlocked && !unlockMessageSent) {
+            Unlock();
+        }
+
         if ((!stream || (stream && !stream.streamInitialized)) && (audioSource)) {
             audioSource.enabled = true;
             if (audioSource.clip.loadState == AudioDataLoadState.Unloaded) {
