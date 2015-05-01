@@ -1,1 +1,1 @@
-Press A to jump! You can jump again by hitting the A button a second time!
+Press <color=#008000ff>A</color> to jump! You can jump again by hitting the <color=#008000ff>A</color> button a second time!
