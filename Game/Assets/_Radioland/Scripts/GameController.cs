@@ -96,6 +96,14 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Minus)) {
             Application.LoadLevel(Application.loadedLevel - 1);
         }
+
+        if (Input.GetKeyDown(KeyCode.Keypad1)) { Application.LoadLevel(3); }
+        if (Input.GetKeyDown(KeyCode.Keypad2)) { Application.LoadLevel(5); }
+        if (Input.GetKeyDown(KeyCode.Keypad3)) { Application.LoadLevel(7); }
+        if (Input.GetKeyDown(KeyCode.Keypad4)) { Application.LoadLevel(9); }
+        if (Input.GetKeyDown(KeyCode.Keypad5)) { Application.LoadLevel(11); }
+        if (Input.GetKeyDown(KeyCode.Keypad6)) { Application.LoadLevel(13); }
+        if (Input.GetKeyDown(KeyCode.Keypad7)) { Application.LoadLevel(15); }
     }
 
     public void SetLatestCheckpoint(GameObject checkpoint) {
