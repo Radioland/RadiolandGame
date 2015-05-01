@@ -10,12 +10,10 @@ public class LevelSelectController : MonoBehaviour
     [SerializeField] private Text descriptionText;
     [SerializeField] private Image largePreviewImage;
 
-    private LevelSelectEntry[] levelSelectEntries;
-
     private GameObject lastSelectedGameObject;
 
     private void Awake() {
-        levelSelectEntries = gameObject.GetComponentsInChildren<LevelSelectEntry>();
+
     }
 
     private void Start() {
