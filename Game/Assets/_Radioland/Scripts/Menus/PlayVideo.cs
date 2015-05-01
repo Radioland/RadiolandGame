@@ -54,9 +54,16 @@ public class PlayVideo : MonoBehaviour
     }
 
     private void Update() {
-        if (Time.time > duration + padding ||
+        if (Time.timeSinceLevelLoad > duration + padding ||
             (Input.GetButtonDown("SubmitAny") && Time.timeSinceLevelLoad > skipTimeSinceLoad)) {
             menu.LoadNextLevel();
         }
+    }
+
+    private void LateUpdate() {
+        #if !UNITY_EDITOR
+        Cursor.lockState = CursorLockMode.Confined;
+        #endif
+        Cursor.visible = false;
     }
 }
