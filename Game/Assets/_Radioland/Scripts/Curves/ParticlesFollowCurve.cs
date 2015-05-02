@@ -12,6 +12,8 @@ public class ParticlesFollowCurve : MonoBehaviour
     [SerializeField] [Tooltip("Ignored if the spline does not loop.")]
     private float loopTime = 1f;
 
+    [SerializeField] private Vector2 particleScaleRange = new Vector2(1f, 0.5f);
+
     private bool stopped;
 
     private void Reset() {
@@ -79,7 +81,7 @@ public class ParticlesFollowCurve : MonoBehaviour
             particle.position = Vector3.Lerp(particle.position, curve.GetPoint(t), smoothing);
 
             if (flickerParticles) {
-                particle.size = Mathf.Lerp(1,0.5f, Random.value);
+                particle.size = Mathf.Lerp(particleScaleRange.x,particleScaleRange.y, Random.value);
             }
 
             particles[i] = particle;
