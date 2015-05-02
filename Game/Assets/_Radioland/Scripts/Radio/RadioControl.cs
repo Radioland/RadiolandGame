@@ -113,6 +113,11 @@ public class RadioControl : MonoBehaviour
         }
     }
 
+    public void HideUI() {
+        radioUIs[1].gameObject.SetActive(false);
+        hidden = true;
+    }
+
     private void UpdateStations() {
         anyStrongSignal = stations.Any(station => station.StrongSignal());
         strongestSignal = stations.Max(station => station.signalStrength);

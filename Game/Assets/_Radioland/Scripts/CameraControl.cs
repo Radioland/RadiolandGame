@@ -99,6 +99,8 @@ public class CameraControl : MonoBehaviour
     private float angleUpBackup;
     private bool overridden;
 
+    private bool cutsceneZoom = false;
+
     private void Awake() {
         if (!followTransform) { followTransform = transform; }
         if (!cameraTransform) { cameraTransform = Camera.main.transform; }
@@ -150,6 +152,9 @@ public class CameraControl : MonoBehaviour
         #else
         if (Input.GetKeyDown(KeyCode.Escape)) { mouseLookEnabled = !mouseLookEnabled; }
         #endif
+        if (cutsceneZoom) {
+            maxRadius += 5f;
+        }
     }
 
     private void LateUpdate() {
@@ -481,5 +486,9 @@ public class CameraControl : MonoBehaviour
         overridden = false;
         followTransform = followTransformBackup;
         angleUp = angleUpBackup;
+    }
+
+    public void ZoomOutCutscene() {
+        cutsceneZoom = true;
     }
 }
